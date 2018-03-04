@@ -1,0 +1,98 @@
+﻿@using System.Data
+@model DBTest.DatabaseComparer
+
+@{
+    ViewBag.Title = "title";
+    Layout = "_Layout";
+}
+
+<div class="row">
+    <div class="col-md-5">
+        <h1>@Model.FirstDatabase.SelectedTable</h1>
+        @{
+            DataRowCollection drc1 = Model.FirstDatabase.GetTableInfo(Model.FirstDatabase.SelectedTable).Rows;
+            <table class="table table-bordered table-responsive table-striped">
+                @foreach (DataRow item in drc1)
+                {
+                    <tr>
+                        <td>@item.ItemArray[3]</td>
+                        <td>@item.ItemArray[7]</td>
+                        <td>@item.ItemArray[8]</td>
+                    </tr>
+                }
+            </table>
+        }
+    </div>
+    <div class="col-md-2 arrow-bloc">
+        <div class="arrowup"></div>
+        <div class="arrowdown"></div>
+    </div>
+    <div class="col-md-5 item-list">
+        <h1>@Model.SecondDatabase.SelectedTable</h1>
+        @{
+            DataRowCollection drc2 = Model.SecondDatabase.GetTableInfo(Model.SecondDatabase.SelectedTable).Rows;
+            <table class="table table-bordered table-responsive table-striped drag">
+                @foreach (DataRow item in drc2)
+                {
+                    <tr class="choosed-item">
+                        <td>@item.ItemArray[3]</td>
+                        <td>@item.ItemArray[7]</td>
+                        <td>@item.ItemArray[8]</td>
+                    </tr>
+                }
+            </table>
+        }
+    </div>
+</div>
+
+
+<script>
+    $(function () {
+        $('div.item-list').not('.disabled').find('tr.choosed-item').on('click', function () {
+            $(this).parent().parent().find('tr.choosed-item').removeClass('selected');
+            $(this).addClass('selected');
+        });
+    });
+
+    (function ($) {
+        $.fn.extend({
+            tableAddCounter: function (options) {
+
+                // set up default options
+                var defaults = {
+                    title: '#',
+                    start: 1,
+                    id: false,
+                    cssClass: false
+                };
+
+                // Overwrite default options with user provided
+                var options = $.extend({}, defaults, options);
+
+                return $(this).each(function () {
+                    // Make sure this is a table tag
+                    if ($(this).is('.drag')) {
+
+                        // Add column title unless set to 'false'
+                        if (!options.title) options.title = '';
+                        $('th:first-child, thead td:first-child', this).each(function () {
+                            var tagName = $(this).prop('tagName');
+                            $(this).before('<' + tagName + ' rowspan="' + $('thead tr').length + '" class="' + options.cssClass + '" id="' + options.id + '">' + options.title + '</' + tagName + '>');
+                        });
+
+                        // Add counter starting counter from 'start'
+                        $('tbody td:first-child', this).each(function (i) {
+                            $(this).before('<td>' + (options.start + i) + '</td>');
+                        });
+
+                    }
+                });
+            }
+        });
+    })(jQuery);
+
+    $(document).ready(function () {
+        $('.table').tableAddCounter();
+        $.getScript("http://code.jquery.com/ui/1.9.2/jquery-ui.js").done(function (script, textStatus) { $('tbody').sortable(); $(".alert-info").alert('close'); $(".alert-success").show(); });
+    });
+</script>

@@ -1,0 +1,112 @@
+﻿@using System.Data
+@model DBTest.DatabaseComparer
+
+@{
+    ViewBag.Title = "title";
+    Layout = "_Layout";
+}
+<div class="container-fluid">
+    <form action="/Home/Upload/?id=1" class="dropzone needsclick dz-clickable" id="demo-upload1">
+
+        <h2>@Model.FirstDatabase.connection.DataSource</h2>
+
+        <div class="row-fluid" id="container-table-info">
+
+<<<<<<< HEAD
+            <div class=" table-chooser panel panel-default panel-table">
+                @{
+                    List<String> drcFirstDBNamesTB = Model.FirstDatabase.GetTablesList("TeamBuilding");
+=======
+<h2>FirstDatabase</h2>
+
+<div class="row-fluid" id="container-table-info">
+    <div class="panel panel-default panel-table">
+        @{ 
+            DataRowCollection drc = Model.FirstDatabase.GetTableInfo("TeamBuilding").Rows;
+        }
+        <div class="panel-heading">
+            <div class="tr">
+                @foreach (DataRow item in drc)
+                {
+                <div class="td">  @item.ItemArray[3] </div>
+>>>>>>> b49e4bed64c69e0fe1e34553552d327a3fa0f8d8
+                }
+                <div class="panel-body">
+
+                    <div class="tr">
+                        @foreach (String nameTB in drcFirstDBNamesTB)
+                        {
+
+                            <div class="td table-chooser-item">
+                                <p class="TbName"> <strong> @nameTB </strong></p>
+                                <br />
+                                @foreach (DataRow typesTB in Model.FirstDatabase.GetTableInfo(nameTB).Rows)
+                                {
+                                    <p class="TbType"> @typesTB.ItemArray[3]</p>
+                                }
+                                <input class="tableRadio" type="radio" name="FirstDatabase" value=@nameTB checked="checked">
+                            </div>
+                        }
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <form action="/Home/Upload/?id=2" class="dropzone needsclick dz-clickable" id="demo-upload2">
+
+        <h2>@Model.FirstDatabase.connection.DataSource</h2>
+
+        <div class="row-fluid" id="container-table-info">
+
+            <div class=" table-chooser panel panel-default panel-table">
+                @{
+                    List<String> drcSecondDBNamesTB = Model.SecondDatabase.GetTablesList("TeamBuilding");
+                }
+                <div class="panel-body">
+
+                    <div class="tr">
+                        @foreach (String nameTB in drcSecondDBNamesTB)
+                        {
+
+                            <div class="td table-chooser-item">
+                                <p class="TbName"> <strong> @nameTB </strong></p>
+                                <br />
+                                @foreach (DataRow typesTB in Model.SecondDatabase.GetTableInfo(nameTB).Rows)
+                                {
+                                    <p class="TbType"> @typesTB.ItemArray[3]</p>
+                                }
+                                <input class="tableRadio" type="radio" name="SecondDatabase" value=@nameTB checked="checked">
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="container-fluid">
+    <h6><button type="button" class="btn-lg" id="GoToColumnMapping">Check Columns</button></h6>
+</div> 
+    <script type="text/javascript">
+        $(function () {
+            $('div.table-chooser').find('div.table-chooser-item').on('click', function () {
+                $(this).parent().parent().find('div.table-chooser-item').removeClass('selected');
+                $(this).addClass('selected');
+                $(this).find('input[type="radio"]').prop("checked", true);
+            });
+        });
+
+
+        $("#GoToColumnMapping").click(function () {
+            $.ajax({
+                url: "ColumnMapping",
+                type: "get",
+                success: function (result) {
+                    $("#Partial").html(result);
+                }
+            });
+        })
+    </script>
+

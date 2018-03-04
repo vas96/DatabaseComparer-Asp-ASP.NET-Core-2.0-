@@ -1,0 +1,161 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Comparer.Models;
+using DbComparer;
+using DBTest;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Net.Http.Headers;
+
+namespace Comparer.Controllers
+{
+    public class HomeController : Controller
+    {
+        private DatabaseComparer db;
+
+        private readonly IHostingEnvironment _hostingEnvironment;
+<<<<<<< HEAD
+
+        public HomeController(IHostingEnvironment hostingEnvironment, DatabaseComparer context)
+=======
+        
+        public HomeController(DatabaseComparer context, IHostingEnvironment hostingEnvironment)
+>>>>>>> b49e4bed64c69e0fe1e34553552d327a3fa0f8d8
+        {
+            db = context;
+            _hostingEnvironment = hostingEnvironment;
+        }
+
+        #region Pages
+
+        public IActionResult Index()
+        {
+            db.CloseAllConnections();
+            return View();
+        }
+
+        public IActionResult Comparer()
+        {
+            db.CloseAllConnections();
+            return View(db);
+        }
+
+        public IActionResult About()
+        {
+            db.CloseAllConnections();
+            ViewData["Message"] = "Your application description page.";
+            var db1 = db.FirstDatabase;
+            db1 = new SqlDataBaseConnector();
+            db1.ConnectToDatabase("Repair");
+            return View(db1);
+        }
+
+        public IActionResult Contact()
+        {
+            db.CloseAllConnections();
+            ViewData["Message"] = "Your contact page.";
+            return View();
+        }
+
+        #endregion
+
+        #region Error
+
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        #endregion
+
+        #region Partial
+
+        public IActionResult FilesDownloaded()
+        {
+            return PartialView("_DownloadFiles", db);
+        }
+
+        public IActionResult SelectTable()
+        {
+            return PartialView("_SelectTable", db);
+        }
+
+        public IActionResult TableInfo()
+        {
+            return PartialView("_TableInfo", db);
+        }
+<<<<<<< HEAD
+
+        public IActionResult CollumnMapping()
+        {
+            //FOR TEST
+            db.FirstDatabase.SelectedTable = "Projects";
+            db.SecondDatabase.SelectedTable = "Users";
+            //
+=======
+        public IActionResult ColumnMapping()
+        {
+            db.FirstDatabase.SelectedTable = "Projects";
+            db.SecondDatabase.SelectedTable = "Users";
+>>>>>>> b49e4bed64c69e0fe1e34553552d327a3fa0f8d8
+            return PartialView("_ColumnMapping", db);
+        }
+
+
+        #endregion
+
+        #region UploadFile
+
+        [HttpPost]
+        public void Upload(IFormFile file, int? id)
+        {
+            if (file != null)
+            {
+<<<<<<< HEAD
+
+
+                string path = _hostingEnvironment.WebRootPath+"\\Uploads\\File"+id+"_" + file.FileName;
+                using (var fileStream = new FileStream(path, FileMode.Append))
+
+=======
+                string path = _hostingEnvironment.WebRootPath+"\\Uploads\\File"+id+"_" + file.FileName;
+                using (var fileStream = new FileStream(path, FileMode.Append))
+>>>>>>> b49e4bed64c69e0fe1e34553552d327a3fa0f8d8
+                {
+                    var fileWriter = new StreamWriter(fileStream);
+                    fileWriter.AutoFlush = true;
+                    file.CopyTo(fileStream);
+                }
+                Database dbase = new SqlDataBaseConnector();
+<<<<<<< HEAD
+                var connected=dbase.ConnectToFile(path);
+=======
+                var a=dbase.ConnectToFile(path);
+>>>>>>> b49e4bed64c69e0fe1e34553552d327a3fa0f8d8
+                switch (id)
+                {
+                    case 1:
+                        {
+                            db.FirstDatabase = dbase;
+                            break;
+                        }
+                    case 2:
+                        {
+                            db.SecondDatabase = dbase;
+                            break;
+                        }
+                }
+            } 
+            return;
+        }
+        #endregion
+    }
+}
