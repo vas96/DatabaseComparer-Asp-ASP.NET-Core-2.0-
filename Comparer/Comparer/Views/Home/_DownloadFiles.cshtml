@@ -1,0 +1,38 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+<h1>Upload databases</h1>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="container-fluid col-md-6" id="Drop1">
+            <form action="/Home/Upload/?id=1" class="dropzone needsclick dz-clickable" id="demo-upload1">
+                <div class="dz-message needsclick">
+                    Drop files here or click to upload.<br>
+                </div>
+            </form>
+        </div>
+
+        <div class="container-fluid col-md-6" id="Drop2">
+            <form action="/Home/Upload/?id=2" class="dropzone needsclick dz-clickable" id="demo-upload2">
+                <div class="dz-message needsclick">
+                    Drop files here or click to upload.<br>
+                </div>
+            </form>
+        </div>
+    </div>
+    <h6><button type="button" class="btn-lg" id="NextStep">NEXT STEP</button></h6>
+    
+
+    <script>
+        $("#NextStep").click(function () {
+            $.ajax({
+                url: "ColumnMapping",
+                type: "get",
+                success: function (result) {
+                    $("#Partial").html(result);
+                }
+            });
+        })
+    </script>
+</div>

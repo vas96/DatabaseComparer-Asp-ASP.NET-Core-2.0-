@@ -1,0 +1,41 @@
+﻿@model DBTest.DatabaseComparer
+@using System.Data
+@{
+    ViewBag.Title = "title";
+    Layout = "_Layout";
+}
+
+<h2>FirstDatabase</h2>
+
+<div class="row-fluid" id="container-table-info">
+    <div class="panel panel-default panel-table">
+        @{ 
+            DataRowCollection drc = Model.FirstDatabase.GetTableInfo("TeamBuilding").Rows;
+        }
+        <div class="panel-heading">
+            <div class="tr">
+                @foreach (DataRow item in drc)
+                {
+                <div class="td">  @item.ItemArray[3] </div>
+                }
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="tr">
+                <div class="td"><p>ffdfsdfsfdsffdsfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsddsfs<p>   Lorem ipsum dolor sit amet, consectetur adipisicing elit. Similique facere necessitatibus quo laboriosam consequuntur</div>
+                <div class="td"><p>ffdfsdfsfdsffdsfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsddsfs<p></p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Excepturi aliquam placeat odit quasi autem distinctio veritatis ex numquam nihil</div>
+                <div class="td"><p>ffdfsdfsfdsffdsfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsddsfs<p></p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Excepturi aliquam placeat odit quasi autem distinctio veritatis ex numquam nihil nulla tempora a dolorem omnis beatae facilis perspiciatis doloribus? Error dolore!</div>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <div class="tr">
+                <div class="td">footer</div>
+                <div class="td">footer</div>
+                <div class="td">footer</div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+

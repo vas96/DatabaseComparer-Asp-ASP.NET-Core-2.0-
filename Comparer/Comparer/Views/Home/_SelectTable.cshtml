@@ -1,0 +1,59 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@using DbComparer
+@model DBTest.DatabaseComparer
+<h1>Select tables to compare</h1>
+
+<div class="container-fluid">
+    @{
+        Database db1 = Model.FirstDatabase;
+        Database db2 = Model.SecondDatabase;
+        List<string> list1 = db1.GetTablesList("TeamBuilding");
+        List<string> list2 = db2.GetTablesList("TeamBuilding");
+    }
+    <div class="row">
+        <div class="col-md-6">
+            <form>
+                <table>
+                    @foreach (var item in list1)
+                {
+                    <tr>
+                        <td>
+                            <input type="radio" name="table"/> @item
+                        </td>
+                    </tr>
+                }
+                </table>
+            </form>
+        </div>
+        <div class="col-md-6">
+            <form>
+                <table>
+                    @foreach (var item in list2)
+                    {
+                    <tr>
+                        <td>
+                            <input type="radio" name="table" /> @item
+                        </td>
+                    </tr>
+                    }
+                </table>
+            </form>
+        </div>
+    </div>
+
+    <h6><button type="button" class="btn-lg" id="NextStep">NEXT STEP</button></h6>
+
+    <script>
+        $("#NextStep").click(function () {
+            $.ajax({
+                url: "Comparing",
+                type: "get",
+                success: function (result) {
+                    $("#Partial").html(result);
+                }
+            });
+        })
+    </script>
+</div>
