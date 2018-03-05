@@ -59,16 +59,16 @@ div.item-list {
         }
 
 div.arrowup {
-    width: 0; 
-    height: 0; 
+    width: 0;
+    height: 0;
     border-left: 60px solid transparent;
     border-right: 60px solid transparent;
     border-bottom: 60px solid #337ab7;
 }
 
 div.arrowdown {
-    width: 0; 
-    height: 0; 
+    width: 0;
+    height: 0;
     border-left: 60px solid transparent;
     border-right: 60px solid transparent;
     border-top: 60px solid #5bc0de;
@@ -99,6 +99,7 @@ div.arrowdown {
     text-align: center;
     cursor: move;
 }
+
     .column tr {
         padding-top: 3%;
         padding-bottom: 3%;
@@ -112,13 +113,37 @@ div.arrowdown {
         border: 2px solid #666666;
     }
 
-.column.dragElem {
-    opacity: 0.4;
-}
-.column.over {
-    border: 2px solid blue;
+    .column.dragElem {
+        opacity: 0.4;
+    }
+
+    .column.over {
+        border: 2px solid blue;
+    }
+
+
+.arrow_box {
+    position: relative;
+    border: 4px solid #c2e1f5;
 }
 
+    .arrow_box:after, .arrow_box:before {
+        left: 100%;
+        top: 50%;
+        border: solid transparent;
+        content: " ";
+        height: 0;
+        width: 0;
+        position: absolute;
+        pointer-events: none;
+    }
+
+    .arrow_box:before {
+        border-color: rgba(194, 225, 245, 0);
+        border-left-color: #c2e1f5;
+        border-width: 18px;
+        margin-top: -18px;
+    }
 
 /*--------------------------------------------------*/
 
