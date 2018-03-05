@@ -15,22 +15,65 @@ namespace DbComparer
 {
     interface IDatabase
     {
+        /// <summary>
+        /// Підключення до сервера
+        /// </summary>
+        /// <returns>True якщо підключення встановлено</returns>
         bool ConnectToServer();
 
+        /// <summary>
+        /// Підключення до конктретної бази даних на сервері
+        /// </summary>
+        /// <param name="databaseName">Ім'я бази даних</param>
+        /// <returns>True якщо підключення встановлено</returns>
         bool ConnectToDatabase(string databaseName);
 
+        /// <summary>
+        /// Підключення до файлу бази данних
+        /// </summary> 
+        /// <param name="location">Шлях до файлу. Якщо не заданий - заново відкривається підключення</param>
+        /// <returns>True, якщо підключення встановлено</returns>
         bool ConnectToFile(string location = null);
 
+        /// <summary>
+        /// Повертає список баз даних на сервері
+        /// </summary>
+        /// <returns></returns>
         List<string> GetDatabasesList();
 
+        /// <summary>
+        /// Повертає список таблиць у базі даних (файлі чи сервері)
+        /// </summary>
+        /// <param name="database"></param>
+        /// <returns></returns>
         List<string> GetTablesList(string database);
 
+        /// <summary>
+        /// Повертає всю інформацію про колонки у таблиці
+        /// </summary>
+        /// <param name="tableName">Назва таблиці. Якщо null - по замовчуванню обирається SelectedTable</param>
+        /// <returns></returns>
         DataTable GetTableInfo(string tableName);
 
+        /// <summary>
+        /// Зчитує дані з таблиці
+        /// </summary>
+        /// <typeparam name="Selected">String</typeparam>
+        /// <param name="query">Запит</param>
+        /// <param name="selector">Селектор (міститься у БД)</param>
+        /// <returns></returns>
         Selected[] Read<Selected>(string query, Func<IDataRecord, Selected> selector);
 
+        /// <summary>
+        /// Закриває підключення
+        /// </summary>
         void CloseConnection();
 
+        /// <summary>
+        /// Будує стандартний запит на вибірку
+        /// </summary>
+        /// <param name="table">Ім'я таблиці. Якщо null - використовується SelectedTable</param>
+        /// <returns></returns>
         string BuildSelectQuery(string table = null);
 
     }
@@ -45,7 +88,7 @@ namespace DbComparer
 
         public DbConnection connection;
 
-        public List<string> CollumnList;
+        public Columns TableColumns;
 
         public Func<IDataRecord, string> ParticallSelector = delegate (IDataRecord s)
         {
@@ -81,7 +124,7 @@ namespace DbComparer
         public string BuildSelectQuery(string table = null)
         {
             string Select = "SELECT ";
-            foreach (var item in CollumnList)
+            foreach (var item in TableColumns.SelectedColumns)
             {
                 Select += item + ", ";
             }
@@ -115,14 +158,16 @@ namespace DbComparer
         }
 
 
-        public static Database InitializeType(Database_Type dt)
+        public static Database InitializeType(IFormFile file)
         {
-            switch (dt)
+
+            Database.Database_Type type = Database.GetDBType(file);
+            switch (type)
             {
                 case Database_Type.MySql:
-                    { return new MySqlDataBaseConnector(); break; }
+                    { return new MySqlDataBaseConnector() { DbType = Database_Type.MySql }; break; }
                 case Database_Type.SqlServer:
-                    { return new SqlDataBaseConnector(); break; }
+                    { return new SqlDataBaseConnector() { DbType = Database_Type.SqlServer }; ; break; }
                 default:
                     {
                         return null;
@@ -140,6 +185,26 @@ namespace DbComparer
             XML,
             NONE
         }
+
+        public class Columns
+        {
+            public List<string> Name;
+            public List<string> Type;
+            public List<string> Length;
+
+            public List<string> SelectedColumns;
+
+            public Columns(DataTable dt)
+            {
+                DataRowCollection drc = dt.Rows;
+                foreach (DataRow row in drc)
+                {
+                    Name.Add(row.ItemArray[3].ToString());
+                    Type.Add(row.ItemArray[7].ToString());
+                    Length.Add(row.ItemArray[8].ToString());
+                }
+            }
+        }
     }
 
     public class SqlDataBaseConnector : Database
@@ -147,7 +212,6 @@ namespace DbComparer
         public SqlDataBaseConnector()
         {
             DataConnectionString = "Data Source=.; Integrated Security=True;";
-            CollumnList = new List<string>();
         }
 
         public override bool ConnectToServer()
@@ -227,7 +291,7 @@ namespace DbComparer
             return list;
         }
 
-        public override DataTable GetTableInfo(string tableName)
+        public override DataTable GetTableInfo(string tableName = null)
         {
 
             try
@@ -237,7 +301,10 @@ namespace DbComparer
                 // For the array, 0-member represents Catalog; 1-member represents Schema; 
                 // 2-member represents Table Name; 3-member represents Column Name. 
                 // Now we specify the Table_Name and Column_Name of the columns what we want to get schema information.
-                columnRestrictions[2] = tableName;
+                if (tableName == null)
+                    columnRestrictions[2] = SelectedTable;
+                else
+                    columnRestrictions[2] = tableName;
 
                 DataTable departmentIDSchemaTable = connection.GetSchema("Columns", columnRestrictions);
                 return departmentIDSchemaTable;
@@ -254,13 +321,13 @@ namespace DbComparer
             {
                 using (var cmd = connection.CreateCommand())
                 {
-                    if (CollumnList.Count == 0)
+                    if (TableColumns.SelectedColumns.Count == 0)
                     {
                         counter = GetTableInfo(SelectedTable).Rows.Count;
                     }
                     else
                     {
-                        counter = CollumnList.Count;
+                        counter = TableColumns.SelectedColumns.Count;
                     }
                     cmd.CommandText = query;
                     using (var r = cmd.ExecuteReader())

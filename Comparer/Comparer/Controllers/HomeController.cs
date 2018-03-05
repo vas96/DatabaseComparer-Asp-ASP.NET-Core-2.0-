@@ -76,18 +76,32 @@ namespace Comparer.Controllers
 
         public IActionResult TableInfo()
         {
+            if ((db.FirstDatabase.connection == null || db.FirstDatabase.connection.State != ConnectionState.Open) ||
+                (db.SecondDatabase.connection == null || db.SecondDatabase.connection.State != ConnectionState.Open))
+                return PartialView("_Error");
             return PartialView("_TableInfo", db);
         }
 
         public IActionResult ColumnMapping()
         {
+            //For test
             db.FirstDatabase.SelectedTable = "Projects";
             db.SecondDatabase.SelectedTable = "Users";
+            //
+            if (db.FirstDatabase.SelectedTable=="" || db.SecondDatabase.SelectedTable == "")
+                return PartialView("_Error");
             return PartialView("_ColumnMapping", db);
         }
 
         public IActionResult Comparing(string[] array)
         {
+            if (array.Length==0)
+                return PartialView("_Error");
+            DataRowCollection drc1 = db.FirstDatabase.GetTableInfo(db.FirstDatabase.SelectedTable).Rows;
+            DataRowCollection drc2 = db.SecondDatabase.GetTableInfo(db.SecondDatabase.SelectedTable).Rows;
+            int min = Math.Min(drc1.Count, drc2.Count);
+            
+
             return PartialView("_Comparing", db);
         }
 
@@ -112,9 +126,7 @@ namespace Comparer.Controllers
                     file.CopyTo(fileStream);
                 }
 
-                Database.Database_Type type = Database.GetDBType(file);
-                Database dbase = Database.InitializeType(type);
-                dbase.DbType = type;
+                Database dbase = Database.InitializeType(file);
                 var a = dbase.ConnectToFile(path);
                 switch (id)
                 {
