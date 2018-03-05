@@ -80,7 +80,19 @@ namespace DbComparer
 
     public abstract class Database : IDatabase
     {
-        public string DataConnectionString = null;
+        /// <summary>
+        /// ІНІЦІАЛІЗАЦІЯ...
+        /// </summary>
+        public Database()
+        {
+            DataConnectionString = null;
+            SelectedTable = null;
+            SelectedDatabase = null;
+            connection = null;
+            TableColumns = new List<Column>();
+            SelectedColumns = new List<string>();
+        }
+        public string DataConnectionString;
 
         public string SelectedDatabase;
 
@@ -88,7 +100,9 @@ namespace DbComparer
 
         public DbConnection connection;
 
-        public Columns TableColumns;
+        public List<Column> TableColumns;
+
+        public List<string> SelectedColumns;
 
         public Func<IDataRecord, string> ParticallSelector = delegate (IDataRecord s)
         {
@@ -115,7 +129,7 @@ namespace DbComparer
         public abstract bool ConnectToFile(string location = null);
         public abstract List<string> GetDatabasesList();
         public abstract List<string> GetTablesList(string database);
-        public abstract DataTable GetTableInfo(string tableName);
+        public abstract DataTable GetTableInfo(string tableName=null);
 
         public abstract Selected[] Read<Selected>(string query, Func<IDataRecord, Selected> selector);
 
@@ -124,7 +138,7 @@ namespace DbComparer
         public string BuildSelectQuery(string table = null)
         {
             string Select = "SELECT ";
-            foreach (var item in TableColumns.SelectedColumns)
+            foreach (var item in SelectedColumns)
             {
                 Select += item + ", ";
             }
@@ -186,30 +200,25 @@ namespace DbComparer
             NONE
         }
 
-        public class Columns
+        public class Column
         {
-            public List<string> Name;
-            public List<string> Type;
-            public List<string> Length;
+            public string Name;
+            public string Type;
+            public string Length;
 
-            public List<string> SelectedColumns;
-
-            public Columns(DataTable dt)
+            public Column(DataRow dr)
             {
-                DataRowCollection drc = dt.Rows;
-                foreach (DataRow row in drc)
-                {
-                    Name.Add(row.ItemArray[3].ToString());
-                    Type.Add(row.ItemArray[7].ToString());
-                    Length.Add(row.ItemArray[8].ToString());
-                }
+                var array = dr.ItemArray;
+                Name = array[3].ToString();
+                Type = array[7].ToString();
+                Length = array[8].ToString();
             }
         }
     }
 
     public class SqlDataBaseConnector : Database
     {
-        public SqlDataBaseConnector()
+        public SqlDataBaseConnector():base()
         {
             DataConnectionString = "Data Source=.; Integrated Security=True;";
         }
@@ -307,6 +316,14 @@ namespace DbComparer
                     columnRestrictions[2] = tableName;
 
                 DataTable departmentIDSchemaTable = connection.GetSchema("Columns", columnRestrictions);
+                TableColumns.Clear();
+                DataView dv = departmentIDSchemaTable.DefaultView;
+                departmentIDSchemaTable.DefaultView.Sort = "ORDINAL_POSITION Asc";
+                var SortedView = dv.ToTable();
+                foreach (DataRow row in SortedView.Rows)
+                {
+                    TableColumns.Add(new Column(row));
+                }
                 return departmentIDSchemaTable;
             }
             catch (Exception ex)
@@ -321,13 +338,13 @@ namespace DbComparer
             {
                 using (var cmd = connection.CreateCommand())
                 {
-                    if (TableColumns.SelectedColumns.Count == 0)
+                    if (SelectedColumns.Count == 0)
                     {
                         counter = GetTableInfo(SelectedTable).Rows.Count;
                     }
                     else
                     {
-                        counter = TableColumns.SelectedColumns.Count;
+                        counter = SelectedColumns.Count;
                     }
                     cmd.CommandText = query;
                     using (var r = cmd.ExecuteReader())
@@ -349,7 +366,7 @@ namespace DbComparer
 
     public class MySqlDataBaseConnector : Database
     {
-        public MySqlDataBaseConnector()
+        public MySqlDataBaseConnector():base()
         {
             DataConnectionString = "SERVER=localhost;UID='root';" + "PASSWORD='';";
         }

@@ -1,4 +1,5 @@
 ﻿@using System.Data
+@using DbComparer
 @model DBTest.DatabaseComparer
 
 @{
@@ -10,14 +11,13 @@
     <div class="col-md-6">
         <h1>@Model.FirstDatabase.SelectedTable</h1>
         @{
-            DataRowCollection drc1 = Model.FirstDatabase.GetTableInfo(Model.FirstDatabase.SelectedTable).Rows;
             <table class="table table-bordered table-responsive table-striped">
-                @foreach (DataRow item in drc1)
+                @foreach (Database.Column item in Model.FirstDatabase.TableColumns)
                 {
                     <tr>
-                        <td>@item.ItemArray[3]</td>
-                        <td>@item.ItemArray[7]</td>
-                        <td>@item.ItemArray[8]</td>
+                        <td>@item.Name</td>
+                        <td>@item.Type</td>
+                        <td>@item.Length</td>
                     </tr>
                 }
             </table>
@@ -26,14 +26,13 @@
     <div class="col-md-6 item-list">
         <h1>@Model.SecondDatabase.SelectedTable</h1>
         @{
-            DataRowCollection drc2 = Model.SecondDatabase.GetTableInfo(Model.SecondDatabase.SelectedTable).Rows;
             <table class="table table-bordered table-responsive table-striped drag">
-                @foreach (DataRow item in drc2)
+                @foreach (Database.Column item in Model.SecondDatabase.TableColumns)
                 {
-                    <tr class="choosed-item">
-                        <td>@item.ItemArray[3]</td>
-                        <td>@item.ItemArray[7]</td>
-                        <td>@item.ItemArray[8]</td>
+                    <tr>
+                        <td>@item.Name</td>
+                        <td>@item.Type</td>
+                        <td>@item.Length</td>
                     </tr>
                 }
             </table>

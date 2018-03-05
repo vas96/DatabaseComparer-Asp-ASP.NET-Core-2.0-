@@ -55,5 +55,13 @@ namespace DBTest
             var list3 = list1.Union(list2);
             return list3;
         }
+
+        public void CloseConnection()
+        {
+            if (FirstDatabase!= null && FirstDatabase.connection != null)
+                FirstDatabase.CloseConnection();
+            if (SecondDatabase != null && SecondDatabase.connection != null)
+                SecondDatabase.CloseConnection();
+        }
     }
 }

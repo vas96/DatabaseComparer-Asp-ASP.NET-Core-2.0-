@@ -33,16 +33,19 @@ namespace Comparer.Controllers
 
         public IActionResult Index()
         {
+            db.CloseConnection();
             return View();
         }
 
         public IActionResult Comparer()
         {
+            db.CloseConnection();
             return View(db);
         }
 
         public IActionResult About()
         {
+            db.CloseConnection();
             ViewData["Message"] = "Your application description page.";
             var db1 = db.FirstDatabase;
             db1 = new SqlDataBaseConnector();
@@ -52,6 +55,7 @@ namespace Comparer.Controllers
 
         public IActionResult Contact()
         {
+            db.CloseConnection();
             ViewData["Message"] = "Your contact page.";
             return View();
         }
@@ -90,6 +94,8 @@ namespace Comparer.Controllers
             //
             if (db.FirstDatabase.SelectedTable=="" || db.SecondDatabase.SelectedTable == "")
                 return PartialView("_Error");
+            db.FirstDatabase.GetTableInfo();
+            db.SecondDatabase.GetTableInfo();
             return PartialView("_ColumnMapping", db);
         }
 
@@ -97,10 +103,16 @@ namespace Comparer.Controllers
         {
             if (array.Length==0)
                 return PartialView("_Error");
-            DataRowCollection drc1 = db.FirstDatabase.GetTableInfo(db.FirstDatabase.SelectedTable).Rows;
-            DataRowCollection drc2 = db.SecondDatabase.GetTableInfo(db.SecondDatabase.SelectedTable).Rows;
-            int min = Math.Min(drc1.Count, drc2.Count);
-            
+            int min = Math.Min(db.FirstDatabase.TableColumns.Count, db.SecondDatabase.TableColumns.Count);
+            for (int i = 0; i < min; i++)
+            {
+                db.FirstDatabase.SelectedColumns.Add(db.FirstDatabase.TableColumns[i].Name);
+                foreach (var column in db.SecondDatabase.TableColumns)
+                {
+                    if (column.Name==array[i])
+                        db.SecondDatabase.SelectedColumns.Add(array[i]);
+                }
+            }
 
             return PartialView("_Comparing", db);
         }
