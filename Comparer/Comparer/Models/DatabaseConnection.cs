@@ -178,15 +178,9 @@ namespace DbComparer
         {
             try
             {
-<<<<<<< HEAD
                 if(location!=null)
                 DataConnectionString =
                     "Data Source=(localdb)\\MSSQLLocalDB;AttachDbFilename="+location+";Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False;";
-=======
-                if (location != null)
-                    DataConnectionString =
-                        "Data Source=(localdb)\\MSSQLLocalDB;AttachDbFilename=" + location + ";Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False;";
->>>>>>> b49e4bed64c69e0fe1e34553552d327a3fa0f8d8
                 connection = new SqlConnection(DataConnectionString);
                 connection.Open();
                 return true;
@@ -382,13 +376,7 @@ namespace DbComparer
             try
             {
                 String[] columnRestrictions = new String[4];
-<<<<<<< HEAD
 
-                // For the array, 0-member represents Catalog; 1-member represents Schema; 
-                // 2-member represents Table Name; 3-member represents Column Name. 
-                // Now we specify the Table_Name and Column_Name of the columns what we want to get schema information.
-=======
->>>>>>> b49e4bed64c69e0fe1e34553552d327a3fa0f8d8
                 columnRestrictions[2] = tableName;
 
                 DataTable departmentIDSchemaTable = connection.GetSchema("Columns", columnRestrictions);

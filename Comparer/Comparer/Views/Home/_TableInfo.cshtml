@@ -12,25 +12,11 @@
 
         <div class="row-fluid" id="container-table-info">
 
-<<<<<<< HEAD
             <div class=" table-chooser panel panel-default panel-table">
                 @{
-                    List<String> drcFirstDBNamesTB = Model.FirstDatabase.GetTablesList("TeamBuilding");
-=======
-<h2>FirstDatabase</h2>
+                    List<String> drcFirstDBNamesTB = Model.FirstDatabase.GetTablesList("TeamBuilding"); 
+                    }
 
-<div class="row-fluid" id="container-table-info">
-    <div class="panel panel-default panel-table">
-        @{ 
-            DataRowCollection drc = Model.FirstDatabase.GetTableInfo("TeamBuilding").Rows;
-        }
-        <div class="panel-heading">
-            <div class="tr">
-                @foreach (DataRow item in drc)
-                {
-                <div class="td">  @item.ItemArray[3] </div>
->>>>>>> b49e4bed64c69e0fe1e34553552d327a3fa0f8d8
-                }
                 <div class="panel-body">
 
                     <div class="tr">

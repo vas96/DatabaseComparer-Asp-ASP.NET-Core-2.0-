@@ -27,11 +27,7 @@
     <script>
         $("#NextStep").click(function () {
             $.ajax({
-<<<<<<< HEAD
                 url: "TableInfo",
-=======
-                url: "ColumnMapping",
->>>>>>> b49e4bed64c69e0fe1e34553552d327a3fa0f8d8
                 type: "get",
                 success: function (result) {
                     $("#Partial").html(result);

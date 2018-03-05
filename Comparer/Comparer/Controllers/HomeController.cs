@@ -22,13 +22,9 @@ namespace Comparer.Controllers
         private DatabaseComparer db;
 
         private readonly IHostingEnvironment _hostingEnvironment;
-<<<<<<< HEAD
 
-        public HomeController(IHostingEnvironment hostingEnvironment, DatabaseComparer context)
-=======
         
         public HomeController(DatabaseComparer context, IHostingEnvironment hostingEnvironment)
->>>>>>> b49e4bed64c69e0fe1e34553552d327a3fa0f8d8
         {
             db = context;
             _hostingEnvironment = hostingEnvironment;
@@ -92,20 +88,13 @@ namespace Comparer.Controllers
         {
             return PartialView("_TableInfo", db);
         }
-<<<<<<< HEAD
 
-        public IActionResult CollumnMapping()
-        {
-            //FOR TEST
-            db.FirstDatabase.SelectedTable = "Projects";
-            db.SecondDatabase.SelectedTable = "Users";
-            //
-=======
+
         public IActionResult ColumnMapping()
         {
             db.FirstDatabase.SelectedTable = "Projects";
             db.SecondDatabase.SelectedTable = "Users";
->>>>>>> b49e4bed64c69e0fe1e34553552d327a3fa0f8d8
+
             return PartialView("_ColumnMapping", db);
         }
 
@@ -119,27 +108,20 @@ namespace Comparer.Controllers
         {
             if (file != null)
             {
-<<<<<<< HEAD
-
 
                 string path = _hostingEnvironment.WebRootPath+"\\Uploads\\File"+id+"_" + file.FileName;
                 using (var fileStream = new FileStream(path, FileMode.Append))
-
-=======
-                string path = _hostingEnvironment.WebRootPath+"\\Uploads\\File"+id+"_" + file.FileName;
-                using (var fileStream = new FileStream(path, FileMode.Append))
->>>>>>> b49e4bed64c69e0fe1e34553552d327a3fa0f8d8
                 {
                     var fileWriter = new StreamWriter(fileStream);
                     fileWriter.AutoFlush = true;
                     file.CopyTo(fileStream);
                 }
                 Database dbase = new SqlDataBaseConnector();
-<<<<<<< HEAD
+
                 var connected=dbase.ConnectToFile(path);
-=======
+
                 var a=dbase.ConnectToFile(path);
->>>>>>> b49e4bed64c69e0fe1e34553552d327a3fa0f8d8
+
                 switch (id)
                 {
                     case 1:
