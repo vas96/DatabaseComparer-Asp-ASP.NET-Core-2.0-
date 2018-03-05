@@ -22,7 +22,7 @@ namespace Comparer.Controllers
         private DatabaseComparer db;
 
         private readonly IHostingEnvironment _hostingEnvironment;
-        
+
         public HomeController(DatabaseComparer context, IHostingEnvironment hostingEnvironment)
         {
             db = context;
@@ -74,15 +74,11 @@ namespace Comparer.Controllers
             return PartialView("_DownloadFiles", db);
         }
 
-        public IActionResult SelectTable()
-        {
-            return PartialView("_SelectTable", db);
-        }
-
         public IActionResult TableInfo()
         {
             return PartialView("_TableInfo", db);
         }
+
         public IActionResult ColumnMapping()
         {
             db.FirstDatabase.SelectedTable = "Projects";
@@ -90,7 +86,15 @@ namespace Comparer.Controllers
             return PartialView("_ColumnMapping", db);
         }
 
+        public IActionResult Comparing(string[] array)
+        {
+            return PartialView("_Comparing", db);
+        }
 
+        public IActionResult SelectTable()
+        {
+            return PartialView("_SelectTable", db);
+        }
         #endregion
 
         #region UploadFile
@@ -100,15 +104,18 @@ namespace Comparer.Controllers
         {
             if (file != null)
             {
-                string path = _hostingEnvironment.WebRootPath+"\\Uploads\\File"+id+"_" + file.FileName;
+                string path = _hostingEnvironment.WebRootPath + "\\Uploads\\File" + id + "_" + file.FileName;
                 using (var fileStream = new FileStream(path, FileMode.Append))
                 {
                     var fileWriter = new StreamWriter(fileStream);
                     fileWriter.AutoFlush = true;
                     file.CopyTo(fileStream);
                 }
-                Database dbase = new SqlDataBaseConnector();
-                var a=dbase.ConnectToFile(path);
+
+                Database.Database_Type type = Database.GetDBType(file);
+                Database dbase = Database.InitializeType(type);
+                dbase.DbType = type;
+                var a = dbase.ConnectToFile(path);
                 switch (id)
                 {
                     case 1:
@@ -122,7 +129,7 @@ namespace Comparer.Controllers
                             break;
                         }
                 }
-            } 
+            }
             return;
         }
         #endregion

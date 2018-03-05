@@ -7,7 +7,7 @@
 }
 
 <div class="row">
-    <div class="col-md-5">
+    <div class="col-md-6">
         <h1>@Model.FirstDatabase.SelectedTable</h1>
         @{
             DataRowCollection drc1 = Model.FirstDatabase.GetTableInfo(Model.FirstDatabase.SelectedTable).Rows;
@@ -23,11 +23,7 @@
             </table>
         }
     </div>
-    <div class="col-md-2 arrow-bloc">
-        <div class="arrowup"></div>
-        <div class="arrowdown"></div>
-    </div>
-    <div class="col-md-5 item-list">
+    <div class="col-md-6 item-list">
         <h1>@Model.SecondDatabase.SelectedTable</h1>
         @{
             DataRowCollection drc2 = Model.SecondDatabase.GetTableInfo(Model.SecondDatabase.SelectedTable).Rows;
@@ -43,6 +39,7 @@
             </table>
         }
     </div>
+    <h6><button type="button" class="btn-lg" id="NextStep">NEXT STEP</button></h6>
 </div>
 
 
@@ -58,7 +55,6 @@
         $.fn.extend({
             tableAddCounter: function (options) {
 
-                // set up default options
                 var defaults = {
                     title: '#',
                     start: 1,
@@ -95,4 +91,24 @@
         $('.table').tableAddCounter();
         $.getScript("http://code.jquery.com/ui/1.9.2/jquery-ui.js").done(function (script, textStatus) { $('tbody').sortable(); $(".alert-info").alert('close'); $(".alert-success").show(); });
     });
+
+    $("#NextStep").click(function () {
+        var list = [];
+        var array = [];
+        list = $("table.drag").find("tr").toArray();
+        list.forEach(function (item, i) {
+            array.push(item.cells[1].innerText);
+        });
+        console.log(array);
+        $.ajax({
+            url: "Comparing",
+            type: "POST",
+            data: { array: array },
+            cache: false,
+            dataType: 'json',
+            success: function (result) {
+                $("#Partial").html(result);
+            }
+        });
+    })
 </script>

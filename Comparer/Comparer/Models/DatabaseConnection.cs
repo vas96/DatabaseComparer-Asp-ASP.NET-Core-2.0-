@@ -65,6 +65,8 @@ namespace DbComparer
             return str.Remove(str.Length - 2, 2);
         };
 
+        public Database_Type DbType;
+
         public abstract bool ConnectToServer();
         public abstract bool ConnectToDatabase(string databaseName);
         public abstract bool ConnectToFile(string location = null);
@@ -105,8 +107,11 @@ namespace DbComparer
                     {
                         return Database_Type.XML; break;
                     }
+                default:
+                    {
+                        return Database_Type.NONE; break;
+                    }
             }
-            return Database_Type.NONE;
         }
 
 
