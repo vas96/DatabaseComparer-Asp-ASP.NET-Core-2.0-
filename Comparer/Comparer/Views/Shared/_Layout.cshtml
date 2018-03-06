@@ -42,28 +42,38 @@
     <!--/CSS-->
 </head>
 <body>
-    <nav class="navbar navbar-inverse navbar-fixed-top">
+
+    <nav class="navbar navbar-inverse navbar-fixed-top normal" role="navigation">
         <div class="container">
             <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
                     <span class="sr-only">Toggle navigation</span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
+                <!-- <a class="navbar-brand" href="#"><img class="img-responsive" src="img/9gag1600.png" alt=""></a>-->
                 <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">Comparer</a>
             </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-                    <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
-                    <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
-                    <li><a asp-area="" asp-controller="Home" asp-action="ColumnMapping">CollumnMapping</a></li>
+            <div id="navbar" class="collapse navbar-collapse">
+
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="colorNav"><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
+                    <li><a id="color-nav" asp-area="" asp-controller="Home" asp-action="About">About</a></li>
+                    <li><a id="color-nav" asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
+                    <li><a id="color-nav" asp-area="" asp-controller="Home" asp-action="ColumnMapping">CollumnMapping</a></li>
                 </ul>
+                @*<ul class="nav navbar-nav navbar-right">
+                    <li><a href="registration.html"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+                    <li><a href="#" data-toggle="modal" data-target="#myModal"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+                </ul>*@
             </div>
         </div>
     </nav>
-    <div class="container body-content">
+    <div class="col-lg-6">
+        <div> <img src="#" alt="Alternate Text" /></div>
+    </div>
+    <div class="container-fluid body-content">
         @RenderBody()
         <hr />
         

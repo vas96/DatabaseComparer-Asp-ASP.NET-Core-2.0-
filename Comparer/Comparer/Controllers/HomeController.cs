@@ -23,8 +23,8 @@ namespace Comparer.Controllers
         private DatabaseComparer db;
 
         private readonly IHostingEnvironment _hostingEnvironment;
-
-        public HomeController(DatabaseComparer context, IHostingEnvironment hostingEnvironment)
+<
+public HomeController(DatabaseComparer context, IHostingEnvironment hostingEnvironment)
         {
             db = context;
             _hostingEnvironment = hostingEnvironment;
@@ -79,6 +79,7 @@ namespace Comparer.Controllers
             return PartialView("_DownloadFiles", db);
         }
 
+
         public IActionResult TableInfo()
         {
             if ((db.FirstDatabase.connection == null || db.FirstDatabase.connection.State != ConnectionState.Open) ||
@@ -87,17 +88,7 @@ namespace Comparer.Controllers
             return PartialView("_TableInfo", db);
         }
 
-        public IActionResult ColumnMapping()
-        {
-            //For test
-            db.FirstDatabase.SelectedTable = "Projects";
-            db.SecondDatabase.SelectedTable = "Users";
-            //
-            if (db.FirstDatabase.SelectedTable=="" || db.SecondDatabase.SelectedTable == "")
-                return PartialView("_Error");
-            db.FirstDatabase.GetTableInfo();
-            db.SecondDatabase.GetTableInfo();
-            return PartialView("_ColumnMapping", db);
+                    return PartialView("_ColumnMapping", db);
         }
 
         public IActionResult Comparing(string[] array)
@@ -131,17 +122,15 @@ namespace Comparer.Controllers
         {
             if (file != null)
             {
-                string path = _hostingEnvironment.WebRootPath + "\\Uploads\\File" + id + "_" + file.FileName;
+<<<<<<< 
                 using (var fileStream = new FileStream(path, FileMode.Append))
                 {
                     var fileWriter = new StreamWriter(fileStream);
                     fileWriter.AutoFlush = true;
                     file.CopyTo(fileStream);
                 }
-
-                Database dbase = Database.InitializeType(file);
-                var a = dbase.ConnectToFile(path);
-                switch (id)
+                Database dbase = new SqlDataBaseConnector();
+>>>>>>> b49e4bed64c69e0fe1                switch (id)
                 {
                     case 1:
                         {

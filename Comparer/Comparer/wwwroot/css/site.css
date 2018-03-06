@@ -1,13 +1,6 @@
-﻿body {
-    padding-top: 50px;
-    padding-bottom: 20px;
-}
-
-/* Wrapping element */
-/* Set some basic padding to keep content from hitting the edges */
-.body-content {
-    padding-left: 15px;
-    padding-right: 15px;
+﻿html,
+body {
+    overflow-x: hidden; 
 }
 
 /* Carousel */
@@ -149,3 +142,22 @@ td {
 }
 /*--------------------------------------------------*/
 
+
+.navbar {
+    border: none !important;
+    color:black;
+}
+
+
+.colorNav {
+    color: blue;
+    text-decoration: none;
+}
+
+.shrink {
+    -webkit-transition: 0.5s;
+    -moz-transition: 0.5s;
+    transition: 0.5s;
+    color: blue;
+    padding:1vh;
+}

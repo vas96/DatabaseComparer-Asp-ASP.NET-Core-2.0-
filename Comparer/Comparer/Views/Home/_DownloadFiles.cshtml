@@ -27,8 +27,7 @@
     <script>
         $("#NextStep").click(function () {
             $.ajax({
-                url: "ColumnMapping",
-                type: "get",
+                url: "ColumnMapping",type: "get",
                 success: function (result) {
                     $("#Partial").html(result);
                 }
