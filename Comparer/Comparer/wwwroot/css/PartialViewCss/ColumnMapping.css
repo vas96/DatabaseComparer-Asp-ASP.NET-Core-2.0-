@@ -98,13 +98,13 @@ ol {
 
     .arrow_box:before {
         border-color: rgba(194, 225, 245, 0);
-        border-left-color: green;
+        border-left-color: #337ab7;
         border-width: 18px;
         margin-top: -18px;
     }
 
     .arrow_box.bad:before {
-        border-left-color: red;
+        border-left-color: #e21410;
     }
 
 td {

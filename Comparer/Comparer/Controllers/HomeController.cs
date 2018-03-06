@@ -95,6 +95,9 @@ namespace Comparer.Controllers
                 array = new[]{"Projects", "Users"};
             db.FirstDatabase.SelectedTable = array[0];
             db.SecondDatabase.SelectedTable = array[1];
+            if ((db.FirstDatabase.connection == null || db.FirstDatabase.connection.State != ConnectionState.Open) ||
+                (db.SecondDatabase.connection == null || db.SecondDatabase.connection.State != ConnectionState.Open))
+                return PartialView("_Error");
             if (db.FirstDatabase.SelectedTable == "" || db.SecondDatabase.SelectedTable == "")
                 return PartialView("_Error");
             db.FirstDatabase.GetTableInfo();
@@ -130,38 +133,50 @@ namespace Comparer.Controllers
         #region UploadFile
 
         [HttpPost]
-        public void Upload(IFormFile file, int? id)
+        public bool Upload(IFormFile file, int? id)
         {
             if (file != null)
             {
-                string path = _hostingEnvironment.WebRootPath + "\\Uploads\\File" + id + "_" + file.FileName;
-                using (var fileStream = new FileStream(path, FileMode.Append))
+
+                try
                 {
-                    var fileWriter = new StreamWriter(fileStream);
-                    fileWriter.AutoFlush = true;
-                    file.CopyTo(fileStream);
-                }
-                Database dbase = Database.InitializeType(file);
-                var a=dbase.ConnectToFile(path);
-                switch (id)
-                {
-                    case 1:
+                    string path = _hostingEnvironment.WebRootPath + "\\Uploads\\File" + id + "_" + file.FileName;
+                    using (var fileStream = new FileStream(path, FileMode.Append))
+                    {
+                        var fileWriter = new StreamWriter(fileStream);
+                        fileWriter.AutoFlush = true;
+                        file.CopyTo(fileStream);
+                    }
+                    Database dbase = Database.InitializeType(file);
+                    dbase.ConnectToFile(path);
+                    switch (id)
+                    {
+                        case 1:
                         {
                             if (db.FirstDatabase != null)
                                 db.FirstDatabase.CloseConnection();
                             db.FirstDatabase = dbase;
                             break;
                         }
-                    case 2:
+                        case 2:
                         {
                             if (db.SecondDatabase != null)
                                 db.SecondDatabase.CloseConnection();
                             db.SecondDatabase = dbase;
                             break;
                         }
+                        default: return false;
+                    }
+                    if (dbase.connection.State == ConnectionState.Open)
+                        return true;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    return false;
                 }
             }
-            return;
+            return false;
         }
         #endregion
     }
