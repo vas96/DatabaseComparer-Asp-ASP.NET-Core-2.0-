@@ -47,6 +47,13 @@
 
     <script>
         $("#NextStep").click(function () {
+
+            var list = [];
+            var array = [];
+            list = $("table.drag").find("tr").toArray();
+            list.forEach(function (item, i) {
+            array.push(item.cells[0].innerText);
+
             $.ajax({
                 url: "Comparing",
                 type: "get",

@@ -89,15 +89,16 @@ public HomeController(DatabaseComparer context, IHostingEnvironment hostingEnvir
         }
 
 
-        public IActionResult ColumnMapping()
+        public IActionResult ColumnMapping(string[] array)
         {
-            db.FirstDatabase.SelectedTable = "Projects";
-            db.SecondDatabase.SelectedTable = "Users";
+            db.FirstDatabase.SelectedTable = array[0];
+            db.SecondDatabase.SelectedTable = array[1];
             if (db.FirstDatabase.SelectedTable == "" || db.SecondDatabase.SelectedTable == "")
                 return PartialView("_Error");
             db.FirstDatabase.GetTableInfo();
             db.SecondDatabase.GetTableInfo();
             return PartialView("_ColumnMapping", db);
+            
         }
 
         public IActionResult Comparing(string[] array)

@@ -7,7 +7,7 @@
 }
 <link rel="stylesheet" href="~/css/PartialViewCss/TableInfo.css"/>
 <div class="container-fluid">
-    <form action="/Home/Upload/?id=1" class="dropzone needsclick dz-clickable" id="demo-upload1">
+    <form action="" class="" id="FirstTable">
 
         <h2>@Model.FirstDatabase.connection.DataSource</h2>
 
@@ -31,7 +31,7 @@
                                 {
                                     <p class="TbType"> @typesTB.ItemArray[3]</p>
                                 }
-                                <input class="tableRadio" type="radio" name="FirstDatabase" value=@nameTB checked="checked">
+                                <input class="tableRadio" type="radio" name="FirstDatabaseCH" value=@nameTB checked="checked">
                             </div>
                         }
                     </div>
@@ -64,7 +64,7 @@
                                 {
                                     <p class="TbType"> @typesTB.ItemArray[3]</p>
                                 }
-                                <input class="tableRadio" type="radio" name="SecondDatabase" value=@nameTB checked="checked">
+                                <input class="tableRadio" type="radio" name="SecondDatabaseCH" value=@nameTB checked="checked">
                             </div>
                         }
                     </div>
@@ -77,6 +77,7 @@
     <h6><button type="button" class="btn-lg" id="GoToColumnMapping">Check Columns</button></h6>
 </div> 
     <script type="text/javascript">
+
         $(function () {
             $('div.table-chooser').find('div.table-chooser-item').on('click', function () {
                 $(this).parent().parent().find('div.table-chooser-item').removeClass('selected');
@@ -87,13 +88,22 @@
 
 
         $("#GoToColumnMapping").click(function () {
+          
+            var array = [];      
+            array.push($('input[name=FirstDatabaseCH]:checked').val());
+            array.push($('input[name=SecondDatabaseCH]:checked').val());
+
+            console.log(array);
             $.ajax({
                 url: "ColumnMapping",
-                type: "get",
+                type: "POST",
+                data: { array: array },
+                cache: false,
+                dataType: 'json',
                 success: function (result) {
                     $("#Partial").html(result);
                 }
             });
-        })
+         })
     </script>
 
