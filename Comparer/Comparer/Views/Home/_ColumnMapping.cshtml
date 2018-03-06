@@ -1,6 +1,28 @@
 ﻿@using System.Data
 @using DbComparer
 @model DBTest.DatabaseComparer
+    
+<style>
+    body.dragging, body.dragging * {
+        cursor: move !important;
+    }
+
+    .dragged {
+        position: absolute;
+        opacity: 0.5;
+        z-index: 2000;
+    }
+
+    ol.example li.placeholder {
+        position: relative;
+        /** More li styles **/
+    }
+
+    ol.example li.placeholder:before {
+        position: absolute;
+        /** Define arrowhead **/
+    }
+</style>
 
 <div class="row">
     <div class="col-md-6">
@@ -18,63 +40,71 @@
             </table>
         }
     </div>
-    <div class="col-md-6 item-list">
+    <div class="col-md-6">
         <h1>@Model.SecondDatabase.SelectedTable</h1>
-        @{
-            <table class="table table-bordered table-responsive table-striped table-hover ui-sortable drag">
-                @foreach (Database.Column item in Model.SecondDatabase.TableColumns)
-                {
-                    <tr>
-                        <td>@item.Name</td>
-                        <td>@item.Type</td>
-                        <td>@item.Length</td>
-                    </tr>
-                }
-            </table>
-        }
+        <ol class="ol-drag vertical">
+            @foreach (Database.Column item in Model.SecondDatabase.TableColumns)
+            {
+                <li class="" style="">
+                    <table class="table table-bordered drag">
+                        <tbody>
+                            <tr>
+                                <div class="col-md-2">
+                                    <td>@item.Name</td>
+                                </div> <div class="col-md-2">
+                                    <td>@item.Type</td>
+                                </div> <div class="col-md-2">
+                                    <td>@item.Length</td>
+                                </div>
+                            </tr>
+                        </tbody>
+                    </table>
+                </li>
+            }
+        </ol>
     </div>
     <h6><button type="button" class="btn-lg" id="NextStep">NEXT STEP</button></h6>
 </div>
+
+
+<script src="~/js/Sortable.js"></script>
 <script>
-    (function ($) {
-        $.fn.extend({
-            tableAddCounter: function (options) {
-    
-                var defaults = {
-                    title: '#',
-                    start: 1,
-                    id: false,
-                    cssClass: false
-                };
-    
-                // Overwrite default options with user provided
-                var options = $.extend({}, defaults, options);
-    
-                return $(this).each(function () {
-                    // Make sure this is a table tag
-                    if ($(this).is('.drag')) {
-    
-                        // Add column title unless set to 'false'
-                        if (!options.title) options.title = '';
-                        $('th:first-child, thead td:first-child', this).each(function () {
-                            var tagName = $(this).prop('tagName');
-                            $(this).before('<' + tagName + ' rowspan="' + $('thead tr').length + '" class="' + options.cssClass + '" id="' + options.id + '">' + options.title + '</' + tagName + '>');
-                        });
-    
-                        // Add counter starting counter from 'start'
-                        $('tbody td:first-child', this).each(function (i) {
-                            $(this).before('<td>' + (options.start + i) + '</td>');
-                        });
-    
-                    }
+    var adjustment;
+
+    $("ol.ol-drag").sortable({
+        group: 'ol-drag',
+        pullPlaceholder: false,
+        // animation on drop
+        onDrop: function ($item, container, _super) {
+            var $clonedItem = $('<li/>').css({ height: 0 });
+            $item.before($clonedItem);
+            $clonedItem.animate({ 'height': $item.height() }, 0);
+            $item.animate($clonedItem.position(), 0,
+                function () {
+                    $clonedItem.detach();
+                    _super($item, container);
+                    console.log($("ol").find("li"));
                 });
-            }
-        });
-    })(jQuery);
-    
-    $(document).ready(function () {
-        $('.table').tableAddCounter();
-        $.getScript("http://code.jquery.com/ui/1.9.2/jquery-ui.js").done(function (script, textStatus) { $('tbody').sortable(); $(".alert-info").alert('close'); $(".alert-success").show(); });
+        },
+
+        // set $item relative to cursor position
+        onDragStart: function ($item, container, _super) {
+            var offset = $item.offset(),
+                pointer = container.rootGroup.pointer;
+
+            adjustment = {
+                left: pointer.left - offset.left,
+                top: pointer.top - offset.top
+            };
+
+            _super($item, container);
+        },
+        onDrag: function ($item, position) {
+            $item.css({
+                left: position.left - adjustment.left,
+                top: position.top - adjustment.top
+            });
+        }
     });
 
 
