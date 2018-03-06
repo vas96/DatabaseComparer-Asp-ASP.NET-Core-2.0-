@@ -24,7 +24,7 @@ namespace Comparer.Controllers
 
         private readonly IHostingEnvironment _hostingEnvironment;
 
-public HomeController(DatabaseComparer context, IHostingEnvironment hostingEnvironment)
+        public HomeController(DatabaseComparer context, IHostingEnvironment hostingEnvironment)
         {
             db = context;
             _hostingEnvironment = hostingEnvironment;
@@ -67,7 +67,7 @@ public HomeController(DatabaseComparer context, IHostingEnvironment hostingEnvir
 
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View(new ErrorViewModel {RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier});
         }
 
         #endregion
@@ -89,8 +89,10 @@ public HomeController(DatabaseComparer context, IHostingEnvironment hostingEnvir
         }
 
 
-        public IActionResult ColumnMapping(string[] array)
+        public IActionResult ColumnMapping(string[] array = null)
         {
+            if (array == null)
+                array = new[]{"Projects", "Users"};
             db.FirstDatabase.SelectedTable = array[0];
             db.SecondDatabase.SelectedTable = array[1];
             if (db.FirstDatabase.SelectedTable == "" || db.SecondDatabase.SelectedTable == "")
