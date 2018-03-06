@@ -1,29 +1,8 @@
 ﻿@using System.Data
 @using DbComparer
 @model DBTest.DatabaseComparer
-    
-<style>
-    body.dragging, body.dragging * {
-        cursor: move !important;
-    }
 
-    .dragged {
-        position: absolute;
-        opacity: 0.5;
-        z-index: 2000;
-    }
-
-    ol.example li.placeholder {
-        position: relative;
-        /** More li styles **/
-    }
-
-    ol.example li.placeholder:before {
-        position: absolute;
-        /** Define arrowhead **/
-    }
-</style>
-
+<link rel="stylesheet" href="~/css/PartialViewCss/ColumnMapping.css"/>
 <div class="row">
     <div class="col-md-6">
         <h1>@Model.FirstDatabase.SelectedTable</h1>
@@ -113,7 +92,7 @@
         var array = [];
         list = $("table.drag").find("tr").toArray();
         list.forEach(function (item, i) {
-            array.push(item.cells[1].innerText);
+            array.push(item.cells[0].innerText);
         });
         console.log(array);
         $.ajax({
