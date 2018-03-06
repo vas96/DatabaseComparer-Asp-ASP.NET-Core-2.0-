@@ -15,7 +15,7 @@
 
             <div class=" table-chooser panel panel-default panel-table">
                 @{
-                    List<String> drcFirstDBNamesTB = Model.FirstDatabase.GetTablesList("TeamBuilding"); 
+                    List<String> drcFirstDBNamesTB = Model.FirstDatabase.GetTablesList(); 
                     }
 
                 <div class="panel-body">
@@ -49,7 +49,7 @@
 
             <div class=" table-chooser panel panel-default panel-table">
                 @{
-                    List<String> drcSecondDBNamesTB = Model.SecondDatabase.GetTablesList("TeamBuilding");
+                    List<String> drcSecondDBNamesTB = Model.SecondDatabase.GetTablesList();
                 }
                 <div class="panel-body">
 

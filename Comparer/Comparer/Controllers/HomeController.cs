@@ -147,11 +147,15 @@ namespace Comparer.Controllers
                 {
                     case 1:
                         {
+                            if (db.FirstDatabase != null)
+                                db.FirstDatabase.CloseConnection();
                             db.FirstDatabase = dbase;
                             break;
                         }
                     case 2:
                         {
+                            if (db.SecondDatabase != null)
+                                db.SecondDatabase.CloseConnection();
                             db.SecondDatabase = dbase;
                             break;
                         }

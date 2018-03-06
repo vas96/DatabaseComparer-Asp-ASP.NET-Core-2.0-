@@ -58,9 +58,9 @@ namespace DBTest
 
         public void CloseConnection()
         {
-            if (FirstDatabase!= null && FirstDatabase.connection != null)
+            if (FirstDatabase!= null)
                 FirstDatabase.CloseConnection();
-            if (SecondDatabase != null && SecondDatabase.connection != null)
+            if (SecondDatabase != null)
                 SecondDatabase.CloseConnection();
         }
     }

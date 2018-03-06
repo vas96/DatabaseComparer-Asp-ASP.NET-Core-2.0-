@@ -6,7 +6,7 @@
 <div class="container-fluid">
     <div class="row">
         <div class="container-fluid col-md-6" id="Drop1">
-            <form action="/Home/Upload/?id=1" class="dropzone needsclick dz-clickable" id="demo-upload1">
+            <form action="/Home/Upload/?id=1" class="dropzone needsclick dz-clickable" id="Upload1">
                 <div class="dz-message needsclick">
                     Drop files here or click to upload.<br>
                 </div>
@@ -14,7 +14,7 @@
         </div>
 
         <div class="container-fluid col-md-6" id="Drop2">
-            <form action="/Home/Upload/?id=2" class="dropzone needsclick dz-clickable" id="demo-upload2">
+            <form action="/Home/Upload/?id=2" class="dropzone needsclick dz-clickable" id="Upload2">
                 <div class="dz-message needsclick">
                     Drop files here or click to upload.<br>
                 </div>
@@ -43,6 +43,15 @@
                     $("#Partial").html(result);
                 }
             });
+        })
+
+        $(function () {
+            Dropzone.options.Upload1 =  {
+                uploadMultiple: false,
+                maxFiles: 1,
+                acceptedFiles: ".mdf,.sql,.xml",
+            };
+            Dropzone.options.Upload2 = Dropzone.options.Upload1;
         })
     </script>
 </div>

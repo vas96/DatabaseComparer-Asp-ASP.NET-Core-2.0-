@@ -46,7 +46,7 @@ namespace DbComparer
         /// </summary>
         /// <param name="database"></param>
         /// <returns></returns>
-        List<string> GetTablesList(string database);
+        List<string> GetTablesList(string database=null);
 
         /// <summary>
         /// Повертає всю інформацію про колонки у таблиці
@@ -128,7 +128,7 @@ namespace DbComparer
         public abstract bool ConnectToDatabase(string databaseName);
         public abstract bool ConnectToFile(string location = null);
         public abstract List<string> GetDatabasesList();
-        public abstract List<string> GetTablesList(string database);
+        public abstract List<string> GetTablesList(string database=null);
         public abstract DataTable GetTableInfo(string tableName=null);
 
         public abstract Selected[] Read<Selected>(string query, Func<IDataRecord, Selected> selector);
@@ -289,7 +289,7 @@ namespace DbComparer
             return list;
         }
 
-        public override List<string> GetTablesList(string database)
+        public override List<string> GetTablesList(string database=null)
         {
             List<string> list = new List<string>();
             DataTable schema = connection.GetSchema("Tables");
@@ -359,8 +359,11 @@ namespace DbComparer
 
         public override void CloseConnection()
         {
-            connection.Close();
-            SqlConnection.ClearPool(connection as SqlConnection);
+            if (connection!=null && connection.State!=ConnectionState.Closed)
+            {
+                connection.Close();
+                SqlConnection.ClearPool(connection as SqlConnection);
+            }
         }
     }
 
@@ -497,7 +500,11 @@ namespace DbComparer
 
         public override void CloseConnection()
         {
-            connection.Close();
+            if (connection != null && connection.State != ConnectionState.Closed)
+            {
+                connection.Close();
+                MySqlConnection.ClearPool(connection as MySqlConnection);
+            }
         }
     }
 }
