@@ -6,13 +6,13 @@
     <div class="col-md-6">
         <h1>@Model.FirstDatabase.SelectedTable</h1>
         @{
-            <table class="table table-bordered table-responsive table-striped">
+            <table class="table table-bordered table-responsive table-striped table-hover">
                 @foreach (Database.Column item in Model.FirstDatabase.TableColumns)
                 {
                     <tr>
                         <td>@item.Name</td>
                         <td>@item.Type</td>
-                        <td  class="arrow_box">@item.Length</td>
+                        <td class="arrow_box">@item.Length</td>
                     </tr>
                 }
             </table>
@@ -21,7 +21,7 @@
     <div class="col-md-6 item-list">
         <h1>@Model.SecondDatabase.SelectedTable</h1>
         @{
-            <table class="table table-bordered table-responsive table-striped drag">
+            <table class="table table-bordered table-responsive table-striped table-hover ui-sortable drag">
                 @foreach (Database.Column item in Model.SecondDatabase.TableColumns)
                 {
                     <tr>
@@ -35,56 +35,48 @@
     </div>
     <h6><button type="button" class="btn-lg" id="NextStep">NEXT STEP</button></h6>
 </div>
-
-
 <script>
-    $(function () {
-        $('div.item-list').not('.disabled').find('tr.choosed-item').on('click', function () {
-            $(this).parent().parent().find('tr.choosed-item').removeClass('selected');
-            $(this).addClass('selected');
-        });
-    });
-
     (function ($) {
         $.fn.extend({
             tableAddCounter: function (options) {
-
+    
                 var defaults = {
                     title: '#',
                     start: 1,
                     id: false,
                     cssClass: false
                 };
-
+    
                 // Overwrite default options with user provided
                 var options = $.extend({}, defaults, options);
-
+    
                 return $(this).each(function () {
                     // Make sure this is a table tag
                     if ($(this).is('.drag')) {
-
+    
                         // Add column title unless set to 'false'
                         if (!options.title) options.title = '';
                         $('th:first-child, thead td:first-child', this).each(function () {
                             var tagName = $(this).prop('tagName');
                             $(this).before('<' + tagName + ' rowspan="' + $('thead tr').length + '" class="' + options.cssClass + '" id="' + options.id + '">' + options.title + '</' + tagName + '>');
                         });
-
+    
                         // Add counter starting counter from 'start'
                         $('tbody td:first-child', this).each(function (i) {
                             $(this).before('<td>' + (options.start + i) + '</td>');
                         });
-
+    
                     }
                 });
             }
         });
     })(jQuery);
-
+    
     $(document).ready(function () {
         $('.table').tableAddCounter();
         $.getScript("http://code.jquery.com/ui/1.9.2/jquery-ui.js").done(function (script, textStatus) { $('tbody').sortable(); $(".alert-info").alert('close'); $(".alert-success").show(); });
     });
+
 
     $("#NextStep").click(function () {
         var list = [];

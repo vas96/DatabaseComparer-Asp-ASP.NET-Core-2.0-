@@ -4,6 +4,98 @@
 <h2>@ViewData["Title"]</h2>
 <h3>@ViewData["Message"]</h3>
 
+<style>
+    body.dragging, body.dragging * {
+        cursor: move !important;
+    }
+
+    .dragged {
+        position: absolute;
+        opacity: 0.5;
+        z-index: 2000;
+    }
+
+    ol.example li.placeholder {
+        position: relative;
+        /** More li styles **/
+    }
+
+        ol.example li.placeholder:before {
+            position: absolute;
+            /** Define arrowhead **/
+        }
+</style>
+
+
+<ol class="simple_with_animation vertical">
+    <li>
+        <table>
+            <tr>
+                <td>Item1</td>
+                <td>Item1</td>
+                <td>Item1</td>
+            </tr>
+        </table>
+    </li><li>
+    <table>
+        <tr>
+            <td>Item2</td>
+            <td>Item2</td>
+            <td>Item2</td>
+        </tr>
+    </table>
+</li><li>
+    <table>
+        <tr>
+            <td>Item3</td>
+            <td>Item3</td>
+            <td>Item3</td>
+        </tr>
+    </table>
+</li>
+</ol>
+
+<script src="~/js/Sortable.js"></script>
+<script>
+    var adjustment;
+
+    $("ol.simple_with_animation").sortable({
+        group: 'simple_with_animation',
+        pullPlaceholder: false,
+        // animation on drop
+        onDrop: function($item, container, _super) {
+            var $clonedItem = $('<li/>').css({ height: 0 });
+            $item.before($clonedItem);
+            $clonedItem.animate({ 'height': $item.height() },0);
+            $item.animate($clonedItem.position(),0,
+                function() {
+                    $clonedItem.detach();
+                    _super($item, container);
+                    console.log($("ol").find("li"));
+                });
+        },
+
+        // set $item relative to cursor position
+        onDragStart: function ($item, container, _super) {
+            var offset = $item.offset(),
+                pointer = container.rootGroup.pointer;
+
+            adjustment = {
+                left: pointer.left - offset.left,
+                top: pointer.top - offset.top
+            };
+
+            _super($item, container);
+        },
+        onDrag: function ($item, position) {
+            $item.css({
+                left: position.left - adjustment.left,
+                top: position.top - adjustment.top
+            });
+        }
+    });
+</script>
+
 <address>
     One Microsoft Way<br />
     Redmond, WA 98052-6399<br />
