@@ -2,22 +2,26 @@
 @using DbComparer
 @model DBTest.DatabaseComparer
 
-<link rel="stylesheet" href="~/css/PartialViewCss/ColumnMapping.css"/>
+<link rel="stylesheet" href="~/css/PartialViewCss/ColumnMapping.css" />
 <div class="row">
     <div class="col-md-6">
         <h1>@Model.FirstDatabase.SelectedTable</h1>
-        @{
-            <table class="table table-bordered table-responsive table-striped table-hover">
-                @foreach (Database.Column item in Model.FirstDatabase.TableColumns)
-                {
-                    <tr>
-                        <td>@item.Name</td>
-                        <td>@item.Type</td>
-                        <td class="arrow_box">@item.Length</td>
-                    </tr>
-                }
-            </table>
-        }
+        <ol class="vertical">
+            @foreach (Database.Column item in Model.FirstDatabase.TableColumns)
+            {
+                <li class="" style="">
+                    <table class="table table-bordered" id="source">
+                        <tbody>
+                        <tr>
+                            <td>@item.Name</td>
+                            <td>@item.Type</td>
+                            <td class="arrow_box">@item.Length</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </li>
+            }
+        </ol>
     </div>
     <div class="col-md-6">
         <h1>@Model.SecondDatabase.SelectedTable</h1>
@@ -25,16 +29,12 @@
             @foreach (Database.Column item in Model.SecondDatabase.TableColumns)
             {
                 <li class="" style="">
-                    <table class="table table-bordered drag">
+                    <table class="table table-bordered" id="target">
                         <tbody>
                             <tr>
-                                <div class="col-md-2">
-                                    <td>@item.Name</td>
-                                </div> <div class="col-md-2">
-                                    <td>@item.Type</td>
-                                </div> <div class="col-md-2">
-                                    <td>@item.Length</td>
-                                </div>
+                                <td>@item.Name</td>
+                                <td>@item.Type</td>
+                                <td>@item.Length</td>
                             </tr>
                         </tbody>
                     </table>
@@ -48,6 +48,23 @@
 
 <script src="~/js/Sortable.js"></script>
 <script>
+    function ValidateTypes() {
+        var source_list = [];
+        var target_list = [];
+        source_list = $("table#source").find("tr").toArray();
+        target_list = $("table#target").find("tr").toArray();
+        for (var i = 0; i < source_list.length; i++) {
+            if (source_list[i].cells[1].innerText != target_list[i].cells[1].innerText) {
+                $(source_list[i].cells[2]).addClass("bad");
+            } else {
+                $(source_list[i].cells[2]).removeClass("bad");
+            }
+        }
+    }
+
+    $(function() {
+        ValidateTypes();
+    })
     var adjustment;
 
     $("ol.ol-drag").sortable({
@@ -64,6 +81,7 @@
                     _super($item, container);
                     console.log($("ol").find("li"));
                 });
+            ValidateTypes();
         },
 
         // set $item relative to cursor position
@@ -90,7 +108,7 @@
     $("#NextStep").click(function () {
         var list = [];
         var array = [];
-        list = $("table.drag").find("tr").toArray();
+        list = $("table#target").find("tr").toArray();
         list.forEach(function (item, i) {
             array.push(item.cells[0].innerText);
         });

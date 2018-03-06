@@ -91,7 +91,7 @@ namespace Comparer.Controllers
 
         public IActionResult ColumnMapping(string[] array = null)
         {
-            if (array == null)
+            if (array == null || array.Length<=2)
                 array = new[]{"Projects", "Users"};
             db.FirstDatabase.SelectedTable = array[0];
             db.SecondDatabase.SelectedTable = array[1];
