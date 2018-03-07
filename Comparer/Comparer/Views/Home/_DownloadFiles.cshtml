@@ -50,6 +50,7 @@
                 uploadMultiple: false,
                 acceptedFiles: ".mdf,.sql,.xml",
             };
+            Dropzone.options.Upload2 = Dropzone.options.Upload1;
 
             var dropzones = $(".dropable").toArray();
             dropzones.forEach(function (item, i, dropzones) {
@@ -73,9 +74,6 @@
                     $(elem).addClass("panel-danger");
                 }
             }
-
-            Dropzone.options.Upload2 = Dropzone.options.Upload1;
-
         });
     </script>
 </div>
