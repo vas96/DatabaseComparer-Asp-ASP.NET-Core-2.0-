@@ -6,7 +6,7 @@
 <div class="container-fluid">
     <div class="row">
         <div class="container-fluid col-md-6" id="Drop1">
-            <form class="dropzone dz-clickable" id="Upload1">
+            <form class="dropzone dz-clickable dropable" id="Upload1">
             </form>
             <div class="panel" style="visibility:hidden" id="Res1">
                 <div class="panel-heading"></div>
@@ -14,7 +14,7 @@
         </div>
 
         <div class="container-fluid col-md-6" id="Drop2">
-            <form class="dropzone dz-clickable" id="Upload2">
+            <form class="dropzone dz-clickable dropable" id="Upload2">
             </form>
             <div class="panel" style="visibility:hidden" id="Res2">
                 <div class="panel-heading"></div>
@@ -51,34 +51,31 @@
                 acceptedFiles: ".mdf,.sql,.xml",
             };
 
-            Dropzone.options.Upload2 = Dropzone.options.Upload1;
-
-            $("#Upload1").dropzone({
-                url: "/Home/Upload/?id=1",
-                success: function(file, response) {
-                    ReturnInfo($("#Res1"), response);
-                }
-            });
-
-            $("#Upload2").dropzone({
-                url: "/Home/Upload/?id=2",
-                success: function (file, response) {
-                    ReturnInfo($("#Res2"), response);
-                }
+            var dropzones = $(".dropable").toArray();
+            dropzones.forEach(function (item, i, dropzones) {
+                $(item).dropzone({
+                    url: "/Home/Upload/?id=" + (i+1),
+                    success: function (file, response) {
+                        ReturnInfo($(item).parent().find(".panel"), response);
+                    }
+                });
             });
 
             function ReturnInfo(elem, result) {
                 $(elem).css("visibility", "visible");
-                $(elem).removeClass("panel-warning panel-success");
+                $(elem).removeClass("panel-danger panel-success");
                 if (result == true) {
                     $(elem).find("div").text("Connection established");
                     $(elem).addClass("panel-success");
                 }
                 else {
                     $(elem).find("div").text("Connection not established");
-                    $(elem).addClass("panel-warning");
+                    $(elem).addClass("panel-danger");
                 }
             }
+
+            Dropzone.options.Upload2 = Dropzone.options.Upload1;
+
         });
     </script>
 </div>

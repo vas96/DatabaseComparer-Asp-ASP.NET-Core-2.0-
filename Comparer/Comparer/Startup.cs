@@ -27,7 +27,8 @@ namespace Comparer
         {
             services.AddMvc();
             services.Add(new ServiceDescriptor(typeof(DatabaseComparer), new DatabaseComparer()));
-
+            services.AddScoped<ICounter, RandomCounter>();
+            services.AddScoped<CounterService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -10,3 +10,14 @@
     @Html.Partial("_DownloadFiles",Model);
 </div>
 
+<script>
+    window.onbeforeunload = function () {
+        $.ajax({
+            url: "PageClosedAction",
+            type: "POST",
+            data: { page: "Comparer"},
+            dataType: "json"
+        });
+    };
+</script>
+

@@ -23,11 +23,14 @@ namespace Comparer.Controllers
         private DatabaseComparer db;
 
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly ICounter _counterService;
+        private int _randomInt;
 
-        public HomeController(DatabaseComparer context, IHostingEnvironment hostingEnvironment)
+        public HomeController(DatabaseComparer context, IHostingEnvironment hostingEnvironment, ICounter counter)
         {
             db = context;
             _hostingEnvironment = hostingEnvironment;
+            _counterService = counter;
         }
 
         #region Pages
@@ -67,7 +70,7 @@ namespace Comparer.Controllers
 
         public IActionResult Error()
         {
-            return View(new ErrorViewModel {RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier});
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
         #endregion
@@ -91,8 +94,8 @@ namespace Comparer.Controllers
 
         public IActionResult ColumnMapping(string[] array = null)
         {
-            if (array == null || array.Length<=2)
-                array = new[]{"Projects", "Users"};
+            if (array == null || array.Length <= 2)
+                array = new[] { "Projects", "Users" };
             db.FirstDatabase.SelectedTable = array[0];
             db.SecondDatabase.SelectedTable = array[1];
             if ((db.FirstDatabase.connection == null || db.FirstDatabase.connection.State != ConnectionState.Open) ||
@@ -103,12 +106,12 @@ namespace Comparer.Controllers
             db.FirstDatabase.GetTableInfo();
             db.SecondDatabase.GetTableInfo();
             return PartialView("_ColumnMapping", db);
-            
+
         }
 
         public IActionResult Comparing(string[] array)
         {
-            if (array.Length==0)
+            if (array.Length == 0)
                 return PartialView("_Error");
             int min = Math.Min(db.FirstDatabase.TableColumns.Count, db.SecondDatabase.TableColumns.Count);
             for (int i = 0; i < min; i++)
@@ -116,7 +119,7 @@ namespace Comparer.Controllers
                 db.FirstDatabase.SelectedColumns.Add(db.FirstDatabase.TableColumns[i].Name);
                 foreach (var column in db.SecondDatabase.TableColumns)
                 {
-                    if (column.Name==array[i])
+                    if (column.Name == array[i])
                         db.SecondDatabase.SelectedColumns.Add(array[i]);
                 }
             }
@@ -137,10 +140,24 @@ namespace Comparer.Controllers
         {
             if (file != null)
             {
-
                 try
                 {
-                    string path = _hostingEnvironment.WebRootPath + "\\Uploads\\File" + id + "_" + file.FileName;
+                    string path;
+
+                    if (db.Folder == null || !Directory.Exists(db.Folder))
+                    {
+                        _randomInt = _counterService.Value;
+                        while (true)
+                        {
+                            path = _hostingEnvironment.WebRootPath + "\\Uploads\\Folder_" + _randomInt;
+                            if (db.Folder != null && !Directory.Exists(path)) break;
+                        }
+                        Directory.CreateDirectory(path);
+                        db.Folder = path;
+                    }
+                    else
+                        path = db.Folder;
+                    path += "\\File_" + id + "_" + file.FileName;
                     using (var fileStream = new FileStream(path, FileMode.Append))
                     {
                         var fileWriter = new StreamWriter(fileStream);
@@ -152,19 +169,19 @@ namespace Comparer.Controllers
                     switch (id)
                     {
                         case 1:
-                        {
-                            if (db.FirstDatabase != null)
-                                db.FirstDatabase.CloseConnection();
-                            db.FirstDatabase = dbase;
-                            break;
-                        }
+                            {
+                                if (db.FirstDatabase != null)
+                                    db.FirstDatabase.CloseConnection();
+                                db.FirstDatabase = dbase;
+                                break;
+                            }
                         case 2:
-                        {
-                            if (db.SecondDatabase != null)
-                                db.SecondDatabase.CloseConnection();
-                            db.SecondDatabase = dbase;
-                            break;
-                        }
+                            {
+                                if (db.SecondDatabase != null)
+                                    db.SecondDatabase.CloseConnection();
+                                db.SecondDatabase = dbase;
+                                break;
+                            }
                         default: return false;
                     }
                     if (dbase.connection.State == ConnectionState.Open)
@@ -177,6 +194,35 @@ namespace Comparer.Controllers
                 }
             }
             return false;
+        }
+
+        [HttpPost]
+        public void PageClosedAction(string page)
+        {
+            if (db.Folder!=null)
+            {
+                try
+                {
+                    int sleepTimer = 100;
+                    bool conClosed = db.CloseConnection();
+                    for (int i = 0; i < 20 && !conClosed; i++)
+                    {
+                        Thread.Sleep(sleepTimer+(i*100));
+                        conClosed = db.CloseConnection();
+                    }
+                    bool folderDeleted = db.DeleteActiveFolder();
+                    for (int i = 0; i < 20 && !folderDeleted; i++)
+                    {
+                        Thread.Sleep(sleepTimer + (i * 100));
+                        folderDeleted = db.DeleteActiveFolder();
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    throw;
+                }
+            }
         }
         #endregion
     }

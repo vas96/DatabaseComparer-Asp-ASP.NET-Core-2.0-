@@ -18,9 +18,14 @@ namespace DBTest
         public string[] FirstData = null;
         public string[] SecondData = null;
 
+        public string FirstPath = null;
+        public string SecondPath = null;
+
         public DatabaseComparer()
         {
         }
+
+        public string Folder { get; set; }
 
         public bool LoadFirstData(string query, Func<IDataRecord, string> selector)
         {
@@ -56,12 +61,54 @@ namespace DBTest
             return list3;
         }
 
-        public void CloseConnection()
+        public bool CloseConnection()
         {
-            if (FirstDatabase!= null)
-                FirstDatabase.CloseConnection();
-            if (SecondDatabase != null)
-                SecondDatabase.CloseConnection();
+            try
+            {
+                if (FirstDatabase != null
+                    && FirstDatabase.connection != null
+                    && FirstDatabase.connection.State != ConnectionState.Closed)
+                    FirstDatabase.CloseConnection();
+                if (SecondDatabase != null
+                    && SecondDatabase.connection != null
+                    && SecondDatabase.connection.State != ConnectionState.Closed)
+                    SecondDatabase.CloseConnection();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return false;
+            }
+            return true;
+        }
+
+        public bool DeleteActiveFolder()
+        {
+            try
+            {
+                if ((FirstDatabase == null || FirstDatabase.connection == null || FirstDatabase.connection.State==ConnectionState.Closed)
+                    && (SecondDatabase == null || SecondDatabase.connection == null || SecondDatabase.connection.State == ConnectionState.Closed))
+                {
+                    if (Directory.Exists(Folder))
+                    {
+                        string[] files = Directory.GetFiles(Folder);
+                        foreach (string file in files)
+                        {
+                            File.SetAttributes(file, FileAttributes.Normal);
+                            File.Delete(file);
+                        }
+                        Directory.Delete(Folder, false);
+                        Folder = null;
+                    }
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return false;
+            }
+            return true;
         }
     }
 }
