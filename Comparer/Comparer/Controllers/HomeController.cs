@@ -90,8 +90,7 @@ namespace Comparer.Controllers
                 return PartialView("_Error");
             return PartialView("_TableInfo", db);
         }
-
-
+        
         public IActionResult ColumnMapping(string[] array = null)
         {
             if (array == null || array.Length <= 2)
@@ -108,7 +107,7 @@ namespace Comparer.Controllers
             return PartialView("_ColumnMapping", db);
 
         }
-
+        
         public IActionResult Comparing(string[] array)
         {
             if (array.Length == 0)
@@ -119,11 +118,13 @@ namespace Comparer.Controllers
                 db.FirstDatabase.SelectedColumns.Add(db.FirstDatabase.TableColumns[i].Name);
                 foreach (var column in db.SecondDatabase.TableColumns)
                 {
-                    if (column.Name == array[i])
+                    if (column.Name == array[i] && column.Type== db.FirstDatabase.TableColumns[i].Type)
                         db.SecondDatabase.SelectedColumns.Add(array[i]);
                 }
             }
-
+            if (db.FirstDatabase.SelectedColumns.Count !=
+                db.SecondDatabase.SelectedColumns.Count)
+                return PartialView("_Error");
             return PartialView("_Comparing", db);
         }
 
@@ -146,11 +147,11 @@ namespace Comparer.Controllers
 
                     if (db.Folder == null || !Directory.Exists(db.Folder))
                     {
-                        _randomInt = _counterService.Value;
                         while (true)
                         {
+                            _randomInt = _counterService.Value;
                             path = _hostingEnvironment.WebRootPath + "\\Uploads\\Folder_" + _randomInt;
-                            if (db.Folder != null && !Directory.Exists(path)) break;
+                            if (!Directory.Exists(path)) break;
                         }
                         Directory.CreateDirectory(path);
                         db.Folder = path;
@@ -165,7 +166,7 @@ namespace Comparer.Controllers
                         file.CopyTo(fileStream);
                     }
                     Database dbase = Database.InitializeType(file);
-                    dbase.ConnectToFile(path);
+                    var a=dbase.ConnectToFile(path);
                     switch (id)
                     {
                         case 1:

@@ -29,7 +29,7 @@
         $("#NextStep").click(function() {
             $.ajax({
                 url: "ColumnMapping",
-                type: "get",
+                type: "POST",
                 success: function(result) {
                     $("#Partial").html(result);
                 }
@@ -38,7 +38,7 @@
         $("#NextStep2").click(function () {
             $.ajax({
                 url: "TableInfo",
-                type: "get",
+                type: "POST",
                 success: function (result) {
                     $("#Partial").html(result);
                 }
