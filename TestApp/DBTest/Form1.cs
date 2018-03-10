@@ -25,11 +25,14 @@ namespace DbComparer
 
         static Stopwatch sw = new Stopwatch();
 
+        private DatabaseComparer dbComp;
+
 
 
         public Form1()
         {
             InitializeComponent();
+            dbComp = new DatabaseComparer();
         }
 
         private void ComboBoxSelectedIndexChanged(object sender, EventArgs e)
@@ -51,12 +54,12 @@ namespace DbComparer
             }
             if ((sender as ComboBox) == comboBox1)
             {
-                DatabaseComparer.GetComparer.FirstDatabase = db;
+                dbComp.FirstDatabase = db;
                 tv = treeView1;
             }
             else
             {
-                DatabaseComparer.GetComparer.SecondDatabase = db;
+                dbComp.SecondDatabase = db;
                 tv = treeView2;
             }
             tv.Nodes.Clear();
@@ -80,12 +83,12 @@ namespace DbComparer
             if (tv == treeView1)
             {
                 clb = FirstSelectedCol;
-                db = DatabaseComparer.GetComparer.FirstDatabase;
+                db = dbComp.FirstDatabase;
             }
             else
             {
                 clb = SecondSelectedCol;
-                db = DatabaseComparer.GetComparer.SecondDatabase;
+                db = dbComp.SecondDatabase;
             }
             if (tv.SelectedNode.Index >= 0 && tv.SelectedNode.Level == 0)
             {
@@ -102,7 +105,7 @@ namespace DbComparer
             }
             if (tv.SelectedNode.Level > 0)
             {
-                var info = db.GetTableInfo(tv.SelectedNode.Text);
+                DataSet info = db.GetTableInfo(tv.SelectedNode.Text).DataSet;
                 db.SelectedTable = tv.SelectedNode.Text;
                 clb.Items.Clear();
                 foreach (var row in info.Tables[0].Rows)
@@ -121,7 +124,7 @@ namespace DbComparer
                     Thread.Sleep(100);
                 //                    DatabaseComparer.GetComparer.FirstDatabase.ConnectToDatabase();
                 else
-                    DatabaseComparer.GetComparer.FirstDatabase.ConnectToServer();
+                    dbComp.FirstDatabase.ConnectToServer();
 
             }
         }
@@ -129,9 +132,9 @@ namespace DbComparer
         private void button1_Click(object sender, EventArgs e)
         {
             richTextBox1.Text = "";
-            DatabaseComparer dc = DatabaseComparer.GetComparer;
-            dc.LoadFirstData("Select * from " + dc.FirstDatabase.SelectedTable, dc.FirstDatabase.FullSelector);
-            dc.LoadSecondData("Select * from " + dc.SecondDatabase.SelectedTable, dc.FirstDatabase.FullSelector);
+            DatabaseComparer dc = dbComp;
+//            dc.LoadFirstData("Select * from " + dc.FirstDatabase.SelectedTable, dc.FirstDatabase.FullSelector);
+//            dc.LoadSecondData("Select * from " + dc.SecondDatabase.SelectedTable, dc.FirstDatabase.FullSelector);
             var list = dc.FindDifferences();
             foreach (var item in list)
             {
@@ -142,7 +145,7 @@ namespace DbComparer
 
         private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            DatabaseComparer dc = DatabaseComparer.GetComparer;
+            DatabaseComparer dc = dbComp;
             if (dc.FirstDatabase != null && dc.SecondDatabase != null)
                 panel5.Enabled = true;
         }
@@ -150,17 +153,17 @@ namespace DbComparer
         private void button2_Click(object sender, EventArgs e)
         {
             richTextBox1.Text = "";
-            DatabaseComparer dc = DatabaseComparer.GetComparer;
+            DatabaseComparer dc = dbComp;
             foreach (var item in FirstSelectedCol.CheckedItems)
             {
-                dc.FirstDatabase.CollumnList.Add(item.ToString());
+                dc.FirstDatabase.SelectedColumns.Add(item.ToString());
             }
             foreach (var item in SecondSelectedCol.CheckedItems)
             {
-                dc.SecondDatabase.CollumnList.Add(item.ToString());
+                dc.SecondDatabase.SelectedColumns.Add(item.ToString());
             }
-            dc.LoadFirstData(dc.FirstDatabase.BuildSelectQuery(), dc.FirstDatabase.FullSelector);
-            dc.LoadSecondData(dc.SecondDatabase.BuildSelectQuery(), dc.SecondDatabase.FullSelector);
+//            dc.LoadFirstData(dc.FirstDatabase.BuildSelectQuery(), dc.FirstDatabase.FullSelector);
+//            dc.LoadSecondData(dc.SecondDatabase.BuildSelectQuery(), dc.SecondDatabase.FullSelector);
             var list = dc.FindDifferences();
             foreach (var item in list)
             {

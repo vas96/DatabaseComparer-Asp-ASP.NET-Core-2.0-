@@ -137,7 +137,7 @@ namespace Comparer.Controllers
         #region UploadFile
 
         [HttpPost]
-        public bool Upload(IFormFile file, int? id)
+        public async Task<bool> Upload(IFormFile file, int? id)
         {
             if (file != null)
             {
@@ -163,7 +163,7 @@ namespace Comparer.Controllers
                     {
                         var fileWriter = new StreamWriter(fileStream);
                         fileWriter.AutoFlush = true;
-                        file.CopyTo(fileStream);
+                        await file.CopyToAsync(fileStream);
                     }
                     Database dbase = Database.InitializeType(file);
                     var a=dbase.ConnectToFile(path);

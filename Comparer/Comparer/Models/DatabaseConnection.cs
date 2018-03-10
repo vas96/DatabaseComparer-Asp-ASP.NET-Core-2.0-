@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
@@ -7,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Jdforsythe.MySQLConnection;
 using Microsoft.AspNetCore.Http;
 using MySql.Data.MySqlClient;
@@ -46,7 +48,7 @@ namespace DbComparer
         /// </summary>
         /// <param name="database"></param>
         /// <returns></returns>
-        List<string> GetTablesList(string database=null);
+        List<string> GetTablesList(string database = null);
 
         /// <summary>
         /// Повертає всю інформацію про колонки у таблиці
@@ -56,14 +58,14 @@ namespace DbComparer
         DataTable GetTableInfo(string tableName);
 
         /// <summary>
-        /// Зчитує дані з таблиці
+        /// Зчитує дані з таблиці (для селектора по string)
         /// </summary>
         /// <typeparam name="Selected">String</typeparam>
         /// <param name="query">Запит</param>
         /// <param name="selector">Селектор (міститься у БД)</param>
         /// <returns></returns>
         Selected[] Read<Selected>(string query, Func<IDataRecord, Selected> selector);
-
+        DataTable Read(string query, Func<IDataRecord, DataRow> selector);
         /// <summary>
         /// Закриває підключення
         /// </summary>
@@ -91,6 +93,7 @@ namespace DbComparer
             connection = null;
             TableColumns = new List<Column>();
             SelectedColumns = new List<string>();
+            QueryResult = null;
         }
         public string DataConnectionString;
 
@@ -104,10 +107,13 @@ namespace DbComparer
 
         public List<string> SelectedColumns;
 
+        public static DataTable QueryResult;
+
         public Func<IDataRecord, string> ParticallSelector = delegate (IDataRecord s)
         {
             return String.Format("{0} {1}", s[0], s[1]);
         };
+
 
         protected static int counter;
 
@@ -122,16 +128,29 @@ namespace DbComparer
             return str.Remove(str.Length - 2, 2);
         };
 
+        public Func<IDataRecord, DataRow> FullRowSelector = delegate (IDataRecord s)
+        {
+            DataRow dr = QueryResult.NewRow();
+            int counter = s.FieldCount;
+            string[] array = new string[counter];
+            for (int i = 0; i < counter; i++)
+            {
+                array[i] = s[i].ToString();
+            }
+            QueryResult.Rows.Add(array);
+            return dr;
+        };
+
         public Database_Type DbType;
 
         public abstract bool ConnectToServer();
         public abstract bool ConnectToDatabase(string databaseName);
         public abstract bool ConnectToFile(string location = null);
         public abstract List<string> GetDatabasesList();
-        public abstract List<string> GetTablesList(string database=null);
-        public abstract DataTable GetTableInfo(string tableName=null);
-
+        public abstract List<string> GetTablesList(string database = null);
+        public abstract DataTable GetTableInfo(string tableName = null);
         public abstract Selected[] Read<Selected>(string query, Func<IDataRecord, Selected> selector);
+        public abstract DataTable Read(string query, Func<IDataRecord, DataRow> selector);
 
         public abstract void CloseConnection();
 
@@ -147,49 +166,58 @@ namespace DbComparer
             return Select;
         }
 
-        public static Database_Type GetDBType(IFormFile file)
+        public DataTable BuildContainer()
         {
-            string ext = Path.GetExtension(file.FileName).Replace(".", "").ToLower();
-            switch (ext)
+            DataTable dt = new DataTable();
+            foreach (var column in SelectedColumns)
             {
-                case "mdf":
-                    {
-                        return Database_Type.SqlServer; break;
-                    }
-                case "sql":
-                    {
-                        return Database_Type.MySql; break;
-                    }
-                case "xml":
-                    {
-                        return Database_Type.XML; break;
-                    }
-                default:
-                    {
-                        return Database_Type.NONE; break;
-                    }
+                dt.Columns.Add(column, typeof(string));
             }
+            QueryResult = dt;
+            return dt;
         }
-
-
-        public static Database InitializeType(IFormFile file)
-        {
-
-            Database.Database_Type type = Database.GetDBType(file);
-            switch (type)
-            {
-                case Database_Type.MySql:
-                    { return new MySqlDataBaseConnector() { DbType = Database_Type.MySql }; break; }
-                case Database_Type.SqlServer:
-                    { return new SqlDataBaseConnector() { DbType = Database_Type.SqlServer }; ; break; }
-                default:
+                public static Database_Type GetDBType(IFormFile file)
+                {
+                    string ext = Path.GetExtension(file.FileName).Replace(".", "").ToLower();
+                    switch (ext)
                     {
-                        return null;
-                        break;
+                        case "mdf":
+                            {
+                                return Database_Type.SqlServer; break;
+                            }
+                        case "sql":
+                            {
+                                return Database_Type.MySql; break;
+                            }
+                        case "xml":
+                            {
+                                return Database_Type.XML; break;
+                            }
+                        default:
+                            {
+                                return Database_Type.NONE; break;
+                            }
                     }
-            }
-        }
+                }
 
+
+                public static Database InitializeType(IFormFile file)
+                {
+
+                    Database.Database_Type type = Database.GetDBType(file);
+                    switch (type)
+                    {
+                        case Database_Type.MySql:
+                            { return new MySqlDataBaseConnector() { DbType = Database_Type.MySql }; break; }
+                        case Database_Type.SqlServer:
+                            { return new SqlDataBaseConnector() { DbType = Database_Type.SqlServer }; ; break; }
+                        default:
+                            {
+                                return null;
+                                break;
+                            }
+                    }
+                }
 
         public enum Database_Type
         {
@@ -205,20 +233,22 @@ namespace DbComparer
             public string Name;
             public string Type;
             public string Length;
+            public bool ISKey;
 
             public Column(DataRow dr)
             {
                 var array = dr.ItemArray;
-                Name = array[3].ToString();
-                Type = array[7].ToString();
-                Length = array[8].ToString();
+                Name = array[3].ToString();//Імя
+                Type = array[7].ToString();//Тип
+                Length = array[8].ToString();//Довжина
+                ISKey = false;//Ключ
             }
         }
     }
 
     public class SqlDataBaseConnector : Database
     {
-        public SqlDataBaseConnector():base()
+        public SqlDataBaseConnector() : base()
         {
             DataConnectionString = "Data Source=.; Integrated Security=True;";
         }
@@ -289,7 +319,7 @@ namespace DbComparer
             return list;
         }
 
-        public override List<string> GetTablesList(string database=null)
+        public override List<string> GetTablesList(string database = null)
         {
             List<string> list = new List<string>();
             DataTable schema = connection.GetSchema("Tables");
@@ -324,6 +354,35 @@ namespace DbComparer
                 {
                     TableColumns.Add(new Column(row));
                 }
+
+                /////////
+                // Given a DataTableReader, display schema
+                // information about a particular column.
+                string _table = (tableName == null) ? SelectedTable : tableName;
+                SqlDataAdapter adapter = new
+                    SqlDataAdapter("SELECT TOP 1 * FROM "+ _table,
+                    (connection as SqlConnection));
+
+                // Fill the DataTable, retrieving all the schema information.
+                adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+                DataTable table = new DataTable();
+                adapter.Fill(table);
+
+                // Create the DataTableReader, and close it when done.
+                using (DataTableReader reader = new DataTableReader(table))
+                {
+                    int ordinal = 0;
+                    DataTable schemaTable = reader.GetSchemaTable();
+                    for (int i = 0; i < schemaTable.Rows.Count; i++)
+                    {
+                        if ((bool)schemaTable.Rows[i].ItemArray[12])
+                        {
+                            TableColumns[i].ISKey = true;
+                        }
+                    }
+                }
+                ///////////////
+
                 return departmentIDSchemaTable;
             }
             catch (Exception ex)
@@ -357,19 +416,76 @@ namespace DbComparer
             }
         }
 
+        public override DataTable Read(string query, Func<IDataRecord, DataRow> selector)
+        {
+            try
+            {
+                DataTable dtLocal = QueryResult;
+                using (var cmd = connection.CreateCommand())
+                {
+                    if (SelectedColumns.Count == 0)
+                    {
+                        counter = GetTableInfo(SelectedTable).Rows.Count;
+                    }
+                    else
+                    {
+                        counter = SelectedColumns.Count;
+                    }
+                    cmd.CommandText = query;
+                    using (var r = cmd.ExecuteReader())
+                        ((DbDataReader)r).Cast<IDataRecord>().Select(selector).ToArray();
+                    return QueryResult;
+                }
+            }
+            catch (Exception EX_NAME)
+            {
+                return null;
+            }
+        }
+
         public override void CloseConnection()
         {
-            if (connection!=null && connection.State!=ConnectionState.Closed)
+            if (connection != null && connection.State != ConnectionState.Closed)
             {
                 connection.Close();
                 SqlConnection.ClearPool(connection as SqlConnection);
             }
         }
+
+        public void Test()
+        {
+            DataTable dtMaths = new DataTable("Maths");
+            var a = typeof(int);
+            dtMaths.Columns.Add("StudID1", typeof(object));
+            dtMaths.Columns.Add("StudName1", typeof(object));
+            dtMaths.Columns.Add("Fuck1", typeof(object));
+            dtMaths.Rows.Add(1, "Mike", "Fuck");
+            dtMaths.Rows.Add(2, "Mukesh", "Fuck");
+            dtMaths.Rows.Add(3, "Erin", "Fuck");
+            dtMaths.Rows.Add(4, "Roshni", "Fuck");
+            dtMaths.Rows.Add(5, "Ajay", "Fuck");
+
+            DataTable dtEnglish = new DataTable("English");
+            dtEnglish.Columns.Add("StudID", typeof(object));
+            dtEnglish.Columns.Add("StudName", typeof(object));
+            dtEnglish.Columns.Add("Fuck", typeof(object));
+            dtEnglish.Rows.Add(6, "Arjun", "Fuck");
+            dtEnglish.Rows.Add(2, "Mukesh", "Fuck");
+            dtEnglish.Rows.Add(7, "John", "Fuck");
+            dtEnglish.Rows.Add(4, "Roshni", "Fuck");
+            dtEnglish.Rows.Add(8, "Kumar", "Fuck");
+
+
+            System.Data.DataView view = new System.Data.DataView(dtMaths);
+            System.Data.DataTable selected = view.ToTable("Selected", false, dtMaths.Columns[0].ToString(), dtMaths.Columns[2].ToString());
+
+            var dtOnlyMaths = dtMaths.Rows.Cast<DataRow>().Except(dtEnglish.Rows.Cast<DataRow>());
+        }
     }
 
     public class MySqlDataBaseConnector : Database
     {
-        public MySqlDataBaseConnector():base()
+        public MySqlDataBaseConnector() : base()
         {
             DataConnectionString = "SERVER=localhost;UID='root';" + "PASSWORD='';";
         }
@@ -494,6 +610,33 @@ namespace DbComparer
             catch (Exception EX_NAME)
             {
                 System.Console.WriteLine(EX_NAME.Message);
+                return null;
+            }
+        }
+
+        public override DataTable Read(string query, Func<IDataRecord, DataRow> selector)
+        {
+            try
+            {
+                DataTable dtLocal = QueryResult;
+                using (var cmd = (connection as MySqlConnection).CreateCommand())
+                {
+                    if (SelectedColumns.Count == 0)
+                    {
+                        counter = GetTableInfo(SelectedTable).Rows.Count;
+                    }
+                    else
+                    {
+                        counter = SelectedColumns.Count;
+                    }
+                    cmd.CommandText = query;
+                    using (MySqlDataReader r = cmd.ExecuteReader())
+                         ((DbDataReader)r).Cast<IDataRecord>().Select(selector).ToArray();
+                    return QueryResult;
+                }
+            }
+            catch (Exception EX_NAME)
+            {
                 return null;
             }
         }
