@@ -1,5 +1,6 @@
 ﻿using System;
 using System.CodeDom;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
@@ -9,9 +10,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DBTest;
 using Jdforsythe.MySQLConnection;
 using Microsoft.AspNetCore.Http;
 using MySql.Data.MySqlClient;
+using ObjectsComparer;
 
 namespace DbComparer
 {
@@ -65,7 +68,7 @@ namespace DbComparer
         /// <param name="selector">Селектор (міститься у БД)</param>
         /// <returns></returns>
         Selected[] Read<Selected>(string query, Func<IDataRecord, Selected> selector);
-        DataTable Read(string query, Func<IDataRecord, DataRow> selector);
+        DataTable ReadTable(string query, Func<IDataRecord, DataRow> selector);
         /// <summary>
         /// Закриває підключення
         /// </summary>
@@ -109,7 +112,9 @@ namespace DbComparer
 
         public static DataTable QueryResult;
 
-        public Func<IDataRecord, string> ParticallSelector = delegate (IDataRecord s)
+        private static DataRow newRow;
+
+        public Func<IDataRecord, string> Test = delegate (IDataRecord s)
         {
             return String.Format("{0} {1}", s[0], s[1]);
         };
@@ -117,20 +122,30 @@ namespace DbComparer
 
         protected static int counter;
 
-        public Func<IDataRecord, string> FullSelector = delegate (IDataRecord s)
+        public Func<IDataRecord, string> FullStringSelector = delegate (IDataRecord s)
         {
-            string str = "";
+            object[] obj = new object[s.FieldCount];
+            for (int i = 0; i < s.FieldCount; i++)
+            {
+                obj[i] = s[i];
+            }
+            return String.Join(" ",obj);
+        };
+
+        public Func<IDataRecord, string[]> FullStringArraySelector = delegate (IDataRecord s)
+        {
+            int counter = s.FieldCount;
+
+            string[] array = new string[counter];
             for (int i = 0; i < counter; i++)
             {
-                str += s[i] + " ";
+                array[i] = s[i].ToString();
             }
-
-            return str.Remove(str.Length - 2, 2);
+            return array;
         };
 
         public Func<IDataRecord, DataRow> FullRowSelector = delegate (IDataRecord s)
         {
-            DataRow dr = QueryResult.NewRow();
             int counter = s.FieldCount;
             string[] array = new string[counter];
             for (int i = 0; i < counter; i++)
@@ -138,7 +153,7 @@ namespace DbComparer
                 array[i] = s[i].ToString();
             }
             QueryResult.Rows.Add(array);
-            return dr;
+            return newRow;
         };
 
         public Database_Type DbType;
@@ -150,7 +165,7 @@ namespace DbComparer
         public abstract List<string> GetTablesList(string database = null);
         public abstract DataTable GetTableInfo(string tableName = null);
         public abstract Selected[] Read<Selected>(string query, Func<IDataRecord, Selected> selector);
-        public abstract DataTable Read(string query, Func<IDataRecord, DataRow> selector);
+        public abstract DataTable ReadTable(string query, Func<IDataRecord, DataRow> selector);
 
         public abstract void CloseConnection();
 
@@ -230,6 +245,7 @@ namespace DbComparer
 
         public class Column
         {
+            public string Position;
             public string Name;
             public string Type;
             public string Length;
@@ -238,6 +254,7 @@ namespace DbComparer
             public Column(DataRow dr)
             {
                 var array = dr.ItemArray;
+                Position = array[4].ToString();//Позиція
                 Name = array[3].ToString();//Імя
                 Type = array[7].ToString();//Тип
                 Length = array[8].ToString();//Довжина
@@ -264,6 +281,7 @@ namespace DbComparer
             {
                 return false;
             }
+
             return true;
         }
 
@@ -271,7 +289,8 @@ namespace DbComparer
         {
             try
             {
-                DataConnectionString = "Data Source=.; Integrated Security=True; Initial Catalog =" + databaseName + ";";
+                DataConnectionString =
+                    "Data Source=.; Integrated Security=True; Initial Catalog =" + databaseName + ";";
                 connection = new SqlConnection(DataConnectionString);
                 connection.Open();
             }
@@ -279,6 +298,7 @@ namespace DbComparer
             {
                 return false;
             }
+
             return true;
         }
 
@@ -288,7 +308,8 @@ namespace DbComparer
             {
                 if (location != null)
                     DataConnectionString =
-                        "Data Source=(localdb)\\MSSQLLocalDB;AttachDbFilename=" + location + ";Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False;";
+                        "Data Source=(localdb)\\MSSQLLocalDB;AttachDbFilename=" + location +
+                        ";Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False;";
                 connection = new SqlConnection(DataConnectionString);
                 connection.Open();
                 return true;
@@ -316,6 +337,7 @@ namespace DbComparer
                     }
                 }
             }
+
             return list;
         }
 
@@ -327,6 +349,7 @@ namespace DbComparer
             {
                 list.Add(row[2].ToString());
             }
+
             return list;
         }
 
@@ -360,8 +383,8 @@ namespace DbComparer
                 // information about a particular column.
                 string _table = (tableName == null) ? SelectedTable : tableName;
                 SqlDataAdapter adapter = new
-                    SqlDataAdapter("SELECT TOP 1 * FROM "+ _table,
-                    (connection as SqlConnection));
+                    SqlDataAdapter("SELECT TOP 1 * FROM " + _table,
+                        (connection as SqlConnection));
 
                 // Fill the DataTable, retrieving all the schema information.
                 adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
@@ -375,7 +398,7 @@ namespace DbComparer
                     DataTable schemaTable = reader.GetSchemaTable();
                     for (int i = 0; i < schemaTable.Rows.Count; i++)
                     {
-                        if ((bool)schemaTable.Rows[i].ItemArray[12])
+                        if ((bool) schemaTable.Rows[i].ItemArray[12])
                         {
                             TableColumns[i].ISKey = true;
                         }
@@ -405,9 +428,10 @@ namespace DbComparer
                     {
                         counter = SelectedColumns.Count;
                     }
+
                     cmd.CommandText = query;
                     using (var r = cmd.ExecuteReader())
-                        return ((DbDataReader)r).Cast<IDataRecord>().Select(selector).ToArray();
+                        return ((DbDataReader) r).Cast<IDataRecord>().Select(selector).ToArray();
                 }
             }
             catch (Exception EX_NAME)
@@ -416,7 +440,7 @@ namespace DbComparer
             }
         }
 
-        public override DataTable Read(string query, Func<IDataRecord, DataRow> selector)
+        public override DataTable ReadTable(string query, Func<IDataRecord, DataRow> selector)
         {
             try
             {
@@ -431,10 +455,65 @@ namespace DbComparer
                     {
                         counter = SelectedColumns.Count;
                     }
+
                     cmd.CommandText = query;
                     using (var r = cmd.ExecuteReader())
-                        ((DbDataReader)r).Cast<IDataRecord>().Select(selector).ToArray();
+                        ((DbDataReader) r).Cast<IDataRecord>().Select(selector).ToArray();
                     return QueryResult;
+                }
+            }
+            catch (Exception EX_NAME)
+            {
+                return null;
+            }
+        }
+
+        public string[] ReadRecord(string query, Func<IDataRecord, string> select)
+        {
+            try
+            {
+                DataTable dtLocal = QueryResult;
+                using (var cmd = connection.CreateCommand())
+                {
+                    if (SelectedColumns.Count == 0)
+                    {
+                        counter = GetTableInfo(SelectedTable).Rows.Count;
+                    }
+                    else
+                    {
+                        counter = SelectedColumns.Count;
+                    }
+
+                    cmd.CommandText = query;
+                    using (var r = cmd.ExecuteReader())
+                        return ((DbDataReader) r).Cast<IDataRecord>().Select(select).ToArray();
+                }
+            }
+            catch (Exception EX_NAME)
+            {
+                return null;
+            }
+        }
+
+        public string[][] ReadArrRecord(string query, Func<IDataRecord, string[]> select)
+        {
+            try
+            {
+                DataTable dtLocal = QueryResult;
+                using (var cmd = connection.CreateCommand())
+                {
+                    if (SelectedColumns.Count == 0)
+                    {
+                        counter = GetTableInfo(SelectedTable).Rows.Count;
+                    }
+                    else
+                    {
+                        counter = SelectedColumns.Count;
+                    }
+
+                    cmd.CommandText = query;
+                    using (var r = cmd.ExecuteReader())
+                        return ((DbDataReader)r).Cast<IDataRecord>().Select(select).ToArray();
                 }
             }
             catch (Exception EX_NAME)
@@ -456,9 +535,9 @@ namespace DbComparer
         {
             DataTable dtMaths = new DataTable("Maths");
             var a = typeof(int);
-            dtMaths.Columns.Add("StudID1", typeof(object));
-            dtMaths.Columns.Add("StudName1", typeof(object));
-            dtMaths.Columns.Add("Fuck1", typeof(object));
+            dtMaths.Columns.Add("StudID1", typeof(string));
+            dtMaths.Columns.Add("StudName1", typeof(string));
+            dtMaths.Columns.Add("Fuck1", typeof(string));
             dtMaths.Rows.Add(1, "Mike", "Fuck");
             dtMaths.Rows.Add(2, "Mukesh", "Fuck");
             dtMaths.Rows.Add(3, "Erin", "Fuck");
@@ -466,23 +545,84 @@ namespace DbComparer
             dtMaths.Rows.Add(5, "Ajay", "Fuck");
 
             DataTable dtEnglish = new DataTable("English");
-            dtEnglish.Columns.Add("StudID", typeof(object));
-            dtEnglish.Columns.Add("StudName", typeof(object));
-            dtEnglish.Columns.Add("Fuck", typeof(object));
+            dtEnglish.Columns.Add("StudID", typeof(string));
+            dtEnglish.Columns.Add("StudName", typeof(string));
+            dtEnglish.Columns.Add("Fuck", typeof(string));
             dtEnglish.Rows.Add(6, "Arjun", "Fuck");
             dtEnglish.Rows.Add(2, "Mukesh", "Fuck");
             dtEnglish.Rows.Add(7, "John", "Fuck");
             dtEnglish.Rows.Add(4, "Roshni", "Fuck");
             dtEnglish.Rows.Add(8, "Kumar", "Fuck");
 
+            var d1 = dtMaths.Rows.Cast<DataRow>().Select(i => i.ItemArray).ToArray();
+            var d2 = dtEnglish.Rows.Cast<DataRow>().Select(i => i.ItemArray).ToArray();
+            var d11 = new string[3][]
+                {new string[3] {"1", "2", "4"}, new string[3] {"1", "2", "3"}, new string[3] {"1", "2", "0"}};
+            var d22 = new string[3][]
+                {new string[3] {"1", "2", "4"}, new string[3] {"1", "2", "5"}, new string[3] {"1", "2", "6"}};
+            
+            SqlDataBaseConnector sql = new SqlDataBaseConnector();
+            var c1 = sql.ConnectToServer();
+            var c2 = sql.ConnectToDatabase("Repair");
+            sql.SelectedTable = "NewEmployees";
+            sql.GetTableInfo("NewEmployees");
+            foreach (var item in sql.TableColumns)
+            {
+                sql.SelectedColumns.Add(item.Name);
+            }
 
-            System.Data.DataView view = new System.Data.DataView(dtMaths);
-            System.Data.DataTable selected = view.ToTable("Selected", false, dtMaths.Columns[0].ToString(), dtMaths.Columns[2].ToString());
+            SqlDataBaseConnector sql2 = new SqlDataBaseConnector();
+            var c12 = sql2.ConnectToServer();
+            var c22 = sql2.ConnectToDatabase("Repair");
+            sql2.SelectedTable = "NewEmployees2";
+            sql2.GetTableInfo();
+            foreach (var item in sql2.TableColumns)
+            {
+                sql2.SelectedColumns.Add(item.Name);
+            }
+            Stopwatch sw1 = new Stopwatch();
+            Stopwatch sw2 = new Stopwatch();
+            sw1.Start();
+            IEnumerable<string[]> table1=null, table2=null;
+            var table11 = new Task(() => { table1 = sql.ReadArrRecord(sql.BuildSelectQuery(), FullStringArraySelector); });
+            table11.Start();
+            var table22 = new Task(() => { table2=sql2.ReadArrRecord(sql2.BuildSelectQuery(), FullStringArraySelector); });
+            sw1.Stop();
+            table22.Start();
+            Task.WaitAll(table11, table22);
+            sw2.Start();
+            var dasda = table1.Except(table2, new SomeComparison());
+            sw2.Stop();
+            System.Console.WriteLine(1);
+//            IQueryable<DataRow> dr1 = dtMaths.Rows.Cast<DataRow>().AsQueryable();
+//            IQueryable<DataRow> dr2 = dtEnglish.Rows.Cast<DataRow>().AsQueryable();
 
-            var dtOnlyMaths = dtMaths.Rows.Cast<DataRow>().Except(dtEnglish.Rows.Cast<DataRow>());
+
+//            System.Data.DataView view = new System.Data.DataView(dtMaths);
+//            System.Data.DataTable selected = view.ToTable("Selected", false, dtMaths.Columns[0].ToString(),
+//                dtMaths.Columns[2].ToString());
+//            var dtOnlyMaths = dtMaths.Rows.Cast<DataRow>().Except(dtEnglish.Rows.Cast<DataRow>());
+
         }
     }
+    class SomeComparison : IEqualityComparer<string[]>
+    {
 
+        public bool Equals(string[] x, string[] y)
+        {
+            return x.SequenceEqual(y);
+        }
+
+        public int GetHashCode(string[] obj)
+        {
+            int hash = 0;
+            foreach (var item in obj)
+            {
+                hash += item.GetHashCode();
+            }
+            return (hash);
+        }
+    }
     public class MySqlDataBaseConnector : Database
     {
         public MySqlDataBaseConnector() : base()
@@ -614,7 +754,7 @@ namespace DbComparer
             }
         }
 
-        public override DataTable Read(string query, Func<IDataRecord, DataRow> selector)
+        public override DataTable ReadTable(string query, Func<IDataRecord, DataRow> selector)
         {
             try
             {

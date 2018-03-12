@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
@@ -231,6 +232,19 @@ namespace DBTest
             {
                 int last = row.ItemArray.Length-1;
                 yield return row.ItemArray[last].ToString();
+            }
+        }
+
+        public static IEnumerable<string[]> MyExcept(this string[][] arr1, string[][] arr2)
+        {
+            string str = "";
+            var l1 = arr1.Select(i => String.Join(" ", i)).ToArray();
+            var l2 = arr2.Select(i => String.Join(" ", i)).ToArray();
+            int counter = arr1.Length;
+            for (int i = 0; i < counter; i++)
+            {
+                if (!l2.Contains(l1[i]))
+                    yield return arr1[i];
             }
         }
         /*

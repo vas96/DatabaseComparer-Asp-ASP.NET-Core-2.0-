@@ -38,6 +38,8 @@ namespace Comparer.Controllers
         public IActionResult Index()
         {
             db.CloseConnection();
+            SqlDataBaseConnector sq= new SqlDataBaseConnector();
+            sq.Test();
             return View();
         }
 
