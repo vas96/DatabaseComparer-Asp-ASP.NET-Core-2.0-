@@ -6,20 +6,31 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading.Tasks;
 using DbComparer;
 
 namespace DBTest
 {
     public class DatabaseComparer
     {
-        public Database FirstDatabase;
-        public Database SecondDatabase;
+        /// <summary>
+        /// Екземпляри БД
+        /// </summary>
+        public Database FirstDatabase, SecondDatabase;
 
-        public DataTable FirstData;
-        public DataTable SecondData;
+        /// <summary>
+        /// Результати читання з БД
+        /// </summary>
+        public IQueryable<string[]> FirstData, SecondData;
 
+        /// <summary>
+        /// Статистика про порівняні рядки
+        /// </summary>
         public Statistick[] AdditionalInfo;
 
+        /// <summary>
+        /// Ініціалізація полів
+        /// </summary>
         public DatabaseComparer()
         {
             FirstData = null;
@@ -32,8 +43,15 @@ namespace DBTest
             AdditionalInfo[1] = new Statistick();
         }
 
+        /// <summary>
+        /// Шлях до папки активного користувача
+        /// </summary>
         public string Folder { get; set; }
 
+        /// <summary>
+        /// Закриває всі підключення до БД
+        /// </summary>
+        /// <returns></returns>
         public bool CloseConnection()
         {
             try
@@ -55,6 +73,10 @@ namespace DBTest
             return true;
         }
 
+        /// <summary>
+        /// Видаляє папку активного користувача
+        /// </summary>
+        /// <returns></returns>
         public bool DeleteActiveFolder()
         {
             try
@@ -85,13 +107,76 @@ namespace DBTest
         }
 
         /// <summary>
-        /// Повертає порівняння лвох колонок у вигляді рядків
+        /// Читає дані з 1-ї і 2-ї БД
+        /// Запити генеруються на основі SelectedColumns
+        /// </summary>
+        /// <returns></returns>
+        public bool ReadDataFromDb()
+        {
+            try
+            {
+                var FirstTask = new Task(() =>
+                {
+                    FirstData = FirstDatabase.Read(FirstDatabase.BuildSelectQuery(),
+                        FirstDatabase.FullStringArraySelector);
+                });
+                FirstTask.Start();
+                var SecondTask = new Task(() =>
+                {
+                    SecondData = SecondDatabase.Read(SecondDatabase.BuildSelectQuery(),
+                        SecondDatabase.FullStringArraySelector);
+                });
+                SecondTask.Start();
+                Task.WaitAll(FirstTask, SecondTask);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return false;
+            }
+            return true;
+        }
+
+
+        /// <summary>
+        /// Повертає словник з 2-х елементів
+        /// 1-й FirstDb.Except(SecondDb)
+        /// 2-й SecondDb.Except(FirstDb)
+        /// </summary>
+        /// <returns></returns>
+        public Dictionary<int, IQueryable<string[]>> CompareFullData()
+        {
+            Dictionary<int, IQueryable<string[]>> Result = new Dictionary<int, IQueryable<string[]>>();
+            try
+            {
+                var FirstTask = new Task(() =>
+                {
+                    Result.Add(1, FirstData.Except(SecondData, new SomeComparison()));
+                });
+                FirstTask.Start();
+                var SecondTask = new Task(() =>
+                {
+                    Result.Add(2, SecondData.Except(FirstData, new SomeComparison()));
+                });
+                SecondTask.Start();
+                Task.WaitAll(FirstTask, SecondTask);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return null;
+            }
+            return Result;
+        }
+
+        /// <summary>
+        /// Повертає порівняння лвох колонок як масив рядків
         /// </summary>
         /// <param name="SelectedColumn">Номер колонки</param>
         /// <returns></returns>
-        public List<string>[] CompareColumns(int SelectedColumn)
+        public Dictionary<int, IQueryable<string[]>> CompareColumns(int SelectedColumn)
         {
-            List<string>[] Result = new List<string>[2];
+            Dictionary<int, IQueryable<string[]>> Result = new Dictionary<int, IQueryable<string[]>>();
             try
             {
                 //дістаєм імена колонок-ключів
@@ -99,90 +184,30 @@ namespace DBTest
                 var list2 = FirstDatabase.TableColumns.Where(item => item.ISKey).ToList();
                 //Дістаєм мінімальну к-сть головних ключів з таблиць
                 int min = Math.Min(list1.Count, list2.Count);
-                string[] FirstKeys = new string[min + 1];
-                string[] SecondKeys = new string[min + 1];
+                int[] FirstKeys = new int[min + 1];
+                int[] SecondKeys = new int[min + 1];
                 //додаєм назви цих колонок до запитів
                 for (int i = 0; i < min; i++)
                 {
-                    FirstKeys[i] = list1[i].Name;
-                    SecondKeys[i] = list2[i].Name;
+                    FirstKeys[i] = list1[i].Position;
+                    SecondKeys[i] = list2[i].Position;
                 }
-                FirstKeys[min] = FirstDatabase.TableColumns[SelectedColumn].Name;
-                SecondKeys[min] = SecondDatabase.TableColumns[SelectedColumn].Name;
+                FirstKeys[min] = FirstDatabase.TableColumns[SelectedColumn].Position;
+                SecondKeys[min] = SecondDatabase.TableColumns[SelectedColumn].Position;
                 //створєм предавлення таблиць з врахування первинних ключів
-                DataView FirstView = new DataView(FirstData);
-                DataTable FirstSelected = FirstView.ToTable("Selected", false, FirstKeys);
-                DataView SecondView = new DataView(SecondData);
-                DataTable SecondSelected = SecondView.ToTable("Selected", false, SecondKeys);
-                //перетворюм отримані рядки в string
-                IEnumerable<string> ListOne = FirstSelected.ReturnEnumerateRows();
-                IEnumerable<string> ListTwo = SecondSelected.ReturnEnumerateRows();
-                //отримуєм віддмінності
-                Result[0] = ListOne.Except(ListTwo).ToList();
-                Result[1] = ListTwo.Except(ListOne).ToList();
+                var FirstSelected = FirstData.KeyPlusDataSelection(FirstKeys);
+                var SecondSelected = SecondData.KeyPlusDataSelection(SecondKeys);
                 //заповнюєм статистику
-                AdditionalInfo[0].SameInColumn.Add(SelectedColumn, FirstSelected.Rows.Count - Result[0].Count);
-                AdditionalInfo[1].SameInColumn.Add(SelectedColumn, SecondSelected.Rows.Count - Result[1].Count);
-                AdditionalInfo[0].DifferentInColumn.Add(SelectedColumn, Result[0].Count);
-                AdditionalInfo[1].DifferentInColumn.Add(SelectedColumn, Result[1].Count);
+                AdditionalInfo[0].SameInColumn.Add(SelectedColumn, FirstSelected.Count() - Result[0].Count());
+                AdditionalInfo[1].SameInColumn.Add(SelectedColumn, SecondSelected.Count() - Result[1].Count());
+                AdditionalInfo[0].DifferentInColumn.Add(SelectedColumn, Result[0].Count());
+                AdditionalInfo[1].DifferentInColumn.Add(SelectedColumn, Result[1].Count());
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return Result;
+                return null;
             }
-            return Result;
-        }
-
-        /// <summary>
-        /// Знаходить цілий рядок за поданими даними
-        /// </summary>
-        /// <param name="list">Список даних</param>
-        /// <param name="dataBase">В якій ДБ шукати</param>
-        /// <param name="colName">Номер колонки</param>
-        /// <returns></returns>
-        public DataTable GetFullRows(List<string> list, int dataBase, int colName)
-        {
-            int counter = list.Count;
-            DataTable dt;
-            string[] keys;
-            if (dataBase == 0)
-            {
-                dt = FirstData;
-                keys = FirstDatabase.TableColumns.Where(item => item.ISKey).Select(item => item.Name).ToArray();
-            }
-            else
-            {
-                dt = SecondData;
-                keys = SecondDatabase.TableColumns.Where(item => item.ISKey).Select(item => item.Name).ToArray();
-            }
-            DataView TableView = new DataView(FirstData);
-            DataTable Result = dt.Clone();
-            string Sort;
-            if (keys.Length < 1)
-            {
-                Sort = SecondData.Columns[colName].ColumnName;
-            }
-            else
-            {
-                Sort = keys[0];
-                for (int i = 1; i < keys.Length; i++)
-                {
-                    Sort += ", " + keys[i];
-                }
-                Sort += "," + dt.Columns[colName];
-            }
-            TableView.Sort = Sort;
-            if (colName == 0)
-                foreach (var item in list)
-                {
-                    TableView.Find(item);
-                }
-            else
-                foreach (var item in list)
-                {
-                    Result.Rows.Add(dt.Rows[TableView.Find(item.Split())].ItemArray);
-                }
             return Result;
         }
     }
@@ -192,7 +217,13 @@ namespace DBTest
     /// </summary>
     public class Statistick
     {
+        /// <summary>
+        /// Одинакових колонок
+        /// </summary>
         public Dictionary<int, int> SameInColumn;
+        /// <summary>
+        /// Відмінних колонок
+        /// </summary>
         public Dictionary<int, int> DifferentInColumn;
 
         public Statistick()
@@ -201,10 +232,14 @@ namespace DBTest
             DifferentInColumn = new Dictionary<int, int>();
         }
     }
+
+    /// <summary>
+    /// Клас з розширеннями IEnumerable<string[]>
+    /// </summary>
     public static class Extension
     {
         /// <summary>
-        /// Перетворює DataRow у рядок
+        /// Я не знаю, нашо тут це розширення. Просто тому шо я можу
         /// </summary>
         /// <param name="table">Таблиця</param>
         /// <returns></returns>
@@ -222,7 +257,7 @@ namespace DBTest
         }
 
         /// <summary>
-        /// Витягує з рядка єдине останнє значення
+        /// Ага, тово тоже не потрібне
         /// </summary>
         /// <param name="table"></param>
         /// <returns></returns>
@@ -230,26 +265,26 @@ namespace DBTest
         {
             foreach (DataRow row in table.Rows)
             {
-                int last = row.ItemArray.Length-1;
+                int last = row.ItemArray.Length - 1;
                 yield return row.ItemArray[last].ToString();
             }
         }
 
-        public static IEnumerable<string[]> MyExcept(this string[][] arr1, string[][] arr2)
+        /// <summary>
+        /// Витягує з нумерованого масиву рядків певні рядки
+        /// </summary>
+        /// <param name="arr1">Собсно масив</param>
+        /// <param name="arr2">А тут - масив рядків, які тре дістати</param>
+        /// <returns></returns>
+        public static IQueryable<string[]> KeyPlusDataSelection(this IQueryable<string[]> arr1, int[] arr2)
         {
-            string str = "";
-            var l1 = arr1.Select(i => String.Join(" ", i)).ToArray();
-            var l2 = arr2.Select(i => String.Join(" ", i)).ToArray();
-            int counter = arr1.Length;
-            for (int i = 0; i < counter; i++)
-            {
-                if (!l2.Contains(l1[i]))
-                    yield return arr1[i];
-            }
+            return (from item in arr1 select (from col in arr2 select item.ToArray()[col]).ToArray()).AsQueryable();
         }
         /*
          На всяк випадок 
          Юзабельний код
+         Update - виявилося, шо ет не сильно юзабельний код
+         Але най ше побуде - мож пригодиться
             System.Data.DataView view = new System.Data.DataView(dtMaths);
             System.Data.DataTable selected = view.ToTable("Selected", false, dtMaths.Columns[0].ToString());
             IEnumerable<DataRow> l1 = dtMaths.EnumerateRows();

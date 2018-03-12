@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using DBTest;
 using Jdforsythe.MySQLConnection;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore.Query.Expressions;
 using MySql.Data.MySqlClient;
 using ObjectsComparer;
 
@@ -67,8 +68,7 @@ namespace DbComparer
         /// <param name="query">Запит</param>
         /// <param name="selector">Селектор (міститься у БД)</param>
         /// <returns></returns>
-        Selected[] Read<Selected>(string query, Func<IDataRecord, Selected> selector);
-        DataTable ReadTable(string query, Func<IDataRecord, DataRow> selector);
+        IQueryable<string[]> Read(string query, Func<IDataRecord, string[]> selector);
         /// <summary>
         /// Закриває підключення
         /// </summary>
@@ -96,32 +96,41 @@ namespace DbComparer
             connection = null;
             TableColumns = new List<Column>();
             SelectedColumns = new List<string>();
-            QueryResult = null;
         }
+        /// <summary>
+        /// Рядок підключення
+        /// </summary>
         public string DataConnectionString;
 
+        /// <summary>
+        /// Обрана база даних
+        /// </summary>
         public string SelectedDatabase;
 
+        /// <summary>
+        /// Обрана таблиця
+        /// </summary>
         public string SelectedTable;
 
+        /// <summary>
+        /// Підлючення
+        /// </summary>
         public DbConnection connection;
 
+        /// <summary>
+        /// Інформація про колонки активної таблиці
+        /// </summary>
         public List<Column> TableColumns;
 
+        /// <summary>
+        /// Колонки, обрані для порівняння
+        /// </summary>
         public List<string> SelectedColumns;
 
-        public static DataTable QueryResult;
-
-        private static DataRow newRow;
-
-        public Func<IDataRecord, string> Test = delegate (IDataRecord s)
-        {
-            return String.Format("{0} {1}", s[0], s[1]);
-        };
-
-
-        protected static int counter;
-
+        /// <summary>
+        /// Селектор
+        /// Повертає дані у вигляді суцільного рядка
+        /// </summary>
         public Func<IDataRecord, string> FullStringSelector = delegate (IDataRecord s)
         {
             object[] obj = new object[s.FieldCount];
@@ -129,9 +138,13 @@ namespace DbComparer
             {
                 obj[i] = s[i];
             }
-            return String.Join(" ",obj);
+            return String.Join(" ", obj);
         };
 
+        /// <summary>
+        /// Селектор
+        /// Повертає дані у вигляді масиву рядків
+        /// </summary>
         public Func<IDataRecord, string[]> FullStringArraySelector = delegate (IDataRecord s)
         {
             int counter = s.FieldCount;
@@ -144,18 +157,9 @@ namespace DbComparer
             return array;
         };
 
-        public Func<IDataRecord, DataRow> FullRowSelector = delegate (IDataRecord s)
-        {
-            int counter = s.FieldCount;
-            string[] array = new string[counter];
-            for (int i = 0; i < counter; i++)
-            {
-                array[i] = s[i].ToString();
-            }
-            QueryResult.Rows.Add(array);
-            return newRow;
-        };
-
+        /// <summary>
+        /// Тип активної БД
+        /// </summary>
         public Database_Type DbType;
 
         public abstract bool ConnectToServer();
@@ -164,11 +168,15 @@ namespace DbComparer
         public abstract List<string> GetDatabasesList();
         public abstract List<string> GetTablesList(string database = null);
         public abstract DataTable GetTableInfo(string tableName = null);
-        public abstract Selected[] Read<Selected>(string query, Func<IDataRecord, Selected> selector);
-        public abstract DataTable ReadTable(string query, Func<IDataRecord, DataRow> selector);
+        public abstract IQueryable<string[]> Read(string query, Func<IDataRecord, string[]> selector);
 
         public abstract void CloseConnection();
 
+        /// <summary>
+        /// Будує запит до БД на основі SelectedColumns
+        /// </summary>
+        /// <param name="table"></param>
+        /// <returns></returns>
         public string BuildSelectQuery(string table = null)
         {
             string Select = "SELECT ";
@@ -181,59 +189,61 @@ namespace DbComparer
             return Select;
         }
 
-        public DataTable BuildContainer()
+        /// <summary>
+        /// Визначає тип БД
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        public static Database_Type GetDBType(IFormFile file)
         {
-            DataTable dt = new DataTable();
-            foreach (var column in SelectedColumns)
+            string ext = Path.GetExtension(file.FileName).Replace(".", "").ToLower();
+            switch (ext)
             {
-                dt.Columns.Add(column, typeof(string));
+                case "mdf":
+                    {
+                        return Database_Type.SqlServer; break;
+                    }
+                case "sql":
+                    {
+                        return Database_Type.MySql; break;
+                    }
+                case "xml":
+                    {
+                        return Database_Type.XML; break;
+                    }
+                default:
+                    {
+                        return Database_Type.NONE; break;
+                    }
             }
-            QueryResult = dt;
-            return dt;
         }
-                public static Database_Type GetDBType(IFormFile file)
-                {
-                    string ext = Path.GetExtension(file.FileName).Replace(".", "").ToLower();
-                    switch (ext)
+
+        /// <summary>
+        /// Визначає тип БД та виконує присвоєння
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        public static Database InitializeType(IFormFile file)
+        {
+
+            Database.Database_Type type = Database.GetDBType(file);
+            switch (type)
+            {
+                case Database_Type.MySql:
+                    { return new MySqlDataBaseConnector() { DbType = Database_Type.MySql }; break; }
+                case Database_Type.SqlServer:
+                    { return new SqlDataBaseConnector() { DbType = Database_Type.SqlServer }; ; break; }
+                default:
                     {
-                        case "mdf":
-                            {
-                                return Database_Type.SqlServer; break;
-                            }
-                        case "sql":
-                            {
-                                return Database_Type.MySql; break;
-                            }
-                        case "xml":
-                            {
-                                return Database_Type.XML; break;
-                            }
-                        default:
-                            {
-                                return Database_Type.NONE; break;
-                            }
+                        return null;
+                        break;
                     }
-                }
+            }
+        }
 
-
-                public static Database InitializeType(IFormFile file)
-                {
-
-                    Database.Database_Type type = Database.GetDBType(file);
-                    switch (type)
-                    {
-                        case Database_Type.MySql:
-                            { return new MySqlDataBaseConnector() { DbType = Database_Type.MySql }; break; }
-                        case Database_Type.SqlServer:
-                            { return new SqlDataBaseConnector() { DbType = Database_Type.SqlServer }; ; break; }
-                        default:
-                            {
-                                return null;
-                                break;
-                            }
-                    }
-                }
-
+        /// <summary>
+        /// Можливі типи БД
+        /// </summary>
         public enum Database_Type
         {
             SqlServer,
@@ -243,18 +253,26 @@ namespace DbComparer
             NONE
         }
 
+        /// <summary>
+        /// Дані про колонки таблиці
+        /// </summary>
         public class Column
         {
-            public string Position;
+            public int Position;
             public string Name;
             public string Type;
             public string Length;
             public bool ISKey;
 
+            /// <summary>
+            /// Витянує такі дані про колонку як:
+            /// Позиція, Імя, Тип, Довжина, ЧиЄКлючем
+            /// </summary>
+            /// <param name="dr"></param>
             public Column(DataRow dr)
             {
                 var array = dr.ItemArray;
-                Position = array[4].ToString();//Позиція
+                Position = Int32.Parse(array[4].ToString());//Позиція
                 Name = array[3].ToString();//Імя
                 Type = array[7].ToString();//Тип
                 Length = array[8].ToString();//Довжина
@@ -359,10 +377,6 @@ namespace DbComparer
             try
             {
                 String[] columnRestrictions = new String[4];
-
-                // For the array, 0-member represents Catalog; 1-member represents Schema; 
-                // 2-member represents Table Name; 3-member represents Column Name. 
-                // Now we specify the Table_Name and Column_Name of the columns what we want to get schema information.
                 if (tableName == null)
                     columnRestrictions[2] = SelectedTable;
                 else
@@ -379,26 +393,20 @@ namespace DbComparer
                 }
 
                 /////////
-                // Given a DataTableReader, display schema
-                // information about a particular column.
                 string _table = (tableName == null) ? SelectedTable : tableName;
                 SqlDataAdapter adapter = new
                     SqlDataAdapter("SELECT TOP 1 * FROM " + _table,
                         (connection as SqlConnection));
-
-                // Fill the DataTable, retrieving all the schema information.
                 adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
                 DataTable table = new DataTable();
                 adapter.Fill(table);
-
-                // Create the DataTableReader, and close it when done.
                 using (DataTableReader reader = new DataTableReader(table))
                 {
                     int ordinal = 0;
                     DataTable schemaTable = reader.GetSchemaTable();
                     for (int i = 0; i < schemaTable.Rows.Count; i++)
                     {
-                        if ((bool) schemaTable.Rows[i].ItemArray[12])
+                        if ((bool)schemaTable.Rows[i].ItemArray[12])
                         {
                             TableColumns[i].ISKey = true;
                         }
@@ -414,24 +422,15 @@ namespace DbComparer
             }
         }
 
-        public override Selected[] Read<Selected>(string query, Func<IDataRecord, Selected> selector)
+        public override IQueryable<string[]> Read(string query, Func<IDataRecord, string[]> selector)
         {
             try
             {
                 using (var cmd = connection.CreateCommand())
                 {
-                    if (SelectedColumns.Count == 0)
-                    {
-                        counter = GetTableInfo(SelectedTable).Rows.Count;
-                    }
-                    else
-                    {
-                        counter = SelectedColumns.Count;
-                    }
-
                     cmd.CommandText = query;
                     using (var r = cmd.ExecuteReader())
-                        return ((DbDataReader) r).Cast<IDataRecord>().Select(selector).ToArray();
+                        return ((DbDataReader)r).Cast<IDataRecord>().Select(selector).ToArray().AsQueryable();
                 }
             }
             catch (Exception EX_NAME)
@@ -440,87 +439,6 @@ namespace DbComparer
             }
         }
 
-        public override DataTable ReadTable(string query, Func<IDataRecord, DataRow> selector)
-        {
-            try
-            {
-                DataTable dtLocal = QueryResult;
-                using (var cmd = connection.CreateCommand())
-                {
-                    if (SelectedColumns.Count == 0)
-                    {
-                        counter = GetTableInfo(SelectedTable).Rows.Count;
-                    }
-                    else
-                    {
-                        counter = SelectedColumns.Count;
-                    }
-
-                    cmd.CommandText = query;
-                    using (var r = cmd.ExecuteReader())
-                        ((DbDataReader) r).Cast<IDataRecord>().Select(selector).ToArray();
-                    return QueryResult;
-                }
-            }
-            catch (Exception EX_NAME)
-            {
-                return null;
-            }
-        }
-
-        public string[] ReadRecord(string query, Func<IDataRecord, string> select)
-        {
-            try
-            {
-                DataTable dtLocal = QueryResult;
-                using (var cmd = connection.CreateCommand())
-                {
-                    if (SelectedColumns.Count == 0)
-                    {
-                        counter = GetTableInfo(SelectedTable).Rows.Count;
-                    }
-                    else
-                    {
-                        counter = SelectedColumns.Count;
-                    }
-
-                    cmd.CommandText = query;
-                    using (var r = cmd.ExecuteReader())
-                        return ((DbDataReader) r).Cast<IDataRecord>().Select(select).ToArray();
-                }
-            }
-            catch (Exception EX_NAME)
-            {
-                return null;
-            }
-        }
-
-        public string[][] ReadArrRecord(string query, Func<IDataRecord, string[]> select)
-        {
-            try
-            {
-                DataTable dtLocal = QueryResult;
-                using (var cmd = connection.CreateCommand())
-                {
-                    if (SelectedColumns.Count == 0)
-                    {
-                        counter = GetTableInfo(SelectedTable).Rows.Count;
-                    }
-                    else
-                    {
-                        counter = SelectedColumns.Count;
-                    }
-
-                    cmd.CommandText = query;
-                    using (var r = cmd.ExecuteReader())
-                        return ((DbDataReader)r).Cast<IDataRecord>().Select(select).ToArray();
-                }
-            }
-            catch (Exception EX_NAME)
-            {
-                return null;
-            }
-        }
 
         public override void CloseConnection()
         {
@@ -560,7 +478,7 @@ namespace DbComparer
                 {new string[3] {"1", "2", "4"}, new string[3] {"1", "2", "3"}, new string[3] {"1", "2", "0"}};
             var d22 = new string[3][]
                 {new string[3] {"1", "2", "4"}, new string[3] {"1", "2", "5"}, new string[3] {"1", "2", "6"}};
-            
+
             SqlDataBaseConnector sql = new SqlDataBaseConnector();
             var c1 = sql.ConnectToServer();
             var c2 = sql.ConnectToDatabase("Repair");
@@ -583,10 +501,10 @@ namespace DbComparer
             Stopwatch sw1 = new Stopwatch();
             Stopwatch sw2 = new Stopwatch();
             sw1.Start();
-            IEnumerable<string[]> table1=null, table2=null;
-            var table11 = new Task(() => { table1 = sql.ReadArrRecord(sql.BuildSelectQuery(), FullStringArraySelector); });
+            IEnumerable<string[]> table1 = null, table2 = null;
+            var table11 = new Task(() => { table1 = sql.Read(sql.BuildSelectQuery(), FullStringArraySelector); });
             table11.Start();
-            var table22 = new Task(() => { table2=sql2.ReadArrRecord(sql2.BuildSelectQuery(), FullStringArraySelector); });
+            var table22 = new Task(() => { table2 = sql2.Read(sql2.BuildSelectQuery(), FullStringArraySelector); });
             sw1.Stop();
             table22.Start();
             Task.WaitAll(table11, table22);
@@ -594,14 +512,14 @@ namespace DbComparer
             var dasda = table1.Except(table2, new SomeComparison());
             sw2.Stop();
             System.Console.WriteLine(1);
-//            IQueryable<DataRow> dr1 = dtMaths.Rows.Cast<DataRow>().AsQueryable();
-//            IQueryable<DataRow> dr2 = dtEnglish.Rows.Cast<DataRow>().AsQueryable();
+            //            IQueryable<DataRow> dr1 = dtMaths.Rows.Cast<DataRow>().AsQueryable();
+            //            IQueryable<DataRow> dr2 = dtEnglish.Rows.Cast<DataRow>().AsQueryable();
 
 
-//            System.Data.DataView view = new System.Data.DataView(dtMaths);
-//            System.Data.DataTable selected = view.ToTable("Selected", false, dtMaths.Columns[0].ToString(),
-//                dtMaths.Columns[2].ToString());
-//            var dtOnlyMaths = dtMaths.Rows.Cast<DataRow>().Except(dtEnglish.Rows.Cast<DataRow>());
+            //            System.Data.DataView view = new System.Data.DataView(dtMaths);
+            //            System.Data.DataTable selected = view.ToTable("Selected", false, dtMaths.Columns[0].ToString(),
+            //                dtMaths.Columns[2].ToString());
+            //            var dtOnlyMaths = dtMaths.Rows.Cast<DataRow>().Except(dtEnglish.Rows.Cast<DataRow>());
 
         }
     }
@@ -735,48 +653,20 @@ namespace DbComparer
             }
         }
 
-        public override Selected[] Read<Selected>(string query, Func<IDataRecord, Selected> selector)
+        public override IQueryable<string[]> Read(string query, Func<IDataRecord, string[]> selector)
         {
             try
             {
                 using (var cmd = (connection as MySqlConnection).CreateCommand())
                 {
-                    counter = GetTableInfo(SelectedTable).Rows.Count;
                     cmd.CommandText = query;
                     using (MySqlDataReader r = cmd.ExecuteReader())
-                        return ((DbDataReader)r).Cast<IDataRecord>().Select(selector).ToArray();
+                        return ((DbDataReader)r).Cast<IDataRecord>().Select(selector).ToArray().AsQueryable();
                 }
             }
             catch (Exception EX_NAME)
             {
                 System.Console.WriteLine(EX_NAME.Message);
-                return null;
-            }
-        }
-
-        public override DataTable ReadTable(string query, Func<IDataRecord, DataRow> selector)
-        {
-            try
-            {
-                DataTable dtLocal = QueryResult;
-                using (var cmd = (connection as MySqlConnection).CreateCommand())
-                {
-                    if (SelectedColumns.Count == 0)
-                    {
-                        counter = GetTableInfo(SelectedTable).Rows.Count;
-                    }
-                    else
-                    {
-                        counter = SelectedColumns.Count;
-                    }
-                    cmd.CommandText = query;
-                    using (MySqlDataReader r = cmd.ExecuteReader())
-                         ((DbDataReader)r).Cast<IDataRecord>().Select(selector).ToArray();
-                    return QueryResult;
-                }
-            }
-            catch (Exception EX_NAME)
-            {
                 return null;
             }
         }

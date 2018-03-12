@@ -38,8 +38,6 @@ namespace Comparer.Controllers
         public IActionResult Index()
         {
             db.CloseConnection();
-            SqlDataBaseConnector sq= new SqlDataBaseConnector();
-            sq.Test();
             return View();
         }
 
@@ -230,3 +228,47 @@ namespace Comparer.Controllers
         #endregion
     }
 }
+
+
+/*
+ Код для "дебагу"
+ Вставити на будь-яку сторінку
+             DatabaseComparer comp = new DatabaseComparer();
+            var task1 = new Task(() =>
+            {
+                comp.FirstDatabase = new SqlDataBaseConnector();
+                var c1 = comp.FirstDatabase.ConnectToServer();
+                var c2 = comp.FirstDatabase.ConnectToDatabase("Repair");
+                comp.FirstDatabase.SelectedTable = "NewEmployees";
+                comp.FirstDatabase.GetTableInfo("NewEmployees");
+                foreach (var item in comp.FirstDatabase.TableColumns)
+                {
+                    comp.FirstDatabase.SelectedColumns.Add(item.Name);
+                }
+            });
+            task1.Start();
+            var task2 = new Task(() =>
+            {
+                comp.SecondDatabase = new SqlDataBaseConnector();
+                var c12 = comp.SecondDatabase.ConnectToServer();
+                var c22 = comp.SecondDatabase.ConnectToDatabase("Repair");
+                comp.SecondDatabase.SelectedTable = "NewEmployees2";
+                comp.SecondDatabase.GetTableInfo();
+                foreach (var item in comp.SecondDatabase.TableColumns)
+                {
+                    comp.SecondDatabase.SelectedColumns.Add(item.Name);
+                }
+            });
+            task2.Start();
+            Task.WaitAll(task1, task2);
+            Stopwatch sw1 = new Stopwatch();
+            Stopwatch sw2 = new Stopwatch();
+            sw1.Start();
+            IEnumerable<string[]> table1 = null, table2 = null;
+            var dasda = comp.ReadDataFromDb();
+            sw1.Stop();
+            sw2.Start();
+            var res = comp.CompareFullData();
+            sw2.Stop();
+            System.Console.WriteLine(1);
+ */
