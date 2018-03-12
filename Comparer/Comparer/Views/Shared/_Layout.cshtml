@@ -58,10 +58,10 @@
             <div id="navbar" class="collapse navbar-collapse">
 
                 <ul class="nav navbar-nav navbar-right">
-                    <li class="colorNav"><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-                    <li><a id="color-nav" asp-area="" asp-controller="Home" asp-action="About">About</a></li>
-                    <li><a id="color-nav" asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
-                    <li><a id="color-nav" asp-area="" asp-controller="Home" asp-action="ColumnMapping">CollumnMapping</a></li>
+                    <li><a class="color-nav" asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
+                    <li><a class="color-nav" asp-area="" asp-controller="Home" asp-action="About">About</a></li>
+                    <li><a class="color-nav" asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
+                    <li><a class="color-nav" asp-area="" asp-controller="Home" asp-action="ColumnMapping">CollumnMapping</a></li>
                 </ul>
                 @*<ul class="nav navbar-nav navbar-right">
                         <li><a href="registration.html"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
@@ -75,10 +75,10 @@
     </div>
     <div class="container-fluid body-content">
         @RenderBody()
-        <hr />
-
+    </div>
+    <div class="container-fluid" id="footer">
         <footer>
-            <p>&copy; 2018 - Comparer</p>
+            <h2 class="text-center">&copy; 2018 - Comparer</h2>
         </footer>
     </div>
     @RenderSection("Scripts", required: false)

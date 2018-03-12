@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <Folder Include="Pages\" />
+    <Folder Include="wwwroot\font\" />
     <Folder Include="wwwroot\Uploads\" />
   </ItemGroup>
 

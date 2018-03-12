@@ -1,7 +1,8 @@
 ﻿@using System.Data
 @model DBTest.DatabaseComparer
 
-<link rel="stylesheet" href="~/css/PartialViewCss/TableInfo.css" />
+
+<link rel="stylesheet" href="~/css/PartialViewCss/TableInfo.css"/>
 <div class="container-fluid">
     <form action="" class="" id="FirstTable">
 
@@ -10,9 +11,9 @@
         <div class="row-fluid" id="container-table-info">
 
             <div class=" table-chooser panel panel-default panel-table">
-                @{
-                    List<String> drcFirstDBNamesTB = Model.FirstDatabase.GetTablesList();
-                }
+                    @{
+                    List<String> drcFirstDBNamesTB = Model.FirstDatabase.GetTablesList("TeamBuilding"); 
+                    }
 
                 <div class="panel-body">
 
