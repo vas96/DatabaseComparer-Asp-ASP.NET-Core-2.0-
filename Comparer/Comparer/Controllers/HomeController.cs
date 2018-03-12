@@ -89,19 +89,18 @@ public HomeController(DatabaseComparer context, IHostingEnvironment hostingEnvir
         }
 
 
-        public IActionResult ColumnMapping(string[] array)
+        public IActionResult ColumnMapping(params string[] array)
         {
             db.FirstDatabase.SelectedTable = array[0];
             db.SecondDatabase.SelectedTable = array[1];
             if (db.FirstDatabase.SelectedTable == "" || db.SecondDatabase.SelectedTable == "")
-                return PartialView("_Error");
+            return PartialView("_Error");
             db.FirstDatabase.GetTableInfo();
             db.SecondDatabase.GetTableInfo();
-            return PartialView("_ColumnMapping", db);
-            
+            return PartialView("_ColumnMapping", db);           
         }
 
-        public IActionResult Comparing(string[] array)
+        public IActionResult Comparing(string[] array, string[] array2)
         {
             if (array.Length==0)
                 return PartialView("_Error");
@@ -115,7 +114,6 @@ public HomeController(DatabaseComparer context, IHostingEnvironment hostingEnvir
                         db.SecondDatabase.SelectedColumns.Add(array[i]);
                 }
             }
-
             return PartialView("_Comparing", db);
         }
 

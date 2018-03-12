@@ -90,17 +90,20 @@
     $("#NextStep").click(function () {
         var list = [];
         var array = [];
+        var array2 = [];
         list = $("table.drag").find("tr").toArray();
         list.forEach(function (item, i) {
             array.push(item.cells[0].innerText);
         });
+        array2 = array;
         console.log(array);
+        console.log(array2);
         $.ajax({
             url: "Comparing",
             type: "POST",
             data: { array: array },
+            data: { array2: array2 },
             cache: false,
-            dataType: 'json',
             success: function (result) {
                 $("#Partial").html(result);
             }

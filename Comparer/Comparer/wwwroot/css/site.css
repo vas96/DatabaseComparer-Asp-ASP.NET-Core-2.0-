@@ -1,6 +1,35 @@
-﻿html,
+﻿@font-face {
+    font-family: "RobotoSlabRegular";
+    src: url("../font/RobotoSlab-Regular.ttf") format("truetype");
+    font-style: normal;
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "RobotoSlabBold";
+    src: url("../font/RobotoSlab-Bold.ttf") format("truetype");
+    font-style: normal;
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "RobotoSlabLight";
+    src: url("../font/RobotoSlab-Light.ttf") format("truetype");
+    font-style: normal;
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "RobotoSlabThin";
+    src: url("../font/RobotoSlab-Thin.ttf") format("truetype");
+    font-style: normal;
+    font-weight: normal;
+}
+
+html,
 body {
-    overflow-x: hidden; 
+    overflow-x: hidden;
+    font-family: "RobotoSlabRegular", Helvetica, Arial, sans-serif;
 }
 
 /* Carousel */
@@ -33,19 +62,32 @@ body {
 
 .navbar {
     border: none !important;
-    color:black;
+    color: black;
+}
+.navbar {
+    background-color: #40739e;
 }
 
-
-.colorNav {
-    color: blue;
+.color-nav {
+    color: #dfe6e9 !important;
     text-decoration: none;
+    transition-duration: 0.4s;
 }
+
+    .color-nav:hover {
+        zoom: 1.001;
+        color: #ecf0f1 !important;
+    }
 
 .shrink {
     -webkit-transition: 0.5s;
     -moz-transition: 0.5s;
     transition: 0.5s;
     color: blue;
-    padding:1vh;
+    padding: 1vh;
+}
+
+#footer {
+    background-color: #487eb0;
+    color:white;
 }
