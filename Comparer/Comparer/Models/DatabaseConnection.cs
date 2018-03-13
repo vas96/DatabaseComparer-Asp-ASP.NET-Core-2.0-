@@ -509,7 +509,7 @@ namespace DbComparer
             table22.Start();
             Task.WaitAll(table11, table22);
             sw2.Start();
-            var dasda = table1.Except(table2, new SomeComparison());
+            var dasda = table1.Except(table2, new StringArrayComparer());
             sw2.Stop();
             System.Console.WriteLine(1);
             //            IQueryable<DataRow> dr1 = dtMaths.Rows.Cast<DataRow>().AsQueryable();
@@ -523,11 +523,15 @@ namespace DbComparer
 
         }
     }
-    class SomeComparison : IEqualityComparer<string[]>
+    class StringArrayComparer : IEqualityComparer<string[]>
     {
 
         public bool Equals(string[] x, string[] y)
         {
+            if (y == null || x == null)
+            {
+                return false;
+            }
             return x.SequenceEqual(y);
         }
 

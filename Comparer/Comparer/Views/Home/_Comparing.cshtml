@@ -1,5 +1,32 @@
 ﻿@using System.Data
 @model DBTest.DatabaseComparer
 
-
-<h1>NOT IMPLEMENTED</h1>
+<div class="container-fluid">
+    <div class="row"></div>
+    <table class="table table-bordered table-responsive table-striped">
+        @{
+            using (var sequenceEnum1 = Model.ComparingResult[1].GetEnumerator())
+            {
+                using (var sequenceEnum2 = Model.ComparingResult[2].GetEnumerator())
+                {
+                    while (true)
+                    {
+                        if (sequenceEnum1.MoveNext() && sequenceEnum2.MoveNext())
+                        {
+                            <tr>
+                                @{
+                                    int counter = sequenceEnum1.Current.Length;
+                                    for (int i = 0; i < counter; i++)
+                                    {
+                                        <td>@sequenceEnum1.Current[i]---@sequenceEnum2.Current[i]</td>
+                                    }
+                                }
+                            </tr>
+                        }
+                        else {break;}
+                    }
+                }
+            }
+        }
+    </table>
+</div>

@@ -77,12 +77,14 @@ namespace Comparer.Controllers
 
         #region Partial
 
+        [HttpPost]
         public IActionResult FilesDownloaded()
         {
             return PartialView("_DownloadFiles", db);
         }
 
 
+        [HttpPost]
         public IActionResult TableInfo()
         {
             if ((db.FirstDatabase.connection == null || db.FirstDatabase.connection.State != ConnectionState.Open) ||
@@ -90,7 +92,8 @@ namespace Comparer.Controllers
                 return PartialView("_Error");
             return PartialView("_TableInfo", db);
         }
-        
+
+        [HttpPost]
         public IActionResult ColumnMapping(string[] array = null)
         {
             if (array == null || array.Length <= 2)
@@ -107,7 +110,8 @@ namespace Comparer.Controllers
             return PartialView("_ColumnMapping", db);
 
         }
-        
+
+        [HttpPost]
         public IActionResult Comparing(string[] array)
         {
             if (array.Length == 0)
@@ -125,9 +129,13 @@ namespace Comparer.Controllers
             if (db.FirstDatabase.SelectedColumns.Count !=
                 db.SecondDatabase.SelectedColumns.Count)
                 return PartialView("_Error");
+
+            var readed = db.ReadDataFromDb();
+            db.ComparingResult = db.CompareFullData();
             return PartialView("_Comparing", db);
         }
 
+        [HttpPost]
         public IActionResult SelectTable()
         {
             return PartialView("_SelectTable", db);
@@ -172,14 +180,20 @@ namespace Comparer.Controllers
                         case 1:
                             {
                                 if (db.FirstDatabase != null)
+                                {
                                     db.FirstDatabase.CloseConnection();
+                                    System.IO.File.SetAttributes(path, FileAttributes.Normal);
+                                }
                                 db.FirstDatabase = dbase;
                                 break;
                             }
                         case 2:
                             {
                                 if (db.SecondDatabase != null)
+                                {
                                     db.SecondDatabase.CloseConnection();
+                                    System.IO.File.SetAttributes(path, FileAttributes.Normal);
+                                }
                                 db.SecondDatabase = dbase;
                                 break;
                             }

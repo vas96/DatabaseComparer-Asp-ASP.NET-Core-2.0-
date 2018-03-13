@@ -24,6 +24,11 @@ namespace DBTest
         public IQueryable<string[]> FirstData, SecondData;
 
         /// <summary>
+        /// Результати порівняння
+        /// </summary>
+        public Dictionary<int, IQueryable<string[]>> ComparingResult;
+
+        /// <summary>
         /// Статистика про порівняні рядки
         /// </summary>
         public Statistick[] AdditionalInfo;
@@ -41,6 +46,7 @@ namespace DBTest
             AdditionalInfo = new Statistick[2];
             AdditionalInfo[0] = new Statistick();
             AdditionalInfo[1] = new Statistick();
+            ComparingResult = new Dictionary<int, IQueryable<string[]>>();
         }
 
         /// <summary>
@@ -149,17 +155,20 @@ namespace DBTest
             Dictionary<int, IQueryable<string[]>> Result = new Dictionary<int, IQueryable<string[]>>();
             try
             {
+                IQueryable<string[]> col1=null, col2=null;
                 var FirstTask = new Task(() =>
                 {
-                    Result.Add(1, FirstData.Except(SecondData, new SomeComparison()));
+                    col1 = FirstData.Except(SecondData, new StringArrayComparer());
                 });
                 FirstTask.Start();
                 var SecondTask = new Task(() =>
                 {
-                    Result.Add(2, SecondData.Except(FirstData, new SomeComparison()));
+                    col2 = SecondData.Except(FirstData, new StringArrayComparer());
                 });
                 SecondTask.Start();
                 Task.WaitAll(FirstTask, SecondTask);
+                Result.Add(1, col1);
+                Result.Add(2, col2);
             }
             catch (Exception ex)
             {
@@ -174,34 +183,77 @@ namespace DBTest
         /// </summary>
         /// <param name="SelectedColumn">Номер колонки</param>
         /// <returns></returns>
-        public Dictionary<int, IQueryable<string[]>> CompareColumns(int SelectedColumn)
+        public Dictionary<int, IQueryable<string[]>> CompareColumnsWithKeys(int SelectedColumn)
         {
             Dictionary<int, IQueryable<string[]>> Result = new Dictionary<int, IQueryable<string[]>>();
             try
             {
-                //дістаєм імена колонок-ключів
                 var list1 = FirstDatabase.TableColumns.Where(item => item.ISKey).ToList();
                 var list2 = FirstDatabase.TableColumns.Where(item => item.ISKey).ToList();
-                //Дістаєм мінімальну к-сть головних ключів з таблиць
                 int min = Math.Min(list1.Count, list2.Count);
                 int[] FirstKeys = new int[min + 1];
                 int[] SecondKeys = new int[min + 1];
-                //додаєм назви цих колонок до запитів
                 for (int i = 0; i < min; i++)
                 {
                     FirstKeys[i] = list1[i].Position;
                     SecondKeys[i] = list2[i].Position;
                 }
-                FirstKeys[min] = FirstDatabase.TableColumns[SelectedColumn].Position;
-                SecondKeys[min] = SecondDatabase.TableColumns[SelectedColumn].Position;
-                //створєм предавлення таблиць з врахування первинних ключів
-                var FirstSelected = FirstData.KeyPlusDataSelection(FirstKeys);
-                var SecondSelected = SecondData.KeyPlusDataSelection(SecondKeys);
-                //заповнюєм статистику
-                AdditionalInfo[0].SameInColumn.Add(SelectedColumn, FirstSelected.Count() - Result[0].Count());
-                AdditionalInfo[1].SameInColumn.Add(SelectedColumn, SecondSelected.Count() - Result[1].Count());
+
+                IQueryable<string[]> col1 = null, col2 = null;
+                var task1 = new Task(() =>
+                {
+                    FirstKeys[min] = FirstDatabase.TableColumns[SelectedColumn].Position;
+                    col1 = FirstData.KeyPlusDataSelection(FirstKeys);
+                });
+                task1.Start();
+                var task2 = new Task(() =>
+                    {
+                        SecondKeys[min] = SecondDatabase.TableColumns[SelectedColumn].Position;
+                        col2 = SecondData.KeyPlusDataSelection(SecondKeys);
+                    });
+                task2.Start();
+                Task.WaitAll(task1, task2);
+                Result.Add(1, col1);
+                Result.Add(2, col2);
+                AdditionalInfo[0].SameInColumn.Add(SelectedColumn, Result[0].Count() - Result[0].Count());
                 AdditionalInfo[0].DifferentInColumn.Add(SelectedColumn, Result[0].Count());
+                AdditionalInfo[1].SameInColumn.Add(SelectedColumn, Result[1].Count() - Result[1].Count());
                 AdditionalInfo[1].DifferentInColumn.Add(SelectedColumn, Result[1].Count());
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return null;
+            }
+            return Result;
+        }
+
+
+        public Dictionary<int, IQueryable<string[]>> CompareColumns(int SelectedColumn)
+        {
+            Dictionary<int, IQueryable<string[]>> Result = new Dictionary<int, IQueryable<string[]>>();
+            try
+            {
+                IQueryable<string[]> col1 = null, col2 = null;
+                var task1 = new Task(() =>
+                {
+                    int[] col = new []{FirstDatabase.TableColumns[SelectedColumn].Position};
+                    col1 = FirstData.KeyPlusDataSelection(col);
+                    AdditionalInfo[0].SameInColumn.Add(SelectedColumn, Result[0].Count() - Result[0].Count());
+                    AdditionalInfo[0].DifferentInColumn.Add(SelectedColumn, Result[0].Count());
+                });
+                task1.Start();
+                var task2 = new Task(() =>
+                {
+                    int[] col = new[] { SecondDatabase.TableColumns[SelectedColumn].Position };
+                    col2 = SecondData.KeyPlusDataSelection(col);
+                    AdditionalInfo[1].SameInColumn.Add(SelectedColumn, Result[1].Count() - Result[1].Count());
+                    AdditionalInfo[1].DifferentInColumn.Add(SelectedColumn, Result[1].Count());
+                });
+                task2.Start();
+                Task.WaitAll(task1, task2);
+                Result.Add(1, col1);
+                Result.Add(2, col2);
             }
             catch (Exception e)
             {
