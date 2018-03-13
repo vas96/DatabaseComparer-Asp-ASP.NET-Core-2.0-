@@ -170,7 +170,7 @@ namespace DBTest
         }
 
         /// <summary>
-        /// Повертає порівняння лвох колонок як масив рядків
+        /// Повертає порівняння двох колонок як масив рядків
         /// </summary>
         /// <param name="SelectedColumn">Номер колонки</param>
         /// <returns></returns>
