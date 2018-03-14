@@ -105,7 +105,6 @@ namespace Comparer.Controllers
             db.FirstDatabase.GetTableInfo();
             db.SecondDatabase.GetTableInfo();
             return PartialView("_ColumnMapping", db);
-
         }
         
         public IActionResult Comparing(string[] array)
@@ -125,6 +124,8 @@ namespace Comparer.Controllers
             if (db.FirstDatabase.SelectedColumns.Count !=
                 db.SecondDatabase.SelectedColumns.Count)
                 return PartialView("_Error");
+            var readed = db.ReadDataFromDb();
+            db.ComparingResult = db.CompareFullData();
             return PartialView("_Comparing", db);
         }
 

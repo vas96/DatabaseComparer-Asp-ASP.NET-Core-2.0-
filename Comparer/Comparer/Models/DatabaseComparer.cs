@@ -28,6 +28,9 @@ namespace DBTest
         /// </summary>
         public Statistick[] AdditionalInfo;
 
+
+        public (IQueryable<string[]>, IQueryable<string[]>) ComparingResult;
+
         /// <summary>
         /// Ініціалізація полів
         /// </summary>
@@ -144,29 +147,37 @@ namespace DBTest
         /// 2-й SecondDb.Except(FirstDb)
         /// </summary>
         /// <returns></returns>
-        public Dictionary<int, IQueryable<string[]>> CompareFullData()
+        public (IQueryable<string[]>, IQueryable<string[]>) CompareFullData()
         {
-            Dictionary<int, IQueryable<string[]>> Result = new Dictionary<int, IQueryable<string[]>>();
+            IQueryable<string[]> ResultFirst = null;
+            IQueryable<string[]> ResultSecond = null;
+            (IQueryable<string[]>, IQueryable<string[]>) ResultAll = (source: ResultFirst, target: ResultSecond);
             try
             {
                 var FirstTask = new Task(() =>
                 {
-                    Result.Add(1, FirstData.Except(SecondData, new SomeComparison()));
+                    ResultFirst = FirstData.Except(SecondData, new SomeComparison());
                 });
                 FirstTask.Start();
                 var SecondTask = new Task(() =>
                 {
-                    Result.Add(2, SecondData.Except(FirstData, new SomeComparison()));
+                    ResultSecond = SecondData.Except(FirstData, new SomeComparison());
                 });
                 SecondTask.Start();
                 Task.WaitAll(FirstTask, SecondTask);
+
+#pragma warning disable CS8123 // The tuple element name is ignored because a different name or no name is specified by the assignment target.
+                ResultAll = (source: ResultFirst, target: ResultSecond);
+#pragma warning restore CS8123 // The tuple element name is ignored because a different name or no name is specified by the assignment target.
+
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                return null;
+               // return null;
             }
-            return Result;
+
+            return ResultAll;
         }
 
         /// <summary>
@@ -279,6 +290,12 @@ namespace DBTest
         public static IQueryable<string[]> KeyPlusDataSelection(this IQueryable<string[]> arr1, int[] arr2)
         {
             return (from item in arr1 select (from col in arr2 select item.ToArray()[col]).ToArray()).AsQueryable();
+        }
+
+
+        public static int GetMax(int first, int second)
+        {
+            return first > second ? first : second;
         }
         /*
          На всяк випадок 
