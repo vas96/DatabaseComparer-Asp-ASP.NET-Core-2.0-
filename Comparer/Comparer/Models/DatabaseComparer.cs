@@ -2,12 +2,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using DbComparer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
+using NaturalSort.Extension;
 
 namespace DBTest
 {
@@ -21,12 +26,12 @@ namespace DBTest
         /// <summary>
         /// Результати читання з БД
         /// </summary>
-        public IQueryable<string[]> FirstData, SecondData;
+        public List<string[]> FirstData, SecondData;
 
         /// <summary>
         /// Результати порівняння
         /// </summary>
-        public Dictionary<int, IQueryable<string[]>> ComparingResult;
+        public Dictionary<int, List<string[]>> ComparingResult;
 
         /// <summary>
         /// Статистика про порівняні рядки
@@ -46,7 +51,7 @@ namespace DBTest
             AdditionalInfo = new Statistick[2];
             AdditionalInfo[0] = new Statistick();
             AdditionalInfo[1] = new Statistick();
-            ComparingResult = new Dictionary<int, IQueryable<string[]>>();
+            ComparingResult = new Dictionary<int, List<string[]>>();
         }
 
         /// <summary>
@@ -150,25 +155,50 @@ namespace DBTest
         /// 2-й SecondDb.Except(FirstDb)
         /// </summary>
         /// <returns></returns>
-        public Dictionary<int, IQueryable<string[]>> CompareFullData()
+        public Dictionary<int, List<string[]>> CompareFullData()
         {
-            Dictionary<int, IQueryable<string[]>> Result = new Dictionary<int, IQueryable<string[]>>();
+            Dictionary<int, List<string[]>> Result = new Dictionary<int, List<string[]>>();
             try
             {
-                IQueryable<string[]> col1=null, col2=null;
+                List<string[]> col1 = null, col2 = null;
                 var FirstTask = new Task(() =>
                 {
-                    col1 = FirstData.Except(SecondData, new StringArrayComparer());
+                    col1 = FirstData.Except(SecondData, new StringArrayComparer()).ToList();
+                    var list1 = FirstDatabase.TableColumns.Where(item => item.ISKey).ToList();
+                    int[] FirstKeys = new int[list1.Count];
+                    if (list1.Count != 0)
+                    {
+                        IOrderedQueryable<string[]> temp = col1.AsQueryable().OrderBy(i => i[list1[0].Position], StringComparer.OrdinalIgnoreCase.WithNaturalSort());
+                        for (int i = 1; i < list1.Count; i++)
+                        {
+                            FirstKeys[i] = list1[i].Position;
+                            temp = temp.ThenBy(j => j[FirstKeys[i]]);
+                        }
+                        col1 = temp.ToList();
+                    }
                 });
                 FirstTask.Start();
                 var SecondTask = new Task(() =>
                 {
-                    col2 = SecondData.Except(FirstData, new StringArrayComparer());
+                    col2 = SecondData.Except(FirstData, new StringArrayComparer()).ToList();
+                    var list2 = SecondDatabase.TableColumns.Where(item => item.ISKey).ToList();
+                    int[] SecondKeys = new int[list2.Count];
+                    if (list2.Count != 0)
+                    {
+                        IOrderedQueryable<string[]> temp = col2.AsQueryable().OrderBy(i => i[list2[0].Position], StringComparer.OrdinalIgnoreCase.WithNaturalSort());
+                        for (int i = 1; i < list2.Count; i++)
+                        {
+                            SecondKeys[i] = list2[i].Position;
+                            temp = temp.ThenBy(j => j[SecondKeys[i]]);
+                        }
+                        col2 = temp.ToList();
+                    }
                 });
                 SecondTask.Start();
                 Task.WaitAll(FirstTask, SecondTask);
                 Result.Add(1, col1);
                 Result.Add(2, col2);
+                FindUniqueDifferencess(ref Result);
             }
             catch (Exception ex)
             {
@@ -178,14 +208,51 @@ namespace DBTest
             return Result;
         }
 
+
+        public void FindUniqueDifferencess(ref Dictionary<int, List<string[]>> items)
+        {
+            var list1 = FirstDatabase.TableColumns.Where(item => item.ISKey).Select(i => i.Position).ToArray();
+            var list2 = SecondDatabase.TableColumns.Where(item => item.ISKey).Select(i => i.Position).ToArray();
+            var first = items[1].KeyPlusDataSelection(list1);
+            var second = items[2].KeyPlusDataSelection(list2);
+            var temp = new List<string[]>();
+            var temp2 = new List<string[]>();
+            int counter = second.Count;
+            for (int i = 0; i < counter; i++)
+            {
+                if (!first.Contains(second[i], new StringArrayComparer()))
+                {
+                    temp.Add(items[2][i]);
+                    continue;
+                }
+                temp2.Add(items[2][i]);
+            }
+            items[2] = temp2;
+            items.Add(3, temp);
+            temp = new List<string[]>();
+            temp2 = new List<string[]>();
+            counter = first.Count;
+            for (int i = 0; i < counter; i++)
+            {
+                if (!second.Contains(first[i], new StringArrayComparer()))
+                {
+                    temp.Add(items[1][i]);
+                    continue;
+                }
+                temp2.Add(items[1][i]);
+            }
+            items[1] = temp2;
+            items.Add(4, temp);
+        }
+
         /// <summary>
         /// Повертає порівняння лвох колонок як масив рядків
         /// </summary>
         /// <param name="SelectedColumn">Номер колонки</param>
         /// <returns></returns>
-        public Dictionary<int, IQueryable<string[]>> CompareColumnsWithKeys(int SelectedColumn)
+        public Dictionary<int, List<string[]>> CompareColumnsWithKeys(int SelectedColumn)
         {
-            Dictionary<int, IQueryable<string[]>> Result = new Dictionary<int, IQueryable<string[]>>();
+            Dictionary<int, List<string[]>> Result = new Dictionary<int, List<string[]>>();
             try
             {
                 var list1 = FirstDatabase.TableColumns.Where(item => item.ISKey).ToList();
@@ -199,17 +266,17 @@ namespace DBTest
                     SecondKeys[i] = list2[i].Position;
                 }
 
-                IQueryable<string[]> col1 = null, col2 = null;
+                List<string[]> col1 = null, col2 = null;
                 var task1 = new Task(() =>
                 {
                     FirstKeys[min] = FirstDatabase.TableColumns[SelectedColumn].Position;
-                    col1 = FirstData.KeyPlusDataSelection(FirstKeys);
+                    col1 = FirstData.KeyPlusDataSelection(FirstKeys).ToList();
                 });
                 task1.Start();
                 var task2 = new Task(() =>
                     {
                         SecondKeys[min] = SecondDatabase.TableColumns[SelectedColumn].Position;
-                        col2 = SecondData.KeyPlusDataSelection(SecondKeys);
+                        col2 = SecondData.KeyPlusDataSelection(SecondKeys).ToList();
                     });
                 task2.Start();
                 Task.WaitAll(task1, task2);
@@ -229,16 +296,16 @@ namespace DBTest
         }
 
 
-        public Dictionary<int, IQueryable<string[]>> CompareColumns(int SelectedColumn)
+        public Dictionary<int, List<string[]>> CompareColumns(int SelectedColumn)
         {
-            Dictionary<int, IQueryable<string[]>> Result = new Dictionary<int, IQueryable<string[]>>();
+            Dictionary<int, List<string[]>> Result = new Dictionary<int, List<string[]>>();
             try
             {
-                IQueryable<string[]> col1 = null, col2 = null;
+                List<string[]> col1 = null, col2 = null;
                 var task1 = new Task(() =>
                 {
-                    int[] col = new []{FirstDatabase.TableColumns[SelectedColumn].Position};
-                    col1 = FirstData.KeyPlusDataSelection(col);
+                    int[] col = new[] { FirstDatabase.TableColumns[SelectedColumn].Position };
+                    col1 = FirstData.KeyPlusDataSelection(col).ToList();
                     AdditionalInfo[0].SameInColumn.Add(SelectedColumn, Result[0].Count() - Result[0].Count());
                     AdditionalInfo[0].DifferentInColumn.Add(SelectedColumn, Result[0].Count());
                 });
@@ -246,7 +313,7 @@ namespace DBTest
                 var task2 = new Task(() =>
                 {
                     int[] col = new[] { SecondDatabase.TableColumns[SelectedColumn].Position };
-                    col2 = SecondData.KeyPlusDataSelection(col);
+                    col2 = SecondData.KeyPlusDataSelection(col).ToList();
                     AdditionalInfo[1].SameInColumn.Add(SelectedColumn, Result[1].Count() - Result[1].Count());
                     AdditionalInfo[1].DifferentInColumn.Add(SelectedColumn, Result[1].Count());
                 });
@@ -323,14 +390,14 @@ namespace DBTest
         }
 
         /// <summary>
-        /// Витягує з нумерованого масиву рядків певні рядки
+        /// Витягує з нумерованого масиву рядків певні стовпці
         /// </summary>
         /// <param name="arr1">Собсно масив</param>
         /// <param name="arr2">А тут - масив рядків, які тре дістати</param>
         /// <returns></returns>
-        public static IQueryable<string[]> KeyPlusDataSelection(this IQueryable<string[]> arr1, int[] arr2)
+        public static List<string[]> KeyPlusDataSelection(this List<string[]> arr1, int[] arr2)
         {
-            return (from item in arr1 select (from col in arr2 select item.ToArray()[col]).ToArray()).AsQueryable();
+            return (from item in arr1 select (from col in arr2 select item.ToArray()[col]).ToArray()).ToList();
         }
         /*
          На всяк випадок 
@@ -348,5 +415,28 @@ namespace DBTest
                 (from emp in l2
                     select emp.ItemArray[1]);
          */
+    }
+
+    class StringArrayComparer : IEqualityComparer<string[]>
+    {
+
+        public bool Equals(string[] x, string[] y)
+        {
+            if (y == null || x == null)
+            {
+                return false;
+            }
+            return x.SequenceEqual(y);
+        }
+
+        public int GetHashCode(string[] obj)
+        {
+            int hash = 0;
+            foreach (var item in obj)
+            {
+                hash += item.GetHashCode();
+            }
+            return (hash);
+        }
     }
 }

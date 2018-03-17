@@ -14,8 +14,8 @@
                         <tbody>
                             <tr>
                                 <td>
-                                        @if (@item.ISKey)
-                                         {<img class="img-responsive" src="/images/key-primary.png"/>}
+                                    @if (@item.ISKey)
+                                    {<img class="img-responsive" src="/images/key-primary.png" />}
                                 </td>
                                 <td>@item.Name</td>
                                 <td>@item.Type</td>
@@ -38,7 +38,7 @@
                             <tr>
                                 <td>
                                     @if (@item.ISKey)
-                                    {<img class="img-responsive" src="/images/key-primary.png"/>}
+                                    {<img class="img-responsive" src="/images/key-primary.png" />}
                                 </td>
                                 <td>@item.Name</td>
                                 <td>@item.Type</td>
@@ -74,7 +74,7 @@
         }
     }
 
-    $(function() {
+    $(function () {
         ValidateTypes();
     })
     var adjustment;
@@ -127,7 +127,7 @@
         console.log(array);
         $.ajax({
             url: "Comparing",
-            type:"POST",
+            type: "POST",
             data: { array: array },
             cache: false,
             success: function (result) {

@@ -1,32 +1,28 @@
 ﻿@using System.Data
+@using DBTest
 @model DBTest.DatabaseComparer
 
-<div class="container-fluid">
-    <div class="row"></div>
-    <table class="table table-bordered table-responsive table-striped">
-        @{
-            using (var sequenceEnum1 = Model.ComparingResult[1].GetEnumerator())
+<link rel="stylesheet" href="~/css/PartialViewCss/Comparing.css" />
+<div class="table-responsive">
+    <table class="table table-bordered table-striped table-hover">
+        <tr>
+            @for (int i = 0; i < Model.FirstDatabase.SelectedColumns.Count; i++)
             {
-                using (var sequenceEnum2 = Model.ComparingResult[2].GetEnumerator())
-                {
-                    while (true)
+                <td>@Model.FirstDatabase.SelectedColumns[i]/@Model.SecondDatabase.SelectedColumns[i]</td>
+            }
+        </tr>
+        @{
+            var min = Math.Min(Model.ComparingResult[1].Count, Model.ComparingResult[2].Count);
+            for (int i = 0; i < min; i++)
+            {
+                <tr>
+                    @for (int j = 0; j < Model.FirstDatabase.SelectedColumns.Count; j++)
                     {
-                        if (sequenceEnum1.MoveNext() && sequenceEnum2.MoveNext())
-                        {
-                            <tr>
-                                @{
-                                    int counter = sequenceEnum1.Current.Length;
-                                    for (int i = 0; i < counter; i++)
-                                    {
-                                        <td>@sequenceEnum1.Current[i]---@sequenceEnum2.Current[i]</td>
-                                    }
-                                }
-                            </tr>
-                        }
-                        else {break;}
+                    <td>@Model.ComparingResult[1][i][j]/@Model.ComparingResult[2][i][j]</td>
                     }
-                }
+                </tr>
             }
         }
     </table>
 </div>
+

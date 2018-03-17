@@ -68,7 +68,7 @@ namespace DbComparer
         /// <param name="query">Запит</param>
         /// <param name="selector">Селектор (міститься у БД)</param>
         /// <returns></returns>
-        IQueryable<string[]> Read(string query, Func<IDataRecord, string[]> selector);
+        List<string[]> Read(string query, Func<IDataRecord, string[]> selector);
         /// <summary>
         /// Закриває підключення
         /// </summary>
@@ -168,7 +168,7 @@ namespace DbComparer
         public abstract List<string> GetDatabasesList();
         public abstract List<string> GetTablesList(string database = null);
         public abstract DataTable GetTableInfo(string tableName = null);
-        public abstract IQueryable<string[]> Read(string query, Func<IDataRecord, string[]> selector);
+        public abstract List<string[]> Read(string query, Func<IDataRecord, string[]> selector);
 
         public abstract void CloseConnection();
 
@@ -272,7 +272,7 @@ namespace DbComparer
             public Column(DataRow dr)
             {
                 var array = dr.ItemArray;
-                Position = Int32.Parse(array[4].ToString());//Позиція
+                Position = Int32.Parse(array[4].ToString())-1;//Позиція
                 Name = array[3].ToString();//Імя
                 Type = array[7].ToString();//Тип
                 Length = array[8].ToString();//Довжина
@@ -422,7 +422,7 @@ namespace DbComparer
             }
         }
 
-        public override IQueryable<string[]> Read(string query, Func<IDataRecord, string[]> selector)
+        public override List<string[]> Read(string query, Func<IDataRecord, string[]> selector)
         {
             try
             {
@@ -430,7 +430,7 @@ namespace DbComparer
                 {
                     cmd.CommandText = query;
                     using (var r = cmd.ExecuteReader())
-                        return ((DbDataReader)r).Cast<IDataRecord>().Select(selector).ToArray().AsQueryable();
+                        return ((DbDataReader)r).Cast<IDataRecord>().Select(selector).ToList();
                 }
             }
             catch (Exception EX_NAME)
@@ -523,28 +523,7 @@ namespace DbComparer
 
         }
     }
-    class StringArrayComparer : IEqualityComparer<string[]>
-    {
 
-        public bool Equals(string[] x, string[] y)
-        {
-            if (y == null || x == null)
-            {
-                return false;
-            }
-            return x.SequenceEqual(y);
-        }
-
-        public int GetHashCode(string[] obj)
-        {
-            int hash = 0;
-            foreach (var item in obj)
-            {
-                hash += item.GetHashCode();
-            }
-            return (hash);
-        }
-    }
     public class MySqlDataBaseConnector : Database
     {
         public MySqlDataBaseConnector() : base()
@@ -657,7 +636,7 @@ namespace DbComparer
             }
         }
 
-        public override IQueryable<string[]> Read(string query, Func<IDataRecord, string[]> selector)
+        public override List<string[]> Read(string query, Func<IDataRecord, string[]> selector)
         {
             try
             {
@@ -665,7 +644,7 @@ namespace DbComparer
                 {
                     cmd.CommandText = query;
                     using (MySqlDataReader r = cmd.ExecuteReader())
-                        return ((DbDataReader)r).Cast<IDataRecord>().Select(selector).ToArray().AsQueryable();
+                        return ((DbDataReader)r).Cast<IDataRecord>().Select(selector).ToList();
                 }
             }
             catch (Exception EX_NAME)

@@ -6,7 +6,7 @@
 <div class="container-fluid">
     <div class="row">
         <div class="container-fluid col-md-6" id="Drop1">
-            <form class="dropzone dz-clickable dropable" id="Upload1">
+            <form action="/Home/Upload/?id=1" class="dropzone dz-clickable dropable" id="Upload1">
             </form>
             <div class="panel" style="visibility:hidden" id="Res1">
                 <div class="panel-heading"></div>
@@ -14,7 +14,7 @@
         </div>
 
         <div class="container-fluid col-md-6" id="Drop2">
-            <form class="dropzone dz-clickable dropable" id="Upload2">
+            <form action="/Home/Upload/?id=2" class="dropzone dz-clickable dropable" id="Upload2">
             </form>
             <div class="panel" style="visibility:hidden" id="Res2">
                 <div class="panel-heading"></div>
@@ -48,6 +48,7 @@
         $(function () {
             Dropzone.options.Upload1 = {
                 uploadMultiple: false,
+                timeout : 500000,
                 acceptedFiles: ".mdf,.sql,.xml",
             };
             Dropzone.options.Upload2 = Dropzone.options.Upload1;
