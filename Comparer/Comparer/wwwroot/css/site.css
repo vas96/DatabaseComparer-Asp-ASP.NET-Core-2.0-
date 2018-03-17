@@ -31,6 +31,9 @@ body {
     overflow-x: hidden;
     font-family: "RobotoSlabRegular", Helvetica, Arial, sans-serif;
 }
+.body-content {
+    min-height: 90vh;
+}
 
 /* Carousel */
 .carousel-caption p {
@@ -69,25 +72,53 @@ body {
 }
 
 .color-nav {
-    color: #dfe6e9 !important;
+    color: #ffffff !important;
     text-decoration: none;
     transition-duration: 0.4s;
 }
 
     .color-nav:hover {
+        transition-duration: 0.5s;
         zoom: 1.001;
-        color: #ecf0f1 !important;
+        color: #dfe6e9 !important;
     }
+
+.navbar {
+    min-height: 70px;
+}
+
+.navbar-brand {
+    padding: 0 15px;
+    height: 70px;
+    line-height: 70px;
+}
+
+.navbar-toggle {
+    /* (80px - высота кнопки 34px) / 2 = 23px */
+    margin-top: 18px;
+    padding: 8px 9px !important;
+}
+
+@media (min-width: 768px) {
+    .navbar-nav > li > a {
+        /* (80px - line-height 27px) / 2 = 21.5px */
+        padding-top: 21.5px;
+        padding-bottom: 2.5px;
+        line-height: 22px;
+    }
+}
 
 .shrink {
     -webkit-transition: 0.5s;
     -moz-transition: 0.5s;
     transition: 0.5s;
     color: blue;
-    padding: 1vh;
+    padding: 1vmin !important;
 }
+
 
 #footer {
     background-color: #487eb0;
     color:white;
+    height:10vh;
 }

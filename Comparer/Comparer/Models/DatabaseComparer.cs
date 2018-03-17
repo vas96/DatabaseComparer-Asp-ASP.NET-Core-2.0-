@@ -261,11 +261,14 @@ namespace DBTest
             Dictionary<int, List<string[]>> Result = new Dictionary<int, List<string[]>>();
             try
             {
+                //дістаєм імена колонок-ключів
                 var list1 = FirstDatabase.TableColumns.Where(item => item.ISKey).ToList();
                 var list2 = FirstDatabase.TableColumns.Where(item => item.ISKey).ToList();
+                //Дістаєм мінімальну к-сть головних ключів з таблиць
                 int min = Math.Min(list1.Count, list2.Count);
                 int[] FirstKeys = new int[min + 1];
                 int[] SecondKeys = new int[min + 1];
+                //додаєм назви цих колонок до запитів
                 for (int i = 0; i < min; i++)
                 {
                     FirstKeys[i] = list1[i].Position;

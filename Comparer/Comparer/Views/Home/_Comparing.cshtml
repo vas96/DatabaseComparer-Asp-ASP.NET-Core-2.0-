@@ -2,27 +2,120 @@
 @using DBTest
 @model DBTest.DatabaseComparer
 
-<link rel="stylesheet" href="~/css/PartialViewCss/Comparing.css" />
-<div class="table-responsive">
-    <table class="table table-bordered table-striped table-hover">
-        <tr>
-            @for (int i = 0; i < Model.FirstDatabase.SelectedColumns.Count; i++)
-            {
-                <td>@Model.FirstDatabase.SelectedColumns[i]/@Model.SecondDatabase.SelectedColumns[i]</td>
-            }
-        </tr>
-        @{
-            var min = Math.Min(Model.ComparingResult[1].Count, Model.ComparingResult[2].Count);
-            for (int i = 0; i < min; i++)
-            {
-                <tr>
-                    @for (int j = 0; j < Model.FirstDatabase.SelectedColumns.Count; j++)
+@{
+    var FirstToSecond = @Model.ComparingResult.Item1.ToList();
+}
+
+@{
+    var SecondToFirst = @Model.ComparingResult.Item2.ToList();
+}
+
+<div class="container">
+    <h3 class="text-center">Comparing results</h3>
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#home">First table difference</a></li>
+        <li><a data-toggle="tab" href="#menu1">Two table difference</a></li>
+        <li><a data-toggle="tab" href="#menu2">Second table difference</a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div id="home" class="tab-pane fade in active">
+            <table class="table table-condensed">
+                @*<thead>
+                        <tr>
+                            <th>Firstname</th>
+                            <th>Lastname</th>
+                            <th>Email</th>
+                        </tr>
+                    </thead>*@
+                <tbody>
+
+                    @for (int i = 0; i < FirstToSecond.Count; i++)
                     {
-                    <td>@Model.ComparingResult[1][i][j]/@Model.ComparingResult[2][i][j]</td>
+                        List<string> temp = FirstToSecond[i].ToList();
+                        <tr>
+                            @for (int j = 0; j < temp.Count; j++)
+                            {
+                                <td class="success">
+                                    @temp[j]
+                                </td>
+                            }
+                        </tr>
                     }
-                </tr>
-            }
-        }
-    </table>
+                </tbody>
+            </table>
+        </div>
+        <div id="menu1" class="tab-pane fade">
+            <table class="table table-condensed">
+                @*<thead>
+                        <tr>
+                            <th>Firstname</th>
+                            <th>Lastname</th>
+                            <th>Email</th>
+                        </tr>
+                    </thead>*@
+                <tbody>
+                    @{
+                        int maxRange = Math.Min(SecondToFirst.Count, FirstToSecond.Count);
+                    }
+                    @for (int i = 0; i < maxRange; i++)
+                    {
+                        List<string> error = new List<string>() { "none", "none" };
+                        List<string> temp = FirstToSecond[i].ToList();
+                        List<string> temp2 = SecondToFirst[i].ToList();
+
+                        temp = temp == null ? temp = error : temp;
+                        temp2 = temp2 == null ? temp2 = error : temp2;
+
+                        int columnNumber = Math.Max(temp.Count, temp2.Count);
+                        <tr>
+                            @for (int j = 0; j < columnNumber; j++)
+                            {
+                                <td class="warning">
+                                    @*@{
+                                        temp[j] = temp[j] == null ? temp[j] = "none" : temp[j];
+                                    }*@
+                                    @temp[j]
+                                </td>
+                                <td class="danger">
+                                    @*@{
+                                        temp2[j] = temp2[j] == null ? temp2[j] = "none" : temp2[j];
+                                    }*@
+                                    @temp2[j]
+                                </td>
+                            }
+                        </tr>
+
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div id="menu2" class="tab-pane fade">
+            <table class="table table-condensed">
+                @*<thead>
+                        <tr>
+                            <th>Firstname</th>
+                            <th>Lastname</th>
+                            <th>Email</th>
+                        </tr>
+                    </thead>*@
+                <tbody>
+                    @for (int i = 0; i < SecondToFirst.Count; i++)
+                    {
+                        List<string> temp = SecondToFirst[i].ToList();
+                        <tr>
+                            @for (int j = 0; j < temp.Count; j++)
+                            {
+                                <td class="success">
+                                    @temp[j]
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
+
 
