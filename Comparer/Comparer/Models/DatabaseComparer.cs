@@ -208,11 +208,17 @@ namespace DBTest
             return Result;
         }
 
-
+        /// <summary>
+        /// Визначає унікальні рядки в наборі
+        /// Первинні ключі визначаються автоматично
+        /// </summary>
+        /// <param name="items">Набір</param>
         public void FindUniqueDifferencess(ref Dictionary<int, List<string[]>> items)
         {
             var list1 = FirstDatabase.TableColumns.Where(item => item.ISKey).Select(i => i.Position).ToArray();
             var list2 = SecondDatabase.TableColumns.Where(item => item.ISKey).Select(i => i.Position).ToArray();
+            if (list1.Length!=list2.Length)
+                return;
             var first = items[1].KeyPlusDataSelection(list1);
             var second = items[2].KeyPlusDataSelection(list2);
             var temp = new List<string[]>();
@@ -294,7 +300,6 @@ namespace DBTest
             }
             return Result;
         }
-
 
         public Dictionary<int, List<string[]>> CompareColumns(int SelectedColumn)
         {
