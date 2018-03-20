@@ -66,12 +66,6 @@
             border-radius: 0 0 4px 0;
         }
 
-
-
-
-
-
-
 div.table-chooser div.table-chooser-item {
     padding: 11px;
     border-radius: 6px;
@@ -100,10 +94,11 @@ div.table-chooser div.table-chooser-item {
 
 .TbName {
     background-color: transparent;
-    border-bottom: 2px solid maroon;
+    border-bottom: 2px solid #40739e;
 }
 
 .TbType {
     background-color: transparent;
     text-decoration: underline;
+    text-decoration-color: #487eb0;
 }

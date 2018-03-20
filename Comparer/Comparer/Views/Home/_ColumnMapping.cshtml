@@ -12,11 +12,11 @@
                 <li class="" style="">
                     <table class="table table-bordered" id="source">
                         <tbody>
-                        <tr>
-                            <td>@item.Name</td>
-                            <td>@item.Type</td>
-                            <td class="arrow_box">@item.Length</td>
-                        </tr>
+                            <tr>
+                                <td>@item.Name</td>
+                                <td>@item.Type</td>
+                                <td class="arrow_box">@item.Length</td>
+                            </tr>
                         </tbody>
                     </table>
                 </li>
@@ -42,7 +42,8 @@
             }
         </ol>
     </div>
-    <h6><button type="button" class="btn-lg" id="NextStep">NEXT STEP</button></h6>
+    <button type="button" class="btn-lg btn-block btn-primary-custom" id="GoToComparing">NEXT STEP</button>
+    <button type="button" class="btn-lg btn-block btn-default-custom" id="GoTableInfo" style="margin-bottom:1.5vmin;">Step back</button>
 </div>
 
 
@@ -105,7 +106,7 @@
     });
 
 
-    $("#NextStep").click(function () {
+    $("#GoToComparing").click(function () {
         var list = [];
         var array = [];
         list = $("table#target").find("tr").toArray();
@@ -117,7 +118,6 @@
             url: "Comparing",
             type:"POST",
             data: { array: array },
-            cache: false,
             success: function (result) {
                 $("#Partial").html(result);
             }

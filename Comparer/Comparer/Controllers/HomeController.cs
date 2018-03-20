@@ -82,31 +82,47 @@ namespace Comparer.Controllers
             return PartialView("_DownloadFiles", db);
         }
 
-
+        [HttpPost]
         public IActionResult TableInfo()
         {
-            if ((db.FirstDatabase.connection == null || db.FirstDatabase.connection.State != ConnectionState.Open) ||
-                (db.SecondDatabase.connection == null || db.SecondDatabase.connection.State != ConnectionState.Open))
+            try
+            {
+                if ((db.FirstDatabase.connection == null || db.FirstDatabase.connection.State != ConnectionState.Open) ||
+            (db.SecondDatabase.connection == null || db.SecondDatabase.connection.State != ConnectionState.Open))
                 return PartialView("_Error");
-            return PartialView("_TableInfo", db);
+                return PartialView("_TableInfo", db);
+            }
+            catch (Exception ex)
+            {
+                return PartialView("_Error", ex);
+            }
         }
-        
+        [HttpPost]
         public IActionResult ColumnMapping(string[] array = null)
         {
-            if (array == null || array.Length < 2)
-                array = new[] { "Projects", "Users" };
-            db.FirstDatabase.SelectedTable = array[0];
-            db.SecondDatabase.SelectedTable = array[1];
-            if ((db.FirstDatabase.connection == null || db.FirstDatabase.connection.State != ConnectionState.Open) ||
-                (db.SecondDatabase.connection == null || db.SecondDatabase.connection.State != ConnectionState.Open))
-                return PartialView("_Error");
-            if (db.FirstDatabase.SelectedTable == "" || db.SecondDatabase.SelectedTable == "")
-                return PartialView("_Error");
-            db.FirstDatabase.GetTableInfo();
-            db.SecondDatabase.GetTableInfo();
-            return PartialView("_ColumnMapping", db);
+            try
+            {
+                if (array == null || array.Length < 2)
+                    array = new[] { "Projects", "Users" };
+                db.FirstDatabase.SelectedTable = array[0];
+                db.SecondDatabase.SelectedTable = array[1];
+                if ((db.FirstDatabase.connection == null || db.FirstDatabase.connection.State != ConnectionState.Open) ||
+                    (db.SecondDatabase.connection == null || db.SecondDatabase.connection.State != ConnectionState.Open))
+                    return PartialView("_Error");
+                if (db.FirstDatabase.SelectedTable == "" || db.SecondDatabase.SelectedTable == "")
+                    return PartialView("_Error");
+                db.FirstDatabase.GetTableInfo();
+                db.SecondDatabase.GetTableInfo();
+                return PartialView("_ColumnMapping", db);
+            }
+            catch (Exception ex)
+            {
+                return PartialView("_Error", ex);
+            }
+
+           
         }
-        
+        [HttpPost]
         public IActionResult Comparing(string[] array)
         {
             if (array.Length == 0)
@@ -128,7 +144,7 @@ namespace Comparer.Controllers
             db.ComparingResult = db.CompareFullData();
             return PartialView("_Comparing", db);
         }
-
+        [HttpPost]
         public IActionResult SelectTable()
         {
             return PartialView("_SelectTable", db);

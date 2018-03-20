@@ -31,6 +31,7 @@ body {
     overflow-x: hidden;
     font-family: "RobotoSlabRegular", Helvetica, Arial, sans-serif;
 }
+
 .body-content {
     min-height: 90vh;
 }
@@ -59,22 +60,20 @@ body {
     }
 }
 
-/*--------------------------------------------------*/
-/*--------------------------------------------------*/
-
-
 .navbar {
     border: none !important;
     color: black;
 }
+
 .navbar {
     background-color: #40739e;
+    padding: 0.4vmin;
 }
 
 .color-nav {
     color: #ffffff !important;
     text-decoration: none;
-    transition-duration: 0.4s;
+    transition-duration: 0.9s;
 }
 
     .color-nav:hover {
@@ -83,42 +82,61 @@ body {
         color: #dfe6e9 !important;
     }
 
-.navbar {
-    min-height: 70px;
-}
-
 .navbar-brand {
-    padding: 0 15px;
-    height: 70px;
-    line-height: 70px;
+    padding: 0;
 }
 
-.navbar-toggle {
-    /* (80px - высота кнопки 34px) / 2 = 23px */
-    margin-top: 18px;
-    padding: 8px 9px !important;
+.aligner-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-@media (min-width: 768px) {
-    .navbar-nav > li > a {
-        /* (80px - line-height 27px) / 2 = 21.5px */
-        padding-top: 21.5px;
-        padding-bottom: 2.5px;
-        line-height: 22px;
-    }
-}
 
 .shrink {
     -webkit-transition: 0.5s;
     -moz-transition: 0.5s;
     transition: 0.5s;
     color: blue;
-    padding: 1vmin !important;
+    padding: 0vmin !important;
 }
 
 
 #footer {
     background-color: #487eb0;
-    color:white;
-    height:10vh;
+    color: white;
+    height: 10vh;
 }
+
+/*BUTONS*/
+/*BUTONS*/
+/*BUTONS*/
+.btn-primary-custom {
+    background-color: #40739e !important;
+    border-radius: 0;
+    border-color: #40739e !important;
+    transition-duration: 0.4s;
+    color: white !important;
+}
+
+    .btn-primary-custom:hover {
+        background-color: #487eb0 !important;
+    }
+
+.btn-default-custom {
+    background-color: white !important;
+    border-radius: 0;
+    border: 2px solid #487eb0 !important;
+    transition-duration: 0.4s;
+    color: #487eb0 !important;
+}
+
+    .btn-default-custom:hover {
+        background-color: #487eb0 !important;
+        border: 2px solid #40739e !important;
+        color: white !important;
+    }
+/*end_BUTONS*/
+/*end_BUTONS*/
+/*end_BUTONS*/
+

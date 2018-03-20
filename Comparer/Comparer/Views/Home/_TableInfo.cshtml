@@ -2,7 +2,10 @@
 @model DBTest.DatabaseComparer
 
 
-<link rel="stylesheet" href="~/css/PartialViewCss/TableInfo.css"/>
+<link rel="stylesheet" href="~/css/PartialViewCss/TableInfo.css" />
+
+<h1>Check tables</h1>
+<hr />
 <div class="container-fluid">
     <form action="" class="" id="FirstTable">
 
@@ -11,9 +14,9 @@
         <div class="row-fluid" id="container-table-info">
 
             <div class=" table-chooser panel panel-default panel-table">
-                    @{
-                    List<String> drcFirstDBNamesTB = Model.FirstDatabase.GetTablesList("TeamBuilding"); 
-                    }
+                @{
+                    List<String> drcFirstDBNamesTB = Model.FirstDatabase.GetTablesList("TeamBuilding");
+                }
 
                 <div class="panel-body">
 
@@ -69,9 +72,10 @@
             </div>
         </div>
     </form>
-</div>
-<div class="container-fluid">
-    <h6><button type="button" class="btn-lg" id="GoToColumnMapping">Check Columns</button></h6>
+
+   
+        <button type="button" class="btn-lg btn-block btn-primary-custom" id="GoToColumnMapping">Check Columns</button>
+        <button type="button" class="btn-lg btn-block btn-default-custom" id="GoTableInfo" style="margin-bottom:1.5vmin;">Step back</button>
 </div>
 <script>
 
@@ -84,7 +88,7 @@
     });
 
 
-    $("#GoToColumnMapping").click(function() {
+    $("#GoToColumnMapping").click(function () {
 
         var array = [];
         array.push($('input[name=FirstDatabaseCH]:checked').val());
@@ -96,7 +100,7 @@
             type: "POST",
             data: { array: array },
             cache: false,
-            success: function(result) {
+            success: function (result) {
                 $("#Partial").html(result);
             }
         });

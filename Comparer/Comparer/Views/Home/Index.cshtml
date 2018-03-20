@@ -8,9 +8,11 @@
         padding: 0;
         margin: 0;
     }
+
     .inform-block {
         height: 50vh;
     }
+
     .top-block {
         height: 80vh;
         background-color: white;
@@ -22,10 +24,11 @@
         background-color: #487eb0;
         vertical-align: middle;
     }
+
     #top-block-under-text {
         color: white !important;
-        margin-top:0.01vmin;
-        margin-right:2vmin;
+        margin-top: 0.01vmin;
+        margin-right: 2vmin;
     }
 
     .aligner-center {
@@ -39,41 +42,17 @@
         margin-right: 5vmin;
     }
 
-    #btn-primary-custom {
-        background-color: #40739e !important;
-        border-radius: 0;
-        transition-duration: 0.4s;
-    }
-
-        #btn-primary-custom:hover {
-            background-color: #487eb0 !important;
-        }
-
-    #btn-default-custom {
-        background-color: white !important;
-        border-radius: 0;
-        border: 2px solid #487eb0 !important;
-        transition-duration: 0.4s;
-        color: #487eb0;
-    }
-
-        #btn-default-custom:hover {
-            background-color: #487eb0 !important;
-            border: 2px solid #40739e !important;
-            color: white;
-        }
     #index-opp-block {
         background-color: #ecf0f1;
         color: #40739e;
     }
-
 </style>
 
 <!-- First Container -->
 <div class="container-fluid ">
     <div class="row"></div>
     <div class="col-md-6 top-block aligner-center">
-        <img src="~/images/mainPage(1).svg" class="img-responsive center-block" alt="Onedrive" style="width: 100%; height: auto;" />
+        <img src="~/images/index1.5.svg" class="img-responsive center-block" alt="Onedrive" style="width: 100%; height: auto;" />
     </div>
     <div class="col-md-6 top-block aligner-center">
         <div class="text-header">
@@ -83,17 +62,17 @@
                     1If you're using Bootstrap v3.0.1 or greater, you should use this solution instead. It doesn't override Bootstrap's styles with custom CSS, but instead uses a Bootstrap feature.
                 </h4>
             </div>
-            <div class="col-md-6" >
-                <button type="button" class="btn btn-primary btn-lg active btn-block" id="btn-primary-custom">Start comparing</button>
+            <div class="col-md-6">
+                <button type="button" class="btn btn-primary btn-lg active btn-block btn-primary-custom" id="">Start comparing</button>
             </div>
-            <div class="col-md-6" >
-                <button type="button" class="btn btn-default btn-lg active  btn-block" id="btn-default-custom">Show demonstration</button>
+            <div class="col-md-6">
+                <button type="button" class="btn btn-default btn-lg active  btn-block btn-default-custom" id="" data-toggle="modal" data-target="#myModal">Show demonstration</button>
             </div>
         </div>
     </div>
     <div class="col-md-12 top-block-under aligner-center">
         <h1 id="top-block-under-text">Some Text ololololololooolololo</h1>
-        <button type="button" class="btn btn-default btn-lg active" id="btn-default-custom">Show demonstration</button>
+        <button type="button" class="btn btn-default btn-lg active btn-default-custom" id=""data-toggle="modal" data-target="#myModal">Show demonstration</button>
 
     </div>
 </div>
@@ -104,16 +83,16 @@
         <h4 class="">Dropbox</h4>
     </div>
     <div class="col-md-2 col-md-offset-1 col-sm-4 col-sm-offset-0 text-center">
-       
-            <img src="~/images/icons8-onedrive.svg" class="img-responsive center-block" alt="Onedrive" />
-            <h4 class="text-center">Onedrive</h4>
-        
+
+        <img src="~/images/icons8-onedrive.svg" class="img-responsive center-block" alt="Onedrive" />
+        <h4 class="text-center">Onedrive</h4>
+
     </div>
     <div class="col-md-2 col-md-offset-1 col-sm-4 col-sm-offset-0 text-center">
-        
-            <img src="~/images/icons8-google-drive.svg" class="img-responsive center-block" alt="Google_Drive" />
-            <h4 class="text-center">Google Drive</h4>
-        
+
+        <img src="~/images/icons8-google-drive.svg" class="img-responsive center-block" alt="Google_Drive" />
+        <h4 class="text-center">Google Drive</h4>
+
     </div>
 
 </div>
@@ -137,4 +116,26 @@
 </div>
 <div class="col-lg-6 inform-block aligner-center" style="color:#d63031">
     <h3>Some text Some text Some text Some text Some text Some text Some text</h3>
+</div>
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Modal Header</h4>
+            </div>
+            <div class="modal-body">
+                <p>Some text in the modal.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
 </div>
