@@ -118,10 +118,9 @@ namespace Comparer.Controllers
             catch (Exception ex)
             {
                 return PartialView("_Error", ex);
-            }
-
-           
+            }          
         }
+
         [HttpPost]
         public IActionResult Comparing(string[] array)
         {
