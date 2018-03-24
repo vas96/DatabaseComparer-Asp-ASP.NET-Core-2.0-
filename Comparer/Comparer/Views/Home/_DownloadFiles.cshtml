@@ -25,16 +25,6 @@
 </div>
 
     <script>
-        $("#NextStep").click(function() {
-            $.ajax({
-                url: "ColumnMapping",
-                type: "POST",
-                success: function(result) {
-                    $("#Partial").html(result);
-                }
-            });
-        });
-    });
     $("#GoTableInfo").click(function () {
         $.ajax({
             url: "TableInfo",
