@@ -183,6 +183,7 @@ namespace Comparer.Controllers
                     }
                     Database dbase = Database.InitializeType(file);
                     var a=dbase.ConnectToFile(path);
+                    dbase.FileName = Path.GetFileNameWithoutExtension(file.FileName);
                     switch (id)
                     {
                         case 1:

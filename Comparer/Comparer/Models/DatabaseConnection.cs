@@ -96,7 +96,13 @@ namespace DbComparer
             connection = null;
             TableColumns = new List<Column>();
             SelectedColumns = new List<string>();
+            FileName = null; 
         }
+        /// <summary>
+        /// Назва файлу
+        /// </summary>
+        
+        public string FileName;
         /// <summary>
         /// Рядок підключення
         /// </summary>

@@ -3,7 +3,6 @@
 }
 
 <style>
-
     .container-fluid {
         padding: 0;
         margin: 0;
@@ -11,18 +10,6 @@
 
     .inform-block {
         height: 50vh;
-    }
-
-    .top-block {
-        height: 80vh;
-        background-color: white;
-        vertical-align: middle;
-    }
-
-    .top-block-under {
-        height: 20vh;
-        background-color: #487eb0;
-        vertical-align: middle;
     }
 
     #top-block-under-text {
@@ -46,6 +33,7 @@
         background-color: #ecf0f1;
         color: #40739e;
     }
+
 </style>
 
 <!-- First Container -->
@@ -59,7 +47,7 @@
             <div class="col-md-12">
                 <h1 class="text-center">Header</h1>
                 <h4 class="text-left">
-                    1If you're using Bootstrap v3.0.1 or greater, you should use this solution instead. It doesn't override Bootstrap's styles with custom CSS, but instead uses a Bootstrap feature.
+                    Database Comparer helps to compare, synchronize and update databases structure. You can compare one database with another database or database with SQL/DDL script or even two SQL/DDL scripts!
                 </h4>
             </div>
             <div class="col-md-6">
@@ -70,10 +58,9 @@
             </div>
         </div>
     </div>
-    <div class="col-md-12 top-block-under aligner-center">
+    <div class="col-md-12 top-block-under aligner-center ">
         <h1 id="top-block-under-text">Some Text ololololololooolololo</h1>
-        <button type="button" class="btn btn-default btn-lg active btn-default-custom" id=""data-toggle="modal" data-target="#myModal">Show demonstration</button>
-
+        <button type="button" class="btn btn-default btn-lg active btn-default-custom" id="" data-toggle="modal" data-target="#myModal">Show demonstration</button>
     </div>
 </div>
 <div class="container-fluid" id="index-opp-block">
@@ -92,33 +79,57 @@
 
         <img src="~/images/icons8-google-drive.svg" class="img-responsive center-block" alt="Google_Drive" />
         <h4 class="text-center">Google Drive</h4>
-
     </div>
-
 </div>
 
 <div class="col-lg-6 inform-block aligner-center" style="background-color:#fdcb6e">
-    <img src="~/images/загружено.png" class="img-responsive" alt="Alternate Text" />
+    <img src="~/images/sql.svg" class="img-responsive" style="width:70%;" alt="Alternate Text" />
 </div>
 <div class="col-lg-6 inform-block aligner-center" style="color:#fdcb6e">
-    <h3>Some text Some text Some text Some text Some text Some text Some text</h3>
+    <div class="text-header">
+        <div class="col-md-12">
+            <h1 class="text-center">Header</h1>
+            <h4 class="text-left">
+                Some text Some text Some text Some text Some text Some text Some text
+            </h4>
+        </div>
+    </div>
 </div>
 
-<div class="col-lg-6 inform-block aligner-center" style="color:#0984e3">
-    <h3>Some text Some text Some text Some text Some text Some text Some text</h3>
+<div class="col-lg-6 col-md-push-6 inform-block aligner-center" style="background-color:#0984e3">
+    <img src="~/images/MYsql.svg" class="img-responsive" style="width:70%;" alt="Alternate Text" />
 </div>
-<div class="col-lg-6 inform-block aligner-center" style="background-color:#0984e3">
-    <img src="~/images/загружено.png" class="img-responsive" alt="Alternate Text" />
+<div class="col-lg-6 col-md-pull-6 inform-block aligner-center" style="color:#0984e3">
+    <div class="text-header">
+        <div class="col-md-12 ">
+            <h1 class="text-center">Header</h1>
+            <h4 class="text-left">
+                Some text Some text Some text Some text Some text Some text Some text
+            </h4>
+        </div>
+    </div>
 </div>
+
 
 <div class="col-lg-6 inform-block aligner-center" style="background-color:#d63031">
-    <img src="~/images/загружено.png" class="img-responsive" alt="Alternate Text" />
+    <img src="~/images/oracle.svg" class="img-responsive" style="width:70%;" alt="Alternate Text" />
 </div>
 <div class="col-lg-6 inform-block aligner-center" style="color:#d63031">
-    <h3>Some text Some text Some text Some text Some text Some text Some text</h3>
+    <div class="text-header">
+        <div class="col-md-12">
+            <h1 class="text-center">Header</h1>
+            <h4 class="text-left">
+                Can compare database with database, database with SQL/DDL script and SQL/DDL script with SQL/DDL script.
+                Can compare and synchronize data between two database tables.
+                You can optionally select which objects (domains, tables, procedures, triggers etc.) should be compared.
+                Batch mode for most operations.
+                Ability to browse Master and Target structure trees and visually display the differences between them.
+                Final update SQL script can be edited or broken onto separate steps using built-in SQL editor with highlight feature. You can manually change steps order or optionally disable selected steps.
+                Build-in additional functionality such as: drop constraints, backup/restore, database validation and many other useful features.
+            </h4>
+        </div>
+    </div>
 </div>
-
-
 
 <!-- Modal -->
 <div class="modal fade" id="myModal" role="dialog">
