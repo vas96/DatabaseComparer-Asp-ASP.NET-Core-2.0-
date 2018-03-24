@@ -13,6 +13,10 @@
                     <table class="table table-bordered" id="source">
                         <tbody>
                             <tr>
+                                <td>
+                                    @if (@item.ISKey)
+                                    {<img class="img-responsive" src="/images/key-primary.png" />}
+                                </td>
                                 <td>@item.Name</td>
                                 <td>@item.Type</td>
                                 <td class="arrow_box">@item.Length</td>
@@ -32,6 +36,10 @@
                     <table class="table table-bordered" id="target">
                         <tbody>
                             <tr>
+                                <td>
+                                    @if (@item.ISKey)
+                                    {<img class="img-responsive" src="/images/key-primary.png" />}
+                                </td>
                                 <td>@item.Name</td>
                                 <td>@item.Type</td>
                                 <td>@item.Length</td>
@@ -55,15 +63,19 @@
         source_list = $("table#source").find("tr").toArray();
         target_list = $("table#target").find("tr").toArray();
         for (var i = 0; i < source_list.length; i++) {
-            if (source_list[i].cells[1].innerText != target_list[i].cells[1].innerText) {
-                $(source_list[i].cells[2]).addClass("bad");
+            if (i >= target_list.length) {
+                $(source_list[i].cells[3]).addClass("block");
+                continue;
+            }
+            if (source_list[i].cells[2].innerText != target_list[i].cells[2].innerText) {
+                $(source_list[i].cells[3]).addClass("bad");
             } else {
-                $(source_list[i].cells[2]).removeClass("bad");
+                $(source_list[i].cells[3]).removeClass("bad");
             }
         }
     }
 
-    $(function() {
+    $(function () {
         ValidateTypes();
     })
     var adjustment;
@@ -111,12 +123,12 @@
         var array = [];
         list = $("table#target").find("tr").toArray();
         list.forEach(function (item, i) {
-            array.push(item.cells[0].innerText);
+            array.push(item.cells[1].innerText);
         });
         console.log(array);
         $.ajax({
             url: "Comparing",
-            type:"POST",
+            type: "POST",
             data: { array: array },
             success: function (result) {
                 $("#Partial").html(result);

@@ -77,10 +77,12 @@ namespace Comparer.Controllers
 
         #region Partial
 
+        [HttpPost]
         public IActionResult FilesDownloaded()
         {
             return PartialView("_DownloadFiles", db);
         }
+
 
         [HttpPost]
         public IActionResult TableInfo()
@@ -126,6 +128,8 @@ namespace Comparer.Controllers
         {
             if (array.Length == 0)
                 return PartialView("_Error");
+            db.FirstDatabase.SelectedColumns.Clear();
+            db.SecondDatabase.SelectedColumns.Clear();
             int min = Math.Min(db.FirstDatabase.TableColumns.Count, db.SecondDatabase.TableColumns.Count);
             for (int i = 0; i < min; i++)
             {
@@ -143,6 +147,7 @@ namespace Comparer.Controllers
             db.ComparingResult = db.CompareFullData();
             return PartialView("_Comparing", db);
         }
+
         [HttpPost]
         public IActionResult SelectTable()
         {
@@ -189,14 +194,20 @@ namespace Comparer.Controllers
                         case 1:
                             {
                                 if (db.FirstDatabase != null)
+                                {
                                     db.FirstDatabase.CloseConnection();
+                                    System.IO.File.SetAttributes(path, FileAttributes.Normal);
+                                }
                                 db.FirstDatabase = dbase;
                                 break;
                             }
                         case 2:
                             {
                                 if (db.SecondDatabase != null)
+                                {
                                     db.SecondDatabase.CloseConnection();
+                                    System.IO.File.SetAttributes(path, FileAttributes.Normal);
+                                }
                                 db.SecondDatabase = dbase;
                                 break;
                             }

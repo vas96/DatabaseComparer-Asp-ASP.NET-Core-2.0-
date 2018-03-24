@@ -7,6 +7,7 @@ using DbComparer;
 using DBTest;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,6 +27,11 @@ namespace Comparer
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            services.Configure<FormOptions>(x =>
+            {
+                x.ValueLengthLimit = int.MaxValue;
+                x.MultipartBodyLengthLimit = int.MaxValue; // In case of multipart
+            });
             services.Add(new ServiceDescriptor(typeof(DatabaseComparer), new DatabaseComparer()));
             services.AddScoped<ICounter, RandomCounter>();
             services.AddScoped<CounterService>();
@@ -45,8 +51,7 @@ namespace Comparer
             }
 
             app.UseStaticFiles();
-
-            app.UseMvc(routes =>
+                app.UseMvc(routes =>
             {
                 routes.MapRoute(
                     name: "default",
