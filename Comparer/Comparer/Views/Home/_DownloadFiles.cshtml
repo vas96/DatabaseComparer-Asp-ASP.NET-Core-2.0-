@@ -6,16 +6,14 @@
 <div class="container-fluid">
     <div class="row">
         <div class="container-fluid col-md-6" id="Drop1">
-            <form action="/Home/Upload/?id=1" class="dropzone dz-clickable dropable" id="Upload1">
-            </form>
+            <form action="/Home/Upload/?id=1" class="dropzone dz-clickable dropable" id="Upload1"></form>
             <div class="panel" style="visibility:hidden" id="Res1">
                 <div class="panel-heading"></div>
             </div>
         </div>
 
         <div class="container-fluid col-md-6" id="Drop2">
-            <form action="/Home/Upload/?id=2" class="dropzone dz-clickable dropable" id="Upload2">
-            </form>
+            <form action="/Home/Upload/?id=2" class="dropzone dz-clickable dropable" id="Upload2"></form>
             <div class="panel" style="visibility:hidden" id="Res2">
                 <div class="panel-heading"></div>
             </div>
@@ -26,56 +24,55 @@
     <button type="button" class="btn-lg btn-block btn-default-custom" id="GoTableInfo">Step back</button>
 </div>
 
-    <script>
-        $("#NextStep").click(function() {
-            $.ajax({
-                url: "ColumnMapping",
-                type: "POST",
-                success: function(result) {
-                    $("#Partial").html(result);
-                }
-            });
-        });
-        $("#GoTableInfo").click(function () {
-            $.ajax({
-                url: "TableInfo",
-                type: "POST",
-                success: function (result) {
-                    $("#Partial").html(result);
-                }
-            });
-        })
-
-        $(function () {
-            Dropzone.options.Upload1 = {
-                uploadMultiple: false,
-                timeout : 500000,
-                acceptedFiles: ".mdf,.sql,.xml",
-            };
-            Dropzone.options.Upload2 = Dropzone.options.Upload1;
-
-            var dropzones = $(".dropable").toArray();
-            dropzones.forEach(function (item, i, dropzones) {
-                $(item).dropzone({
-                    url: "/Home/Upload/?id=" + (i+1),
-                    success: function (file, response) {
-                        ReturnInfo($(item).parent().find(".panel"), response);
-                    }
-                });
-            });
-
-            function ReturnInfo(elem, result) {
-                $(elem).css("visibility", "visible");
-                $(elem).removeClass("panel-danger panel-success");
-                if (result == true) {
-                    $(elem).find("div").text("Connection established");
-                    $(elem).addClass("panel-success");
-                }
-                else {
-                    $(elem).find("div").text("Connection not established");
-                    $(elem).addClass("panel-danger");
-                }
+<script>
+    $("#NextStep").click(function () {
+        $.ajax({
+            url: "ColumnMapping",
+            type: "POST",
+            success: function (result) {
+                $("#Partial").html(result);
             }
         });
-    </script>
-</div>
+    });
+    $("#GoTableInfo").click(function () {
+        $.ajax({
+            url: "TableInfo",
+            type: "POST",
+            success: function (result) {
+                $("#Partial").html(result);
+            }
+        });
+    })
+
+    $(function () {
+        Dropzone.options.Upload1 = {
+            uploadMultiple: false,
+            timeout: 500000,
+            acceptedFiles: ".mdf,.sql,.xml",
+        };
+        Dropzone.options.Upload2 = Dropzone.options.Upload1;
+
+        var dropzones = $(".dropable").toArray();
+        dropzones.forEach(function (item, i, dropzones) {
+            $(item).dropzone({
+                url: "/Home/Upload/?id=" + (i + 1),
+                success: function (file, response) {
+                    ReturnInfo($(item).parent().find(".panel"), response);
+                }
+            });
+        });
+
+        function ReturnInfo(elem, result) {
+            $(elem).css("visibility", "visible");
+            $(elem).removeClass("panel-danger panel-success");
+            if (result == true) {
+                $(elem).find("div").text("Connection established");
+                $(elem).addClass("panel-success");
+            }
+            else {
+                $(elem).find("div").text("Connection not established");
+                $(elem).addClass("panel-danger");
+            }
+        }
+    });
+</script>
