@@ -116,6 +116,8 @@ namespace Comparer.Controllers
         {
             if (array.Length == 0)
                 return PartialView("_Error");
+            db.FirstDatabase.SelectedColumns.Clear();
+            db.SecondDatabase.SelectedColumns.Clear();
             int min = Math.Min(db.FirstDatabase.TableColumns.Count, db.SecondDatabase.TableColumns.Count);
             for (int i = 0; i < min; i++)
             {

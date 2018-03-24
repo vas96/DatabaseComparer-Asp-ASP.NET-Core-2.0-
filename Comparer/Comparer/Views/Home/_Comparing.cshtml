@@ -3,11 +3,8 @@
 @model DBTest.DatabaseComparer
 
 @{
-    var FirstToSecond = @Model.ComparingResult.Item1.ToList();
-}
-
-@{
-    var SecondToFirst = @Model.ComparingResult.Item2.ToList();
+    var FirstToSecond = @Model.ComparingResult[1];
+    var SecondToFirst = @Model.ComparingResult[2];
 }
 
 <div class="container">
