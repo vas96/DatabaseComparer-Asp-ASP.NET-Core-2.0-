@@ -9,7 +9,7 @@
 
 <div class="container">
     <h3 class="text-center">Comparing results</h3>
-    <ul class="nav nav-tabs">
+    <ul class="nav nav-tabs">                    
         <li class="active"><a data-toggle="tab" href="#home">First table difference</a></li>
         <li><a data-toggle="tab" href="#menu1">Two table difference</a></li>
         <li><a data-toggle="tab" href="#menu2">Second table difference</a></li>
@@ -61,7 +61,7 @@
                         List<string> error = new List<string>() { "none", "none" };
 
                         List<string> temp = i > FirstToSecond.Count ? temp = error : temp = FirstToSecond[i].ToList();
-                        List<string> temp2 = i > SecondToFirst.Count ? temp2 = error : temp2 = FirstToSecond[i].ToList();
+                        List<string> temp2 = i > SecondToFirst.Count ? temp2 = error : temp2 = SecondToFirst[i].ToList();
 
                         //temp = temp == null ? temp = error : temp;
                         //temp2 = temp2 == null ? temp2 = error : temp2;

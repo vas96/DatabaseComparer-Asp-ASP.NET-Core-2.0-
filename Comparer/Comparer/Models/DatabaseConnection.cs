@@ -97,6 +97,7 @@ namespace DbComparer
             TableColumns = new List<Column>();
             SelectedColumns = new List<string>();
         }
+        
         /// <summary>
         /// Рядок підключення
         /// </summary>

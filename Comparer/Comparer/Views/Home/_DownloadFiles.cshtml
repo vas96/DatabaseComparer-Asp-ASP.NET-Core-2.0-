@@ -1,7 +1,7 @@
 ﻿@*
     For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 *@
-<h1>Upload databases</h1>
+<h1 style="margin-top: 70px">Upload databases</h1>
 <hr />
 <div class="container-fluid">
     <div class="row">
@@ -25,9 +25,9 @@
 </div>
 
 <script>
-    $("#NextStep").click(function () {
+    $("#GoTableInfo").click(function () {
         $.ajax({
-            url: "ColumnMapping",
+            url: "TableInfo",
             type: "POST",
             success: function (result) {
                 $("#Partial").html(result);
