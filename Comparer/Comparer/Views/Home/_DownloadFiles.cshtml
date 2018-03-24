@@ -2,7 +2,7 @@
     For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 *@
 <h1>Upload databases</h1>
-
+<hr />
 <div class="container-fluid">
     <div class="row">
         <div class="container-fluid col-md-6" id="Drop1">
@@ -21,9 +21,10 @@
             </div>
         </div>
     </div>
-    <h6><button type="button" class="btn-lg" id="NextStep">NEXT STEP</button></h6>
-    <h6><button type="button" class="btn-lg" id="NextStep2">NEXT STEP1</button></h6>
-
+    @* <h6><button type="button" class="btn-lg" id="NextStep">NEXT STEP</button></h6>*@
+    <button type="button" class="btn-lg btn-block btn-primary-custom" id="GoTableInfo">Check tables from DB</button>
+    <button type="button" class="btn-lg btn-block btn-default-custom" id="GoTableInfo">Step back</button>
+</div>
 
     <script>
         $("#NextStep").click(function() {
@@ -35,7 +36,7 @@
                 }
             });
         });
-        $("#NextStep2").click(function () {
+        $("#GoTableInfo").click(function () {
             $.ajax({
                 url: "TableInfo",
                 type: "POST",

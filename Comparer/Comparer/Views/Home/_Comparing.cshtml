@@ -39,6 +39,7 @@
                             }
                         </tr>
                     }
+
                 </tbody>
             </table>
         </div>
@@ -58,11 +59,12 @@
                     @for (int i = 0; i < maxRange; i++)
                     {
                         List<string> error = new List<string>() { "none", "none" };
-                        List<string> temp = FirstToSecond[i].ToList();
-                        List<string> temp2 = SecondToFirst[i].ToList();
 
-                        temp = temp == null ? temp = error : temp;
-                        temp2 = temp2 == null ? temp2 = error : temp2;
+                        List<string> temp = i > FirstToSecond.Count ? temp = error : temp = FirstToSecond[i].ToList();
+                        List<string> temp2 = i > SecondToFirst.Count ? temp2 = error : temp2 = FirstToSecond[i].ToList();
+
+                        //temp = temp == null ? temp = error : temp;
+                        //temp2 = temp2 == null ? temp2 = error : temp2;
 
                         int columnNumber = Math.Max(temp.Count, temp2.Count);
                         <tr>
