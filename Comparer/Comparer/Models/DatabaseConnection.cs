@@ -100,9 +100,9 @@ namespace DbComparer
         }
         /// <summary>
         /// Назва файлу
-        /// </summary>
-        
+        /// </summary>        
         public string FileName;
+
         /// <summary>
         /// Рядок підключення
         /// </summary>

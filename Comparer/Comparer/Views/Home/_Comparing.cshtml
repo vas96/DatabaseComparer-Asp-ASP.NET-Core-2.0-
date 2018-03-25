@@ -5,6 +5,9 @@
 @{
     var FirstToSecond = @Model.ComparingResult[1];
     var SecondToFirst = @Model.ComparingResult[2];
+
+    var FirstToSecond_unique = @Model.ComparingResult[3];
+    var SecondToFirst_unique = @Model.ComparingResult[4];
 }
 
 <div class="container">
@@ -18,40 +21,81 @@
     <div class="tab-content">
         <div id="home" class="tab-pane fade in active">
             <table class="table table-condensed">
-                @*<thead>
-                        <tr>
-                            <th>Firstname</th>
-                            <th>Lastname</th>
-                            <th>Email</th>
-                        </tr>
-                    </thead>*@
+                <thead>
+                    <tr>
+                        <th class="text-center"><input type="checkbox" id="checkAllFirstDatabase" checked /><span id="checkAllFirstDatabaseText">Uncheck all</span></th>
+                        @for (int i = 0; i < @Model.FirstDatabase.SelectedColumns.Count; i++)
+                {
+                    <th>  @Model.FirstDatabase.SelectedColumns[i]  </th>
+        }
+                    </tr>
+                </thead>
                 <tbody>
 
                     @for (int i = 0; i < FirstToSecond.Count; i++)
-                    {
-                        List<string> temp = FirstToSecond[i].ToList();
-                        <tr>
-                            @for (int j = 0; j < temp.Count; j++)
-                            {
-                                <td class="success">
-                                    @temp[j]
-                                </td>
-                            }
-                        </tr>
-                    }
+            {
+                List<string> temp = FirstToSecond[i].ToList();
+                <tr>
+                    <td class="warning text-center"> <input type="checkbox" name="FirstDatabaseCheckbox" checked value="@i"></td>
+                    @for (int j = 0; j < temp.Count; j++)
+            {
+                <td class="success">
+                    @temp[j]
+                </td>
+    }
+                </tr>
+    }
+                    @for (int i = 0; i < FirstToSecond_unique.Count; i++)
+            {
+                List<string> temp = FirstToSecond_unique[i].ToList();
+                <tr>
+                    <td class="warning text-center"> <input type="checkbox" name="FirstDatabaseCheckboxUnique" checked value="@i"></td>
+                    @for (int j = 0; j < temp.Count; j++)
+            {
+                <td class="success">
+                    @temp[j]
+                </td>
+    }
+                </tr>
+    }
 
                 </tbody>
             </table>
+
+            <div class="container-fluid">
+                <div class="panel-group">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" href="#collapse1">Generate script for update database</a>
+                            </h4>
+                        </div>
+                        <div id="collapse1" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <textarea readonly class="form-control disabled" rows="3"></textarea>
+                                <hr />
+                                <button class="btn-block btn-default btn-primary-custom">Start</button>
+                            </div>
+                            <div class="panel-footer">
+                                link for download db <a href="#">Updated DB</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
         <div id="menu1" class="tab-pane fade">
             <table class="table table-condensed">
-                @*<thead>
-                        <tr>
-                            <th>Firstname</th>
-                            <th>Lastname</th>
-                            <th>Email</th>
-                        </tr>
-                    </thead>*@
+                <thead>
+                    <tr>
+                        @for (int i = 0; i < @Model.FirstDatabase.SelectedColumns.Count; i++)
+                        {
+                            <th>  @Model.FirstDatabase.SelectedColumns[i]  </th>
+                            <th>  @Model.SecondDatabase.SelectedColumns[i]  </th>
+                        }
+                    </tr>
+                </thead>
                 <tbody>
                     @{
                         int maxRange = Math.Min(SecondToFirst.Count, FirstToSecond.Count);
@@ -61,25 +105,16 @@
                         List<string> error = new List<string>() { "none", "none" };
 
                         List<string> temp = i > FirstToSecond.Count ? temp = error : temp = FirstToSecond[i].ToList();
-                        List<string> temp2 = i > SecondToFirst.Count ? temp2 = error : temp2 = FirstToSecond[i].ToList();
-
-                        //temp = temp == null ? temp = error : temp;
-                        //temp2 = temp2 == null ? temp2 = error : temp2;
+                        List<string> temp2 = i > SecondToFirst.Count ? temp2 = error : temp2 = SecondToFirst[i].ToList();
 
                         int columnNumber = Math.Max(temp.Count, temp2.Count);
                         <tr>
                             @for (int j = 0; j < columnNumber; j++)
                             {
                                 <td class="warning">
-                                    @*@{
-                                        temp[j] = temp[j] == null ? temp[j] = "none" : temp[j];
-                                    }*@
                                     @temp[j]
                                 </td>
                                 <td class="danger">
-                                    @*@{
-                                        temp2[j] = temp2[j] == null ? temp2[j] = "none" : temp2[j];
-                                    }*@
                                     @temp2[j]
                                 </td>
                             }
@@ -91,30 +126,108 @@
         </div>
         <div id="menu2" class="tab-pane fade">
             <table class="table table-condensed">
-                @*<thead>
-                        <tr>
-                            <th>Firstname</th>
-                            <th>Lastname</th>
-                            <th>Email</th>
-                        </tr>
-                    </thead>*@
+                <thead>
+                    <tr>
+                        <th class="text-center"><input type="checkbox" id="checkAllSecondDatabase" checked /><span id="checkAllSecondDatabaseText">Uncheck all</span></th>
+                        @for (int i = 0; i < @Model.SecondDatabase.SelectedColumns.Count; i++)
+                {
+                    <th>  @Model.SecondDatabase.SelectedColumns[i]  </th>
+        }
+                    </tr>
+                </thead>
                 <tbody>
                     @for (int i = 0; i < SecondToFirst.Count; i++)
-                    {
-                        List<string> temp = SecondToFirst[i].ToList();
-                        <tr>
-                            @for (int j = 0; j < temp.Count; j++)
-                            {
-                                <td class="success">
-                                    @temp[j]
-                                </td>
-                            }
-                        </tr>
-                    }
+            {
+                List<string> temp = SecondToFirst[i].ToList();
+                <tr>
+                    <td class="warning text-center"> <input type="checkbox" name="SecondDatabaseCheckbox" checked value="@i"></td>
+
+                    @for (int j = 0; j < temp.Count; j++)
+            {
+                <td class="success">
+                    @temp[j]
+                </td>
+    }
+
+                </tr>
+    }
+
+                    @for (int i = 0; i < SecondToFirst_unique.Count; i++)
+            {
+                List<string> temp = SecondToFirst_unique[i].ToList();
+                <tr>
+                    <td class="warning text-center"> <input type="checkbox" name="SecondDatabaseCheckboxUnique" checked value="@i"></td>
+                    @for (int j = 0; j < temp.Count; j++)
+            {
+                <td class="success">
+                    @temp[j]
+                </td>
+    }
+                </tr>
+    }
                 </tbody>
             </table>
+            <div class="container-fluid">
+                <div class="panel-group">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" href="#collapse2">Generate script for update database</a>
+                            </h4>
+                        </div>
+                        <div id="collapse2" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <textarea readonly class="form-control disabled" rows="3"></textarea>
+                                <hr />
+                                <button class="btn-block btn-default btn-primary-custom">Start</button>
+                            </div>
+                            <div class="panel-footer">
+                                link for download db <a href="#">Updated DB</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+
+    function ValueCheckbox(name) {
+        var chkArray = [];
+        $("input[name = '" + name + "']:checked").each(function () {
+            chkArray.push($(this).val());
+        });
+        return chkArray;
+    }
+
+    $("#checkAllFirstDatabase").change(function () {
+        $("input[name = 'FirstDatabaseCheckbox']").prop('checked', $(this).prop("checked"));
+        $("input[name = 'FirstDatabaseCheckboxUnique']").prop('checked', $(this).prop("checked"));
+
+        var checked = $("#checkAllFirstDatabase").is(':checked');
+        (checked === true) ? $("#checkAllFirstDatabaseText").text('Uncheck all') : $("#checkAllFirstDatabaseText").text('Check all');
+    });
+    $("#checkAllSecondDatabase").change(function () {
+        $("input[name = 'SecondDatabaseCheckbox']").prop('checked', $(this).prop("checked"));
+        $("input[name = 'SecondDatabaseCheckboxUnique']").prop('checked', $(this).prop("checked"));
+
+        var checked = $("#checkAllSecondDatabase").is(':checked');
+        (checked === true) ? $("#checkAllSecondDatabaseText").text('Uncheck all') : $("#checkAllSecondDatabaseText").text('Check all');
+    });
+
+    var FirstDBListIndex = ValueCheckbox("FirstDatabaseCheckbox");
+    var FirstDBListIndexUnique = ValueCheckbox("FirstDatabaseCheckboxUnique");
+
+    console.log(FirstDBListIndex);
+    console.log(FirstDBListIndexUnique);
+
+    var SecondDBListIndex = ValueCheckbox("SecondDatabaseCheckbox");
+    var SecondDBListIndexUnique = ValueCheckbox("SecondDatabaseCheckboxUnique");
+
+    console.log(SecondDBListIndexUnique);
+    console.log(SecondDBListIndex);
+</script>
 
 
