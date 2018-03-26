@@ -65,14 +65,14 @@
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a data-toggle="collapse" id="1" class="ColapsableScript" href="#collapse1">Generate script for update database</a>
+                                <a data-toggle="collapse" href="#collapse1">Generate script for update database</a>
                             </h4>
                         </div>
                         <div id="collapse1" class="panel-collapse collapse">
                             <div class="panel-body">
                                 <textarea readonly class="form-control disabled" rows="3"></textarea>
                                 <hr />
-                                <button class="btn-block btn-default btn-primary-custom">Start update</button>
+                                <button id="1" class="btn-block btn-default btn-primary-custom ColapsableScript">Start update</button>
                             </div>
                             <div class="panel-footer">
                                 link for download db <a href="#">Updated DB</a>
@@ -129,14 +129,14 @@
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a data-toggle="collapse" id="2" class="ColapsableScript" href="#collapse3">Generate script for update database</a>
+                                <a data-toggle="collapse" href="#collapse3">Generate script for update database</a>
                             </h4>
                         </div>
                         <div id="collapse3" class="panel-collapse collapse">
                             <div class="panel-body">
                                 <textarea readonly class="form-control disabled" rows="3"></textarea>
                                 <hr />
-                                <button class="btn-block btn-default btn-primary-custom">Start update</button>
+                                <button id="2" class="btn-block btn-default btn-primary-custom ColapsableScript">Start update</button>
                             </div>
                             <div class="panel-footer">
                                 link for download db <a href="#">Updated DB</a>
@@ -194,14 +194,14 @@
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a data-toggle="collapse" id="3" class="ColapsableScript" href="#collapse2">Generate script for update database</a>
+                                <a data-toggle="collapse" href="#collapse2">Generate script for update database</a>
                             </h4>
                         </div>
                         <div id="collapse2" class="panel-collapse collapse">
                             <div class="panel-body">
                                 <textarea readonly class="form-control disabled" rows="3"></textarea>
                                 <hr />
-                                <button class="btn-block btn-default btn-primary-custom">Start update</button>
+                                <button id="3" class="btn-block btn-default btn-primary-custom ColapsableScript">Start update</button>
                             </div>
                             <div class="panel-footer">
                                 link for download db <a href="#">Updated DB</a>
@@ -213,6 +213,7 @@
         </div>
     </div>
 </div>
+<button type="button" class="btn-lg btn-block btn-primary-custom" id="Back">STEP BACK</button>
 
 <script type="text/javascript">
 
@@ -262,42 +263,56 @@
 
     //console.log(FromTwoDBListIndex);
 
+
+    $("#Back").click(function() {
+        $.ajax({
+            url: "ColumnMapping",
+            type: "POST",
+            success: function(result) {
+                $("#Partial").html(result);
+            }
+        });
+    });
+
     $(function () {
-        $(".ColapsableScript").click(function () {
-            var id = this.id;
-            var arrayN = null;
-            var arrayU = null;
-            switch (id) {
-                case 1:
-                    {
-                        arrayN = FirstDBListIndex;
-                        arrayU = FirstDBListIndexUnique;
-                        break;
-                    };
-                case 2:
-                    {
-                        arrayN = FromTwoDBListIndex;
-                        arrayU = [];
-                        break;
-                    }
-                case 3:
-                    {
-                        arrayN = SecondDBListIndex;
-                        arrayU = SecondDBListIndexUnique;
-                        break;
-                    };
+        var buttons = $(".ColapsableScript").toArray();
+        buttons.forEach(function (item, i) {
+            $(item).click(function () {
+                var id = this.id;
+                var arrayN = null;
+                var arrayU = null;
+                switch (id) {
+                case "1":
+                {
+                    arrayN = FirstDBListIndex;
+                    arrayU = FirstDBListIndexUnique;
+                    break;
+                };
+                case "2":
+                {
+                    arrayN = FromTwoDBListIndex;
+                    arrayU = [];
+                    break;
+                }
+                case "3":
+                {
+                    arrayN = SecondDBListIndex;
+                    arrayU = SecondDBListIndexUnique;
+                    break;
+                };
                 default:
                     return;
-            }
-            $.ajax({
-                url: "CreateScript",
-                type: "POST",
-                data: { id: id, arrayN: arrayN, arrayU: arrayU },
-                success: function (result) {
-                    console.log(result);
                 }
+                $.ajax({
+                    url: "CreateScript",
+                    type: "POST",
+                    data: { id: id, arrayN: arrayN, arrayU: arrayU },
+                    success: function (result) {
+                        console.log(result);
+                    }
+                });
             });
-        })
+        });
     });
 
 </script>

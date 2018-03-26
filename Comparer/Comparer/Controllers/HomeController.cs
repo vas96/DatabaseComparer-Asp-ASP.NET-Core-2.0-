@@ -80,6 +80,7 @@ namespace Comparer.Controllers
         [HttpPost]
         public IActionResult FilesDownloaded()
         {
+            CleanNotUsedData(1);
             return PartialView("_DownloadFiles", db);
         }
 
@@ -87,6 +88,7 @@ namespace Comparer.Controllers
         [HttpPost]
         public IActionResult TableInfo()
         {
+            CleanNotUsedData(2);
             if ((db.FirstDatabase == null ||
                  db.FirstDatabase.connection == null ||
                  db.FirstDatabase.connection.State != ConnectionState.Open) ||
@@ -102,8 +104,15 @@ namespace Comparer.Controllers
         [HttpPost]
         public IActionResult ColumnMapping(string[] array = null)
         {
-            if (array == null || array.Length < 2)
-                array = new[] { "Projects", "Users" };
+            CleanNotUsedData(3);
+            if (array.Length < 1)
+            {
+                if (db.FirstDatabase.SelectedTable == null || db.SecondDatabase.SelectedTable == null)
+                    return PartialView("_Error");
+                array = new string[2];
+                array[0] = db.FirstDatabase.SelectedTable;
+                array[1] = db.SecondDatabase.SelectedTable;
+            }
             db.FirstDatabase.SelectedTable = array[0];
             db.SecondDatabase.SelectedTable = array[1];
             if ((db.FirstDatabase == null ||
@@ -125,6 +134,7 @@ namespace Comparer.Controllers
         [HttpPost]
         public IActionResult Comparing(string[] array)
         {
+            CleanNotUsedData(4);
             if (array.Length == 0)
                 return PartialView("_Error");
             db.FirstDatabase.SelectedColumns.Clear();
@@ -224,6 +234,41 @@ namespace Comparer.Controllers
             return false;
         }
 
+        public void CleanNotUsedData(int i)
+        {
+            switch (i)
+            {
+                case 1:
+                    {
+                        db = new DatabaseComparer();
+                        PageClosedAction("");
+                        break;
+                    }
+                case 2:
+                    {
+                        db.FirstDatabase.SelectedTable = null;
+                        db.SecondDatabase.SelectedTable = null;
+                        break;
+                    }
+                case 3:
+                    {
+                        db.FirstDatabase.TableColumns.Clear();
+                        db.SecondDatabase.TableColumns.Clear();
+                        db.FirstDatabase.SelectedColumns.Clear();
+                        db.SecondDatabase.SelectedColumns.Clear();
+                        break;
+                    }
+                case 4:
+                    {
+                        db.ComparingResult.Clear();
+                        db.FirstData = null;
+                        db.SecondData = null;
+                        db.AdditionalInfo = null;
+                        break;
+                    }
+            }
+        }
+
         [HttpPost]
         public void PageClosedAction(string page)
         {
@@ -233,16 +278,17 @@ namespace Comparer.Controllers
                 {
                     int sleepTimer = 100;
                     bool conClosed = db.CloseConnection();
-                    for (int i = 0; i < 20 && !conClosed; i++)
+                    for (int i = 0; (i < 20) && !conClosed; i++)
                     {
                         Thread.Sleep(sleepTimer + (i * 100));
                         conClosed = db.CloseConnection();
                     }
                     bool folderDeleted = db.DeleteActiveFolder();
-                    for (int i = 0; i < 20 && !folderDeleted; i++)
+                    for (int i = 0; (i < 20) && !folderDeleted; i++)
                     {
                         Thread.Sleep(sleepTimer + (i * 100));
                         folderDeleted = db.DeleteActiveFolder();
+                        db.DeleteDirectory(null, true);
                     }
                 }
                 catch (Exception e)
@@ -261,22 +307,22 @@ namespace Comparer.Controllers
             {
                 case 1:
                     {
-                        Update = db.SecondDatabase.BuildUpdate(db.ComparingResult[2], db.ComparingResult[1]);
-                        Insert = db.SecondDatabase.BuildInsert(db.ComparingResult[3]);
+                        Update = db.SecondDatabase.BuildUpdate(db.ComparingResult[2], db.ComparingResult[1], arrayN);
+                        Insert = db.SecondDatabase.BuildInsert(db.ComparingResult[3], arrayU);
                         break;
                     }
                 case 2:
-                {
-                    Update = db.SecondDatabase.BuildUpdate(db.ComparingResult[2], db.ComparingResult[1]);
-                    Insert = db.FirstDatabase.BuildUpdate(db.ComparingResult[1], db.ComparingResult[2]);
-                    break;
-                }
+                    {
+                        Update = db.SecondDatabase.BuildUpdate(db.ComparingResult[2], db.ComparingResult[1], arrayN);
+                        Insert = db.FirstDatabase.BuildUpdate(db.ComparingResult[1], db.ComparingResult[2], arrayN);
+                        break;
+                    }
                 case 3:
-                {
-                    Update = db.FirstDatabase.BuildUpdate(db.ComparingResult[1], db.ComparingResult[2]);
-                    Insert = db.FirstDatabase.BuildInsert(db.ComparingResult[4]);
-                    break;
-                }
+                    {
+                        Update = db.FirstDatabase.BuildUpdate(db.ComparingResult[1], db.ComparingResult[2], arrayN);
+                        Insert = db.FirstDatabase.BuildInsert(db.ComparingResult[4], arrayU);
+                        break;
+                    }
             }
         }
 

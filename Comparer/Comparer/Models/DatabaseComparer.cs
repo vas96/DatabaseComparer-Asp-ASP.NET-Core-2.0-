@@ -117,6 +117,39 @@ namespace DBTest
             return true;
         }
 
+        public void DeleteDirectory(string path, bool recursive)
+        {
+            if (path == null) path = Folder; 
+            if (recursive)
+            {
+                var subfolders = Directory.GetDirectories(path);
+                foreach (var s in subfolders)
+                {
+                    DeleteDirectory(s, recursive);
+                }
+            }
+            var files = Directory.GetFiles(path);
+            foreach (var f in files)
+            {
+                try
+                {
+                    var attr = File.GetAttributes(f);
+                    if ((attr & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
+                    {
+                        File.SetAttributes(f, attr ^ FileAttributes.ReadOnly);
+                    }
+                    File.Delete(f);
+                }
+                catch (IOException)
+                {
+                }
+            }
+
+            // At this point, all the files and sub-folders have been deleted.
+            // So we delete the empty folder using the OOTB Directory.Delete method.
+            Directory.Delete(path);
+        }
+
         /// <summary>
         /// Читає дані з 1-ї і 2-ї БД
         /// Запити генеруються на основі SelectedColumns

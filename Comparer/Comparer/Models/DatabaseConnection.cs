@@ -205,17 +205,19 @@ namespace DbComparer
         /// </summary>
         /// <param name="stringses">собсно, по яких даних будувати запит</param>
         /// <returns></returns>
-        public string[] BuildInsert(List<string[]> stringses)
+        public string[] BuildInsert(List<string[]> stringses, string[] selected)
         {
             string[] Result = new string[stringses.Count];
+            int[] arr = selected.Select(i => Int32.Parse(i)).ToArray();
             string columns = "(" + SelectedColumns.Join(",") + ")";
-            for(int i=0; i<stringses.Count;i++)
+            for(int i=0; i<selected.Length;i++)
             {
+                ///ПРОБЛЕМА!!!
                 string Insert = "INSERT INTO "
                                 + SelectedTable
                                 + columns
                                 + " VALUES("
-                                + stringses[i].Join(",")
+                                + stringses[arr[i]].Join(",")
                                 + ");";
                 Result[i] = Insert;
             }
@@ -228,30 +230,34 @@ namespace DbComparer
         /// <param name="stringsTo">Куда</param>
         /// <param name="stringsFrom">Звідки</param>
         /// <returns>масівчик</returns>
-        public string[] BuildUpdate(List<string[]> stringsTo, List<string[]> stringsFrom)
+        public string[] BuildUpdate(List<string[]> stringsTo, List<string[]> stringsFrom,string[] selected)
         {
             string[] Result = new string[stringsTo.Count];
-            for(int i=0; i< stringsTo.Count;i++)
+            int[] arr = selected.Select(i => Int32.Parse(i)).ToArray();
+            for(int i=0; i< selected.Length;i++)
             {
                 string Update = "UPDATE " 
                                 + SelectedTable 
                                 + " SET "
                                 + SelectedColumns[0]
                                 +"="
-                                +stringsFrom[0]
+                                +stringsFrom[arr[i]][0]
                                 +" ";
                 for (int j = 1; j < SelectedColumns.Count; j++)
                 {
-                    Update += ", " + SelectedColumns[j] +"="+stringsFrom[j];
+                    ///ПРОБЛЕМА!!!
+                    Update += ", " + SelectedColumns[j] +"="+stringsFrom[arr[i]][j];
                 }
-                Update+=" WHERE " 
+                ///ПРОБЛЕМА!!!
+                Update += " WHERE " 
                         + SelectedColumns[0]          
                         + "="
-                        + stringsTo[0]
+                        + stringsTo[arr[i]][0]
                         + " ";
                 for (int j = 1; j < SelectedColumns.Count; j++)
                 {
-                    Update += ", " + SelectedColumns[j] + "=" + stringsTo[j];
+                    ///ПРОБЛЕМА!!!
+                    Update += ", " + SelectedColumns[j] + "=" + stringsTo[arr[i]][j];
                 }
                 Update += ";";
                 Result[i] = Update;

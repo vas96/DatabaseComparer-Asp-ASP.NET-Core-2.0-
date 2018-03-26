@@ -75,9 +75,18 @@
 
    
         <button type="button" class="btn-lg btn-block btn-primary-custom" id="GoToColumnMapping">Check Columns</button>
-        <button type="button" class="btn-lg btn-block btn-default-custom" id="GoTableInfo" style="margin-bottom:1.5vmin;">Step back</button>
+        <button type="button" class="btn-lg btn-block btn-default-custom" id="Back" style="margin-bottom:1.5vmin;">Step back</button>
 </div>
 <script>
+    $("#Back").click(function () {
+        $.ajax({
+            url: "FilesDownloaded",
+            type: "POST",
+            success: function (result) {
+                $("#Partial").html(result);
+            }
+        });
+    });
 
     $(function () {
         $('div.table-chooser').find('div.table-chooser-item').on('click', function () {

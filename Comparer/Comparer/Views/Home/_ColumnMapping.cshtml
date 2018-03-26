@@ -55,12 +55,22 @@
         </ol>
     </div>
     <button type="button" class="btn-lg btn-block btn-primary-custom" id="GoToComparing">NEXT STEP</button>
-    <button type="button" class="btn-lg btn-block btn-default-custom" id="GoTableInfo" style="margin-bottom:1.5vmin;">Step back</button>
+    <button type="button" class="btn-lg btn-block btn-default-custom" id="Back" style="margin-bottom:1.5vmin;">Step back</button>
 </div>
 
 
 <script src="~/js/Sortable.js"></script>
 <script>
+    $("#Back").click(function() {
+        $.ajax({
+            url: "TableInfo",
+            type: "POST",
+            success: function(result) {
+                $("#Partial").html(result);
+            }
+        });
+    });
+
     function ValidateTypes() {
         var source_list = [];
         var target_list = [];
@@ -79,9 +89,9 @@
         }
     }
 
-    $(function () {
+    $(function() {
         ValidateTypes();
-    })
+    });
     var adjustment;
 
     $("ol.ol-drag").sortable({
