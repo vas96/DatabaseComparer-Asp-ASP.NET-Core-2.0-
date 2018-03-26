@@ -9,7 +9,7 @@
 <div class="container-fluid">
     <form action="" class="" id="FirstTable">
 
-        <h2>@Model.FirstDatabase.connection.DataSource</h2>
+        <h2>@Model.FirstDatabase.FileName</h2>
 
         <div class="row-fluid" id="container-table-info">
 
@@ -43,30 +43,30 @@
 
     <form action="" class="" id="demo-upload2">
 
-        <h2>@Model.FirstDatabase.DataConnectionString</h2>
+        <h2>@Model.SecondDatabase.FileName</h2>
 
         <div class="row-fluid" id="container-table-info">
 
             <div class=" table-chooser panel panel-default panel-table">
                 @{
-                    List<String> drcSecondDBNamesTB = Model.SecondDatabase.GetTablesList();
+                List<String> drcSecondDBNamesTB = Model.SecondDatabase.GetTablesList();
                 }
                 <div class="panel-body">
 
                     <div class="tr">
                         @foreach (String nameTB in drcSecondDBNamesTB)
-                        {
+                    {
 
-                            <div class="td table-chooser-item">
-                                <p class="TbName"> <strong> @nameTB </strong></p>
-                                <br />
-                                @foreach (DataRow typesTB in Model.SecondDatabase.GetTableInfo(nameTB).Rows)
-                                {
-                                    <p class="TbType"> @typesTB.ItemArray[3]</p>
-                                }
-                                <input class="tableRadio" type="radio" name="SecondDatabaseCH" value=@nameTB checked="checked">
-                            </div>
-                        }
+                        <div class="td table-chooser-item">
+                            <p class="TbName"> <strong> @nameTB </strong></p>
+                            <br />
+                            @foreach (DataRow typesTB in Model.SecondDatabase.GetTableInfo(nameTB).Rows)
+                        {
+                            <p class="TbType"> @typesTB.ItemArray[3]</p>
+                    }
+                            <input class="tableRadio" type="radio" name="SecondDatabaseCH" value=@nameTB checked="checked">
+                        </div>
+                }
                     </div>
                 </div>
             </div>
@@ -93,7 +93,7 @@
         var array = [];
         array.push($('input[name=FirstDatabaseCH]:checked').val());
         array.push($('input[name=SecondDatabaseCH]:checked').val());
-
+              
         console.log(array);
         $.ajax({
             url: "ColumnMapping",
