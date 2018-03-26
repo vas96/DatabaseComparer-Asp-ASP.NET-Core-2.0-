@@ -96,7 +96,7 @@ namespace DbComparer
             SelectedDatabase = null;
             connection = null;
             TableColumns = new List<Column>();
-            SelectedColumns = new List<string>();
+            SelectedColumns = new List<Column>();
             FileName = null;
         }
         /// <summary>
@@ -132,7 +132,7 @@ namespace DbComparer
         /// <summary>
         /// Колонки, обрані для порівняння
         /// </summary>
-        public List<string> SelectedColumns;
+        public List<Column> SelectedColumns;
 
         /// <summary>
         /// Селектор
@@ -189,7 +189,7 @@ namespace DbComparer
             string Select = "SELECT ";
             foreach (var item in SelectedColumns)
             {
-                Select += item + ", ";
+                Select += item.Name + ", ";
             }
             Select = Select.Remove(Select.Length - 2, 2);
             Select += " FROM " + ((table == null) ? SelectedTable : table);
@@ -209,16 +209,21 @@ namespace DbComparer
         {
             string[] Result = new string[stringses.Count];
             int[] arr = selected.Select(i => Int32.Parse(i)).ToArray();
-            string columns = "(" + SelectedColumns.Join(",") + ")";
+            string columns = "(" + SelectedColumns.Select(i=>i.Name).Join(",") + ")";
             for(int i=0; i<selected.Length;i++)
             {
-                ///ПРОБЛЕМА!!!
                 string Insert = "INSERT INTO "
                                 + SelectedTable
                                 + columns
-                                + " VALUES("
-                                + stringses[arr[i]].Join(",")
-                                + ");";
+                                + " VALUES(";
+                for (int j = 0; j < SelectedColumns.Count; j++)
+                {
+                    if (SelectedColumns[j].Type != "int")
+                        Insert += "'"+stringses[arr[i]][j]+"',";
+                    else Insert += stringses[arr[i]][j] + ",";
+                }
+                Insert = Insert.Remove(Insert.Length - 1, 1);
+                Insert += ");";
                 Result[i] = Insert;
             }
             return Result;
@@ -236,28 +241,31 @@ namespace DbComparer
             int[] arr = selected.Select(i => Int32.Parse(i)).ToArray();
             for(int i=0; i< selected.Length;i++)
             {
-                string Update = "UPDATE " 
-                                + SelectedTable 
+                string Update = "UPDATE "
+                                + SelectedTable
                                 + " SET "
-                                + SelectedColumns[0]
-                                +"="
-                                +stringsFrom[arr[i]][0]
-                                +" ";
+                                + SelectedColumns[0].Name
+                                + "=";
+                if (SelectedColumns[0].Type!="int")
+                    Update +="'"+stringsFrom[arr[i]][0]+ "' ";
+                else Update +=stringsFrom[arr[i]][0]+ " ";
                 for (int j = 1; j < SelectedColumns.Count; j++)
                 {
-                    ///ПРОБЛЕМА!!!
-                    Update += ", " + SelectedColumns[j] +"="+stringsFrom[arr[i]][j];
+                    if (SelectedColumns[j].Type != "int")
+                        Update += ", " + SelectedColumns[j].Name + "='" + stringsFrom[arr[i]][j]+"'";
+                    else Update += ", " + SelectedColumns[j].Name + "="+stringsFrom[arr[i]][j];
                 }
-                ///ПРОБЛЕМА!!!
                 Update += " WHERE " 
-                        + SelectedColumns[0]          
-                        + "="
-                        + stringsTo[arr[i]][0]
-                        + " ";
-                for (int j = 1; j < SelectedColumns.Count; j++)
+                        + SelectedColumns[0].Name
+                        + "=";
+                if (SelectedColumns[0].Type != "int")
+                    Update += "'" + stringsTo[arr[i]][0] + "' ";
+                else Update += stringsTo[arr[i]][0]+ " ";
+                    for (int j = 1; j < SelectedColumns.Count; j++)
                 {
-                    ///ПРОБЛЕМА!!!
-                    Update += ", " + SelectedColumns[j] + "=" + stringsTo[arr[i]][j];
+                    if (SelectedColumns[j].Type != "int")
+                        Update += ", " + SelectedColumns[j].Name + "='" + stringsTo[arr[i]][j] + "'";
+                    else Update += ", " + SelectedColumns[j].Name + "=" + stringsTo[arr[i]][j];
                 }
                 Update += ";";
                 Result[i] = Update;
@@ -567,7 +575,7 @@ namespace DbComparer
             sql.GetTableInfo("NewEmployees");
             foreach (var item in sql.TableColumns)
             {
-                sql.SelectedColumns.Add(item.Name);
+                //sql.SelectedColumns.Add(item.Name);
             }
 
             SqlDataBaseConnector sql2 = new SqlDataBaseConnector();
@@ -577,7 +585,7 @@ namespace DbComparer
             sql2.GetTableInfo();
             foreach (var item in sql2.TableColumns)
             {
-                sql2.SelectedColumns.Add(item.Name);
+                //sql2.SelectedColumns.Add(item.Name);
             }
             Stopwatch sw1 = new Stopwatch();
             Stopwatch sw2 = new Stopwatch();

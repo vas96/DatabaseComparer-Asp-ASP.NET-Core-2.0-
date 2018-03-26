@@ -142,11 +142,11 @@ namespace Comparer.Controllers
             int min = Math.Min(db.FirstDatabase.TableColumns.Count, db.SecondDatabase.TableColumns.Count);
             for (int i = 0; i < min; i++)
             {
-                db.FirstDatabase.SelectedColumns.Add(db.FirstDatabase.TableColumns[i].Name);
+                db.FirstDatabase.SelectedColumns.Add(db.FirstDatabase.TableColumns[i]);
                 foreach (var column in db.SecondDatabase.TableColumns)
                 {
                     if (column.Name == array[i] && column.Type == db.FirstDatabase.TableColumns[i].Type)
-                        db.SecondDatabase.SelectedColumns.Add(array[i]);
+                        db.SecondDatabase.SelectedColumns.Add(column);
                 }
             }
             if (db.FirstDatabase.SelectedColumns.Count !=
