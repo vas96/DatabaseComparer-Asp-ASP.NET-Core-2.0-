@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using DBTest;
 using Jdforsythe.MySQLConnection;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.EntityFrameworkCore.Query.Expressions;
 using MySql.Data.MySqlClient;
 using ObjectsComparer;
@@ -96,7 +97,7 @@ namespace DbComparer
             connection = null;
             TableColumns = new List<Column>();
             SelectedColumns = new List<string>();
-            FileName = null; 
+            FileName = null;
         }
         /// <summary>
         /// Назва файлу
@@ -193,6 +194,74 @@ namespace DbComparer
             Select = Select.Remove(Select.Length - 2, 2);
             Select += " FROM " + ((table == null) ? SelectedTable : table);
             return Select;
+            /*
+             INSERT INTO table_name (column1, column2, column3, ...)
+             VALUES (value1, value2, value3, ...);
+             */
+        }
+
+        /// <summary>
+        /// Створює запит на додавання даних
+        /// </summary>
+        /// <param name="stringses">собсно, по яких даних будувати запит</param>
+        /// <returns></returns>
+        public string[] BuildInsert(List<string[]> stringses)
+        {
+            string[] Result = new string[stringses.Count];
+            string columns = "(" + SelectedColumns.Join(",") + ")";
+            for(int i=0; i<stringses.Count;i++)
+            {
+                string Insert = "INSERT INTO "
+                                + SelectedTable
+                                + columns
+                                + " VALUES("
+                                + stringses[i].Join(",")
+                                + ");";
+                Result[i] = Insert;
+            }
+            return Result;
+        }
+        
+        /// <summary>
+        /// Створює запит(и) на оновлення даних в таблиці 
+        /// </summary>
+        /// <param name="stringsTo">Куда</param>
+        /// <param name="stringsFrom">Звідки</param>
+        /// <returns>масівчик</returns>
+        public string[] BuildUpdate(List<string[]> stringsTo, List<string[]> stringsFrom)
+        {
+            string[] Result = new string[stringsTo.Count];
+            for(int i=0; i< stringsTo.Count;i++)
+            {
+                string Update = "UPDATE " 
+                                + SelectedTable 
+                                + " SET "
+                                + SelectedColumns[0]
+                                +"="
+                                +stringsFrom[0]
+                                +" ";
+                for (int j = 1; j < SelectedColumns.Count; j++)
+                {
+                    Update += ", " + SelectedColumns[j] +"="+stringsFrom[j];
+                }
+                Update+=" WHERE " 
+                        + SelectedColumns[0]          
+                        + "="
+                        + stringsTo[0]
+                        + " ";
+                for (int j = 1; j < SelectedColumns.Count; j++)
+                {
+                    Update += ", " + SelectedColumns[j] + "=" + stringsTo[j];
+                }
+                Update += ";";
+                Result[i] = Update;
+            }
+            return Result;
+            /*
+                UPDATE table_name
+                SET column1 = value1, column2 = value2, ...
+                WHERE condition;
+             */
         }
 
         /// <summary>
@@ -278,7 +347,7 @@ namespace DbComparer
             public Column(DataRow dr)
             {
                 var array = dr.ItemArray;
-                Position = Int32.Parse(array[4].ToString())-1;//Позиція
+                Position = Int32.Parse(array[4].ToString()) - 1;//Позиція
                 Name = array[3].ToString();//Імя
                 Type = array[7].ToString();//Тип
                 Length = array[8].ToString();//Довжина

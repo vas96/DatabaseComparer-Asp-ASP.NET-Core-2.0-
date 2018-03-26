@@ -263,8 +263,40 @@
     //console.log(FromTwoDBListIndex);
 
     $(function () {
-        $(".ColapsableScript").click(function() {
-            alert(this.id);
+        $(".ColapsableScript").click(function () {
+            var id = this.id;
+            var arrayN = null;
+            var arrayU = null;
+            switch (id) {
+                case 1:
+                    {
+                        arrayN = FirstDBListIndex;
+                        arrayU = FirstDBListIndexUnique;
+                        break;
+                    };
+                case 2:
+                    {
+                        arrayN = FromTwoDBListIndex;
+                        arrayU = [];
+                        break;
+                    }
+                case 3:
+                    {
+                        arrayN = SecondDBListIndex;
+                        arrayU = SecondDBListIndexUnique;
+                        break;
+                    };
+                default:
+                    return;
+            }
+            $.ajax({
+                url: "CreateScript",
+                type: "POST",
+                data: { id: id, arrayN: arrayN, arrayU: arrayU },
+                success: function (result) {
+                    console.log(result);
+                }
+            });
         })
     });
 
