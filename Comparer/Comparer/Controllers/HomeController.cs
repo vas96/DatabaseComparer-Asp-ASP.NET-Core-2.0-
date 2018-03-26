@@ -288,7 +288,6 @@ namespace Comparer.Controllers
                     {
                         Thread.Sleep(sleepTimer + (i * 100));
                         folderDeleted = db.DeleteActiveFolder();
-                        db.DeleteDirectory(null, true);
                     }
                 }
                 catch (Exception e)
@@ -300,9 +299,9 @@ namespace Comparer.Controllers
         }
 
         [HttpPost]
-        public void CreateScript(int id, string[] arrayN, string[] arrayU = null)
+        public JsonResult CreateScript(int id, string[] arrayN, string[] arrayU = null)
         {
-            string[] Insert, Update;
+            string[] Insert=null, Update=null;
             switch (id)
             {
                 case 1:
@@ -324,6 +323,9 @@ namespace Comparer.Controllers
                         break;
                     }
             }
+
+            var ForReturn = new {Insert = Insert, Update = Update};
+            return Json(ForReturn);
         }
 
         #endregion

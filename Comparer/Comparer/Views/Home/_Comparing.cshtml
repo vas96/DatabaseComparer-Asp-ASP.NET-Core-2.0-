@@ -70,7 +70,7 @@
                         </div>
                         <div id="collapse1" class="panel-collapse collapse">
                             <div class="panel-body">
-                                <textarea readonly class="form-control disabled" rows="3"></textarea>
+                                <textarea readonly class="form-control disabled" rows="3" id="Res1"></textarea>
                                 <hr />
                                 <button id="1" class="btn-block btn-default btn-primary-custom ColapsableScript">Start update</button>
                             </div>
@@ -134,7 +134,7 @@
                         </div>
                         <div id="collapse3" class="panel-collapse collapse">
                             <div class="panel-body">
-                                <textarea readonly class="form-control disabled" rows="3"></textarea>
+                                <textarea readonly class="form-control disabled" rows="3" id="Res2"></textarea>
                                 <hr />
                                 <button id="2" class="btn-block btn-default btn-primary-custom ColapsableScript">Start update</button>
                             </div>
@@ -199,7 +199,7 @@
                         </div>
                         <div id="collapse2" class="panel-collapse collapse">
                             <div class="panel-body">
-                                <textarea readonly class="form-control disabled" rows="3"></textarea>
+                                <textarea readonly class="form-control disabled" rows="3" id="Res3"></textarea>
                                 <hr />
                                 <button id="3" class="btn-block btn-default btn-primary-custom ColapsableScript">Start update</button>
                             </div>
@@ -306,14 +306,18 @@
                 $.ajax({
                     url: "CreateScript",
                     type: "POST",
+                    dataType: "Json",
                     data: { id: id, arrayN: arrayN, arrayU: arrayU },
                     success: function (result) {
+                        elem = result;
+                        $("#Res" + id).html("Insert" + "\n" + result.insert + "\n\n" + result.update);
                         console.log(result);
                     }
                 });
             });
         });
     });
+    var elem;
 
 </script>
 
