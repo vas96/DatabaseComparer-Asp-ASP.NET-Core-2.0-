@@ -87,40 +87,39 @@ namespace Comparer.Controllers
         [HttpPost]
         public IActionResult TableInfo()
         {
-            try
+            if ((db.FirstDatabase == null ||
+                 db.FirstDatabase.connection == null ||
+                 db.FirstDatabase.connection.State != ConnectionState.Open) ||
+                (db.SecondDatabase == null ||
+                 db.SecondDatabase.connection == null ||
+                 db.SecondDatabase.connection.State != ConnectionState.Open))
             {
-                if ((db.FirstDatabase.connection == null || db.FirstDatabase.connection.State != ConnectionState.Open) ||
-            (db.SecondDatabase.connection == null || db.SecondDatabase.connection.State != ConnectionState.Open))
                 return PartialView("_Error");
-                return PartialView("_TableInfo", db);
             }
-            catch (Exception ex)
-            {
-                return PartialView("_Error", ex);
-            }
+            return PartialView("_TableInfo", db);
         }
+
         [HttpPost]
         public IActionResult ColumnMapping(string[] array = null)
         {
-            try
-            {
                 if (array == null || array.Length < 2)
                     array = new[] { "Projects", "Users" };
                 db.FirstDatabase.SelectedTable = array[0];
                 db.SecondDatabase.SelectedTable = array[1];
-                if ((db.FirstDatabase.connection == null || db.FirstDatabase.connection.State != ConnectionState.Open) ||
-                    (db.SecondDatabase.connection == null || db.SecondDatabase.connection.State != ConnectionState.Open))
+                if ((db.FirstDatabase == null ||
+                     db.FirstDatabase.connection == null ||
+                     db.FirstDatabase.connection.State != ConnectionState.Open) ||
+                    (db.SecondDatabase == null ||
+                     db.SecondDatabase.connection == null ||
+                     db.SecondDatabase.connection.State != ConnectionState.Open))
+                {
                     return PartialView("_Error");
+                }
                 if (db.FirstDatabase.SelectedTable == "" || db.SecondDatabase.SelectedTable == "")
                     return PartialView("_Error");
                 db.FirstDatabase.GetTableInfo();
                 db.SecondDatabase.GetTableInfo();
                 return PartialView("_ColumnMapping", db);
-            }
-            catch (Exception ex)
-            {
-                return PartialView("_Error", ex);
-            }          
         }
 
         [HttpPost]
@@ -136,7 +135,7 @@ namespace Comparer.Controllers
                 db.FirstDatabase.SelectedColumns.Add(db.FirstDatabase.TableColumns[i].Name);
                 foreach (var column in db.SecondDatabase.TableColumns)
                 {
-                    if (column.Name == array[i] && column.Type== db.FirstDatabase.TableColumns[i].Type)
+                    if (column.Name == array[i] && column.Type == db.FirstDatabase.TableColumns[i].Type)
                         db.SecondDatabase.SelectedColumns.Add(array[i]);
                 }
             }
@@ -187,7 +186,7 @@ namespace Comparer.Controllers
                         await file.CopyToAsync(fileStream);
                     }
                     Database dbase = Database.InitializeType(file);
-                    var a=dbase.ConnectToFile(path);
+                    var a = dbase.ConnectToFile(path);
                     dbase.FileName = Path.GetFileNameWithoutExtension(file.FileName);
                     switch (id)
                     {
@@ -228,7 +227,7 @@ namespace Comparer.Controllers
         [HttpPost]
         public void PageClosedAction(string page)
         {
-            if (db.Folder!=null)
+            if (db.Folder != null)
             {
                 try
                 {
@@ -236,9 +235,9 @@ namespace Comparer.Controllers
                     bool conClosed = db.CloseConnection();
                     for (int i = 0; i < 20 && !conClosed; i++)
                     {
-                        Thread.Sleep(sleepTimer+(i*100));
+                        Thread.Sleep(sleepTimer + (i * 100));
                         conClosed = db.CloseConnection();
-                    }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
+                    }
                     bool folderDeleted = db.DeleteActiveFolder();
                     for (int i = 0; i < 20 && !folderDeleted; i++)
                     {

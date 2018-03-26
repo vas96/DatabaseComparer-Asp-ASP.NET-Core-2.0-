@@ -96,10 +96,13 @@ namespace DbComparer
             connection = null;
             TableColumns = new List<Column>();
             SelectedColumns = new List<string>();
-            FileName = null;
+            FileName = null; 
         }
-
+        /// <summary>
+        /// Назва файлу
+        /// </summary>        
         public string FileName;
+
         /// <summary>
         /// Рядок підключення
         /// </summary>
@@ -275,7 +278,7 @@ namespace DbComparer
             public Column(DataRow dr)
             {
                 var array = dr.ItemArray;
-                Position = Int32.Parse(array[4].ToString()) - 1;//Позиція
+                Position = Int32.Parse(array[4].ToString())-1;//Позиція
                 Name = array[3].ToString();//Імя
                 Type = array[7].ToString();//Тип
                 Length = array[8].ToString();//Довжина

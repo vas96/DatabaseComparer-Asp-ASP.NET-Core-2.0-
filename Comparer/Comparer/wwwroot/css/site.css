@@ -36,6 +36,31 @@ body {
     min-height: 90vh;
 }
 
+.top-block {
+    height: 80vh;
+    background-color: white;
+    vertical-align: middle;
+}
+    .top-block-under {
+        height: 20vh;
+        background-color: #487eb0;
+        vertical-align: middle;
+    }
+
+@media only screen and (max-width : 768px)  {
+    .top-block {
+        height: 50vh;
+        background-color: white;
+        vertical-align: middle;
+    }
+
+    .top-block-under {
+        visibility: hidden;
+        display: none;
+        height:0;
+    }
+}
+
 /* Carousel */
 .carousel-caption p {
     font-size: 20px;

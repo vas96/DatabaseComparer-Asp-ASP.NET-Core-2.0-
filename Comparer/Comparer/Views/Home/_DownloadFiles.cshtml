@@ -21,7 +21,6 @@
     </div>
     @* <h6><button type="button" class="btn-lg" id="NextStep">NEXT STEP</button></h6>*@
     <button type="button" class="btn-lg btn-block btn-primary-custom" id="GoTableInfo">Check tables from DB</button>
-    <button type="button" class="btn-lg btn-block btn-default-custom" id="GoTableInfo">Step back</button>
 </div>
 
 <script>
@@ -34,15 +33,6 @@
             }
         });
     });
-    $("#GoTableInfo").click(function () {
-        $.ajax({
-            url: "TableInfo",
-            type: "POST",
-            success: function (result) {
-                $("#Partial").html(result);
-            }
-        });
-    })
 
     $(function () {
         Dropzone.options.Upload1 = {
@@ -53,6 +43,7 @@
         Dropzone.options.Upload2 = Dropzone.options.Upload1;
 
         var dropzones = $(".dropable").toArray();
+
         dropzones.forEach(function (item, i, dropzones) {
             $(item).dropzone({
                 url: "/Home/Upload/?id=" + (i + 1),
