@@ -25,10 +25,12 @@
 
 <script>
     $("#GoTableInfo").click(function () {
+        waitingDialog.show();
         $.ajax({
             url: "TableInfo",
             type: "POST",
             success: function (result) {
+                waitingDialog.hide();
                 $("#Partial").html(result);
             }
         });
@@ -37,7 +39,7 @@
     $(function () {
         Dropzone.options.Upload1 = {
             uploadMultiple: false,
-            timeout: 500000,
+            timeout: 9999999,
             acceptedFiles: ".mdf,.sql,.xml",
         };
         Dropzone.options.Upload2 = Dropzone.options.Upload1;
@@ -48,7 +50,10 @@
             $(item).dropzone({
                 url: "/Home/Upload/?id=" + (i + 1),
                 success: function (file, response) {
-                    ReturnInfo($(item).parent().find(".panel"), response);
+                    if (response == true)
+                        ReturnInfo($(item).parent().find(".panel"), response);
+                    else
+                        $('#myModal').modal('show');
                 }
             });
         });

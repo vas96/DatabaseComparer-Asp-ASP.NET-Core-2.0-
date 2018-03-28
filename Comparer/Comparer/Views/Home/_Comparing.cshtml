@@ -216,92 +216,35 @@
 <button type="button" class="btn-lg btn-block btn-primary-custom" id="Back">STEP BACK</button>
 
 <script type="text/javascript">
-
-    function ValueCheckbox(name) {
-        var chkArray = [];
-        $("input[name = '" + name + "']:checked").each(function () {
-            chkArray.push($(this).val());
-        });
-        return chkArray;
-    }
-
-    $("#checkAllFirstDatabase").change(function () {
-        $("input[name = 'FirstDatabaseCheckbox']").prop('checked', $(this).prop("checked"));
-        $("input[name = 'FirstDatabaseCheckboxUnique']").prop('checked', $(this).prop("checked"));
-
-        var checked = $("#checkAllFirstDatabase").is(':checked');
-        (checked === true) ? $("#checkAllFirstDatabaseText").text('Uncheck all') : $("#checkAllFirstDatabaseText").text('Check all');
-    });
-    $("#checkAllSecondDatabase").change(function () {
-        $("input[name = 'SecondDatabaseCheckbox']").prop('checked', $(this).prop("checked"));
-        $("input[name = 'SecondDatabaseCheckboxUnique']").prop('checked', $(this).prop("checked"));
-
-        var checked = $("#checkAllSecondDatabase").is(':checked');
-        (checked === true) ? $("#checkAllSecondDatabaseText").text('Uncheck all') : $("#checkAllSecondDatabaseText").text('Check all');
-    });
-
-    $("#checkAllFromTwo").change(function () {
-        $("input[name = 'FromTwoDatabaseCheckbox']").prop('checked', $(this).prop("checked"));
-
-        var checked = $("#checkAllFromTwo").is(':)checked');
-        (checked === true) ? $("#checkAllFromTwoText").text('Uncheck all') : $("#checkAllFromTwoText").text('Check all');
-    });
-
-    var FirstDBListIndex = ValueCheckbox("FirstDatabaseCheckbox");
-    var FirstDBListIndexUnique = ValueCheckbox("FirstDatabaseCheckboxUnique");
-
-    //console.log(FirstDBListIndex);
-    //onsole.log(FirstDBListIndexUnique);
-
-    var SecondDBListIndex = ValueCheckbox("SecondDatabaseCheckbox");
-    var SecondDBListIndexUnique = ValueCheckbox("SecondDatabaseCheckboxUnique");
-
-    //console.log(SecondDBListIndexUnique);
-    //console.log(SecondDBListIndex);
-
-    var FromTwoDBListIndex = ValueCheckbox("FromTwoDatabaseCheckbox");
-
-    //console.log(FromTwoDBListIndex);
-
-
-    $("#Back").click(function() {
-        $.ajax({
-            url: "ColumnMapping",
-            type: "POST",
-            success: function(result) {
-                $("#Partial").html(result);
-            }
-        });
-    });
-
     $(function () {
         var buttons = $(".ColapsableScript").toArray();
         buttons.forEach(function (item, i) {
             $(item).click(function () {
+                waitingDialog.show();
                 var id = this.id;
                 var arrayN = null;
                 var arrayU = null;
                 switch (id) {
-                case "1":
-                {
-                    arrayN = FirstDBListIndex;
-                    arrayU = FirstDBListIndexUnique;
-                    break;
-                };
-                case "2":
-                {
-                    arrayN = FromTwoDBListIndex;
-                    arrayU = [];
-                    break;
-                }
-                case "3":
-                {
-                    arrayN = SecondDBListIndex;
-                    arrayU = SecondDBListIndexUnique;
-                    break;
-                };
-                default:
-                    return;
+                    case "1":
+                        {
+                            arrayN = ValueCheckbox("FirstDatabaseCheckbox");
+                            arrayU = ValueCheckbox("FirstDatabaseCheckboxUnique");
+                            break;
+                        };
+                    case "2":
+                        {
+                            arrayN = ValueCheckbox("FromTwoDatabaseCheckbox");
+                            arrayU = [];
+                            break;
+                        }
+                    case "3":
+                        {
+                            arrayN = ValueCheckbox("SecondDatabaseCheckbox");
+                            arrayU = ValueCheckbox("SecondDatabaseCheckboxUnique");
+                            break;
+                        };
+                    default:
+                        return;
                 }
                 $.ajax({
                     url: "CreateScript",
@@ -309,15 +252,57 @@
                     dataType: "Json",
                     data: { id: id, arrayN: arrayN, arrayU: arrayU },
                     success: function (result) {
-                        elem = result;
-                        $("#Res" + id).html("Insert" + "\n" + result.insert + "\n\n" + result.update);
-                        console.log(result);
+                        waitingDialog.hide();
+                        $("#Res" + id).html(result.insert + "\n\n" + result.update);
                     }
                 });
             });
         });
+
+
+        $("#Back").click(function () {
+            waitingDialog.show();
+            $.ajax({
+                url: "ColumnMapping",
+                type: "POST",
+                success: function (result) {
+                    waitingDialog.hide();
+                    $("#Partial").html(result);
+                }
+            });
+        });
+
+        function ValueCheckbox(name) {
+            var chkArray = [];
+            $("input[name = '" + name + "']:checked").each(function () {
+                chkArray.push($(this).val());
+                console.log(chkArray);
+            });
+            return chkArray;
+        }
+
+        $("#checkAllFirstDatabase").change(function () {
+            $("input[name = 'FirstDatabaseCheckbox']").prop('checked', $(this).prop("checked"));
+            $("input[name = 'FirstDatabaseCheckboxUnique']").prop('checked', $(this).prop("checked"));
+
+            var checked = $("#checkAllFirstDatabase").is(':checked');
+            (checked === true) ? $("#checkAllFirstDatabaseText").text('Uncheck all') : $("#checkAllFirstDatabaseText").text('Check all');
+        });
+        $("#checkAllSecondDatabase").change(function () {
+            $("input[name = 'SecondDatabaseCheckbox']").prop('checked', $(this).prop("checked"));
+            $("input[name = 'SecondDatabaseCheckboxUnique']").prop('checked', $(this).prop("checked"));
+
+            var checked = $("#checkAllSecondDatabase").is(':checked');
+            (checked === true) ? $("#checkAllSecondDatabaseText").text('Uncheck all') : $("#checkAllSecondDatabaseText").text('Check all');
+        });
+
+        $("#checkAllFromTwo").change(function () {
+            $("input[name = 'FromTwoDatabaseCheckbox']").prop('checked', $(this).prop("checked"));
+
+            var checked = $("#checkAllFromTwo").is(':)checked');
+            (checked === true) ? $("#checkAllFromTwoText").text('Uncheck all') : $("#checkAllFromTwoText").text('Check all');
+        });
     });
-    var elem;
 
 </script>
 

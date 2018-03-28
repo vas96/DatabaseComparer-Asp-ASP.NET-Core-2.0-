@@ -207,10 +207,10 @@ namespace DbComparer
         /// <returns></returns>
         public string[] BuildInsert(List<string[]> stringses, string[] selected)
         {
-            string[] Result = new string[stringses.Count];
+            string[] Result = new string[selected.Length];
             int[] arr = selected.Select(i => Int32.Parse(i)).ToArray();
-            string columns = "(" + SelectedColumns.Select(i=>i.Name).Join(",") + ")";
-            for(int i=0; i<selected.Length;i++)
+            string columns = "(" + SelectedColumns.Select(i => i.Name).Join(",") + ")";
+            for (int i = 0; i < selected.Length; i++)
             {
                 string Insert = "INSERT INTO "
                                 + SelectedTable
@@ -219,7 +219,7 @@ namespace DbComparer
                 for (int j = 0; j < SelectedColumns.Count; j++)
                 {
                     if (SelectedColumns[j].Type != "int")
-                        Insert += "'"+stringses[arr[i]][j]+"',";
+                        Insert += "'" + stringses[arr[i]][j] + "',";
                     else Insert += stringses[arr[i]][j] + ",";
                 }
                 Insert = Insert.Remove(Insert.Length - 1, 1);
@@ -228,40 +228,40 @@ namespace DbComparer
             }
             return Result;
         }
-        
+
         /// <summary>
         /// Створює запит(и) на оновлення даних в таблиці 
         /// </summary>
         /// <param name="stringsTo">Куда</param>
         /// <param name="stringsFrom">Звідки</param>
         /// <returns>масівчик</returns>
-        public string[] BuildUpdate(List<string[]> stringsTo, List<string[]> stringsFrom,string[] selected)
+        public string[] BuildUpdate(List<string[]> stringsTo, List<string[]> stringsFrom, string[] selected)
         {
-            string[] Result = new string[stringsTo.Count];
+            string[] Result = new string[selected.Length];
             int[] arr = selected.Select(i => Int32.Parse(i)).ToArray();
-            for(int i=0; i< selected.Length;i++)
+            for (int i = 0; i < selected.Length; i++)
             {
                 string Update = "UPDATE "
                                 + SelectedTable
                                 + " SET "
                                 + SelectedColumns[0].Name
                                 + "=";
-                if (SelectedColumns[0].Type!="int")
-                    Update +="'"+stringsFrom[arr[i]][0]+ "' ";
-                else Update +=stringsFrom[arr[i]][0]+ " ";
+                if (SelectedColumns[0].Type != "int")
+                    Update += "'" + stringsFrom[arr[i]][0] + "' ";
+                else Update += stringsFrom[arr[i]][0] + " ";
                 for (int j = 1; j < SelectedColumns.Count; j++)
                 {
                     if (SelectedColumns[j].Type != "int")
-                        Update += ", " + SelectedColumns[j].Name + "='" + stringsFrom[arr[i]][j]+"'";
-                    else Update += ", " + SelectedColumns[j].Name + "="+stringsFrom[arr[i]][j];
+                        Update += ", " + SelectedColumns[j].Name + "='" + stringsFrom[arr[i]][j] + "'";
+                    else Update += ", " + SelectedColumns[j].Name + "=" + stringsFrom[arr[i]][j];
                 }
-                Update += " WHERE " 
+                Update += " WHERE "
                         + SelectedColumns[0].Name
                         + "=";
                 if (SelectedColumns[0].Type != "int")
                     Update += "'" + stringsTo[arr[i]][0] + "' ";
-                else Update += stringsTo[arr[i]][0]+ " ";
-                    for (int j = 1; j < SelectedColumns.Count; j++)
+                else Update += stringsTo[arr[i]][0] + " ";
+                for (int j = 1; j < SelectedColumns.Count; j++)
                 {
                     if (SelectedColumns[j].Type != "int")
                         Update += ", " + SelectedColumns[j].Name + "='" + stringsTo[arr[i]][j] + "'";

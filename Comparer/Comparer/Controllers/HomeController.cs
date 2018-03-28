@@ -88,17 +88,17 @@ namespace Comparer.Controllers
         [HttpPost]
         public IActionResult TableInfo()
         {
-            CleanNotUsedData(2);
-            if ((db.FirstDatabase == null ||
-                 db.FirstDatabase.connection == null ||
-                 db.FirstDatabase.connection.State != ConnectionState.Open) ||
-                (db.SecondDatabase == null ||
-                 db.SecondDatabase.connection == null ||
-                 db.SecondDatabase.connection.State != ConnectionState.Open))
+            try
             {
-                return PartialView("_Error");
+                if ((db.FirstDatabase.connection == null || db.FirstDatabase.connection.State != ConnectionState.Open) ||
+                    (db.SecondDatabase.connection == null || db.SecondDatabase.connection.State != ConnectionState.Open))
+                    return PartialView("_Error");
+                return PartialView("_TableInfo", db);
             }
-            return PartialView("_TableInfo", db);
+            catch (Exception ex)
+            {
+                return PartialView("_Error", ex);
+            }
         }
 
         [HttpPost]

@@ -61,16 +61,6 @@
 
 <script src="~/js/Sortable.js"></script>
 <script>
-    $("#Back").click(function() {
-        $.ajax({
-            url: "TableInfo",
-            type: "POST",
-            success: function(result) {
-                $("#Partial").html(result);
-            }
-        });
-    });
-
     function ValidateTypes() {
         var source_list = [];
         var target_list = [];
@@ -132,21 +122,35 @@
     });
 
 
-    $("#GoToComparing").click(function () {
+    $("#GoToComparing").click(function() {
         var list = [];
         var array = [];
         list = $("table#target").find("tr").toArray();
-        list.forEach(function (item, i) {
+        list.forEach(function(item, i) {
             array.push(item.cells[1].innerText);
         });
         console.log(array);
+        waitingDialog.show();
         $.ajax({
             url: "Comparing",
             type: "POST",
             data: { array: array },
-            success: function (result) {
+            success: function(result) {
+                waitingDialog.hide();
                 $("#Partial").html(result);
             }
         });
-    })
+    });
+
+    $("#Back").click(function () {
+        waitingDialog.show();
+        $.ajax({
+            url: "TableInfo",
+            type: "POST",
+            success: function (result) {
+                waitingDialog.hide();
+                $("#Partial").html(result);
+            }
+        });
+    });
 </script>
