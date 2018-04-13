@@ -70,7 +70,11 @@
                         </div>
                         <div id="collapse1" class="panel-collapse collapse">
                             <div class="panel-body">
-                                <textarea readonly class="form-control disabled" rows="3" id="Res1"></textarea>
+                                <pre>
+                                    <code class="language-sql" id="Res1">
+                                    </code>
+                                </pre>
+                                @*  <textarea readonly class="form-control disabled" rows="3" id="Res1"></textarea>*@
                                 <hr />
                                 <button id="1" class="btn-block btn-default btn-primary-custom ColapsableScript">Start update</button>
                             </div>
@@ -134,8 +138,10 @@
                         </div>
                         <div id="collapse3" class="panel-collapse collapse">
                             <div class="panel-body">
-                                <textarea readonly class="form-control disabled" rows="3" id="Res2"></textarea>
-                                <hr />
+                                <pre>
+                                <code class="language-sql" id="Res2">
+                                    </code>
+                                </pre>                                <hr />
                                 <button id="2" class="btn-block btn-default btn-primary-custom ColapsableScript">Start update</button>
                             </div>
                             <div class="panel-footer">
@@ -199,8 +205,10 @@
                         </div>
                         <div id="collapse2" class="panel-collapse collapse">
                             <div class="panel-body">
-                                <textarea readonly class="form-control disabled" rows="3" id="Res3"></textarea>
-                                <hr />
+                                <pre>
+                                <code class="language-sql" id="Res3">
+                                    </code>
+                                </pre>                                <hr />
                                 <button id="3" class="btn-block btn-default btn-primary-custom ColapsableScript">Start update</button>
                             </div>
                             <div class="panel-footer">
@@ -247,18 +255,21 @@
                         return;
                 }
                 $.ajax({
+                    async: true,
                     url: "CreateScript",
                     type: "POST",
-                    dataType: "Json",
                     data: { id: id, arrayN: arrayN, arrayU: arrayU },
                     success: function (result) {
                         waitingDialog.hide();
-                        $("#Res" + id).html(result.insert + "\n\n" + result.update);
+                        let sql = result.insert + result.update;
+                        document.getElementById("Res" + id).innerText = sql;
+                        $.getScript("/js/prism.js", function (jqxhr) {
+                            console.log(jqxhr.status); // 200
+                        });
                     }
                 });
             });
         });
-
 
         $("#Back").click(function () {
             waitingDialog.show();
@@ -276,7 +287,6 @@
             var chkArray = [];
             $("input[name = '" + name + "']:checked").each(function () {
                 chkArray.push($(this).val());
-                console.log(chkArray);
             });
             return chkArray;
         }

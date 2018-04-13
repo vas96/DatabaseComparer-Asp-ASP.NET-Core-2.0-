@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Net.Http.Headers;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace Comparer.Controllers
 {
@@ -324,10 +325,9 @@ namespace Comparer.Controllers
                     }
             }
 
-            var ForReturn = new {Insert = Insert, Update = Update};
+            var ForReturn = new {Insert = Insert.Join("\n"), Update = Update.Join("\n")};
             return Json(ForReturn);
         }
-
         #endregion
     }
 }

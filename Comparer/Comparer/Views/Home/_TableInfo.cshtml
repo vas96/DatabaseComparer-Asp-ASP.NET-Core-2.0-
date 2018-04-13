@@ -96,6 +96,7 @@
         console.log(array);
         waitingDialog.show();
         $.ajax({
+            async: true, 
             url: "ColumnMapping",
             type: "POST",
             data: { array: array },

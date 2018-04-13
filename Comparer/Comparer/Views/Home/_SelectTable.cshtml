@@ -54,7 +54,8 @@
             list.forEach(function (item, i) {
             array.push(item.cells[0].innerText);
 
-            $.ajax({
+                $.ajax({
+                async: true, 
                 url: "Comparing",
                 type: "POST",
                 success: function (result) {
