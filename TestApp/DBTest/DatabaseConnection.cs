@@ -8,7 +8,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Jdforsythe.MySQLConnection;
 using MySql.Data.MySqlClient;
 
 namespace DbComparer
@@ -490,13 +489,13 @@ namespace DbComparer
     {
         public MySqlDataBaseConnector() : base()
         {
-            DataConnectionString = "SERVER=localhost;UID='root';" + "PASSWORD='';";
         }
 
         public override bool ConnectToServer()
         {
             try
             {
+                DataConnectionString = "SERVER=localhost;UID='root';" + "PASSWORD='danyliv';";
                 connection = new MySqlConnection(DataConnectionString);
                 connection.Open();
                 return true;
@@ -512,7 +511,7 @@ namespace DbComparer
             try
             {
                 DataConnectionString = "SERVER=localhost;DATABASE=" + databaseName +
-                     ";UID=root; PASSWORD='';";
+                     ";UID=root; PASSWORD='danyliv';";
                 connection = new MySqlConnection(DataConnectionString);
                 connection.Open();
                 return true;

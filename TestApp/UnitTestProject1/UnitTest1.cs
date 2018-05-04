@@ -17,8 +17,9 @@ namespace UnitTestProject1
     [TestClass]
     public class UnitTest1
     {
+        private Stopwatch sw;
         [TestMethod]
-        public void TestMethod1()
+        public void SQLConnection()
         {
             Database db = new SqlDataBaseConnector();
             if (db.ConnectToServer())
@@ -30,7 +31,7 @@ namespace UnitTestProject1
                 DataTable dtMaths = new DataTable("Maths");
                 dtMaths.Columns.Add("StudID", typeof(int));
                 dtMaths.Columns.Add("StudName", typeof(string));
-                Func<IDataRecord, DataRow> select = delegate (IDataRecord s)
+                Func<IDataRecord, DataRow> select = delegate(IDataRecord s)
                 {
                     DataRow dr = dtMaths.NewRow();
                     dr.ItemArray = new object[4];
@@ -43,45 +44,44 @@ namespace UnitTestProject1
                 };
                 var l3 = db.GetTableInfo(l2[3]);
                 Assert.IsNotNull(l3);
-                var l4 = db.Read("Select * from " + l2[3], select);
+                sw = new Stopwatch();
+                sw.Start();
+                var l4 = db.Read("Select * from " + l2[17], select);
+                sw.Stop();
+                var time = sw.Elapsed;
                 Assert.IsNotNull(l4);
                 db.CloseConnection();
             }
         }
+
         [TestMethod]
-        public void TestMethod2()
+        public void MySQLConnection()
         {
             Database db = new MySqlDataBaseConnector();
             if (db.ConnectToServer())
             {
                 var l1 = db.GetDatabasesList();
                 Assert.IsNotNull(l1);
-                var l2 = db.GetTablesList(l1[1]);
+                var l2 = db.GetTablesList(l1[3]);
                 Assert.IsNotNull(l2);
-                DataTable dtMaths = new DataTable("Maths");
-                dtMaths.Columns.Add("StudID", typeof(int));
-                dtMaths.Columns.Add("StudName", typeof(string));
-                Func<IDataRecord, DataRow> select = delegate (IDataRecord s)
+                Func<IDataRecord, string> select = delegate(IDataRecord s)
                 {
-                    DataRow dr = dtMaths.NewRow();
-                    dr.ItemArray = new object[4];
-                    for (int i = 0; i < s.FieldCount; i++)
-                    {
-                        dr.ItemArray[i] = s[i];
-                    }
-
-                    return dr;
+                    return String.Format("{0} {1}", s[0], s[1]);
                 };
-                var l3 = db.GetTableInfo(l2[3]);
+                var l3 = db.GetTableInfo(l2[17]);
                 Assert.IsNotNull(l3);
-                var l4 = db.Read("Select * from " + l2[3], select);
+                sw = new Stopwatch();
+                sw.Start();
+                var l4 = db.Read("Select * from " + l2[17], select);
+                sw.Stop();
+                var time = sw.Elapsed;
                 Assert.IsNotNull(l4);
                 db.CloseConnection();
             }
         }
 
         [TestMethod]
-        public void TestMethod3()
+        public void Comparer()
         {
             DatabaseComparer comp = new DatabaseComparer();
             Database db = new SqlDataBaseConnector();
@@ -90,7 +90,7 @@ namespace UnitTestProject1
                 DataTable dtMaths = new DataTable("Maths");
                 dtMaths.Columns.Add("StudID", typeof(int));
                 dtMaths.Columns.Add("StudName", typeof(string));
-                Func<IDataRecord, DataRow> select = delegate (IDataRecord s)
+                Func<IDataRecord, DataRow> select = delegate(IDataRecord s)
                 {
                     DataRow dr = dtMaths.NewRow();
                     dr.ItemArray = new object[4];
@@ -109,9 +109,8 @@ namespace UnitTestProject1
         }
 
         [TestMethod]
-        public void TestMethod4()
+        public void FullSQLTest()
         {
-
             //Створюєм компарер
             DatabaseComparer comp = new DatabaseComparer();
 
@@ -135,6 +134,7 @@ namespace UnitTestProject1
             {
                 comp.FirstDatabase.SelectedColumns.Add(item.Name);
             }
+
             foreach (var item in comp.SecondDatabase.TableColumns)
             {
                 comp.SecondDatabase.SelectedColumns.Add(item.Name);
@@ -150,19 +150,20 @@ namespace UnitTestProject1
             comp.FirstData = comp.FirstDatabase.BuildContainer();
 
             //Виконуєм вибірку даних
-            comp.FirstData = (comp.FirstDatabase as SqlDataBaseConnector).Read(query1, comp.FirstDatabase.FullRowSelector);
-            
+            comp.FirstData =
+                (comp.FirstDatabase as SqlDataBaseConnector).Read(query1, comp.FirstDatabase.FullRowSelector);
+
             //То саме, тільки з другов таблицев
             comp.SecondDatabase.BuildContainer();
-            comp.SecondData = (comp.SecondDatabase as SqlDataBaseConnector).Read(query2, comp.SecondDatabase.FullRowSelector);
+            comp.SecondData =
+                (comp.SecondDatabase as SqlDataBaseConnector).Read(query2, comp.SecondDatabase.FullRowSelector);
             sw.Stop();
             //Собсно, порівняння
             var res1 = comp.CompareColumns(1);
             var res2 = comp.CompareColumns(2);
             var res3 = comp.CompareColumns(3);
-            var test = comp.GetFullRows(res1[0], 0,1);
+            var test = comp.GetFullRows(res1[0], 0, 1);
             System.Console.Write(sw.Elapsed);
-
         }
     }
 }
