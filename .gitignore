@@ -291,7 +291,8 @@ __pycache__/
 bin
 obj
 *.ldf
-*.mdf
 TestResults
 CoreFunctionsTesting
 *.orig
+Uploads
+/Comparer/Comparer/wwwroot/Uploads
