@@ -11,6 +11,7 @@ using System.Text;
 using DbComparer;
 using DBTest;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MySql.Data.MySqlClient;
 
 namespace UnitTestProject1
 {
@@ -164,6 +165,67 @@ namespace UnitTestProject1
             var res3 = comp.CompareColumns(3);
             var test = comp.GetFullRows(res1[0], 0, 1);
             System.Console.Write(sw.Elapsed);
+        }
+
+        [TestMethod]
+        public void TestTwoMySQLInstance()
+        {
+            try
+            {
+                //шлях до Mysql
+                string FileName = @"C:\Program Files\MariaDB 10.2\bin\mysqld.exe";
+                //створюєм 2 сервери, кожен в свой  папці, кожен на своєму порті
+                Process.Start(FileName, @"--user=root --password=danyliv --datadir=D:\GitHub\testFolder\F1 --port=1111");
+                //пробуєм підключитис до тих серверів
+                var con1 = new MySqlConnection("SERVER=localhost;Port=1111;UID='root';PASSWORD='danyliv';");
+                con1.Open();
+                Process.Start(FileName, @"--user=root --password=danyliv --datadir=D:\GitHub\testFolder\F2 --port=2222");
+                var con2 = new MySqlConnection("SERVER=localhost;Port=2222;UID='root';PASSWORD='danyliv';");
+                con2.Open();
+                //виконуєм різні скрипти на тих серверах
+                //1-й
+                var DbList1 = GetDatabasesList(con1);
+                MySqlScript script1 = new MySqlScript((con1 as MySqlConnection), File.ReadAllText(@"D:\GitHub\testFolder\F1\Site.sql"));
+                script1.Delimiter = ";";
+                script1.Execute();
+                var NewDbName1 = GetDatabasesList(con1).Except(DbList1).First();
+                //2-й
+                var DbList2 = GetDatabasesList(con2);
+                MySqlScript script2 = new MySqlScript((con2 as MySqlConnection), File.ReadAllText(@"D:\GitHub\testFolder\F2\sakila.sql"));
+                script2.Delimiter = ";";
+                script2.Execute();
+                var NewDbName2 = GetDatabasesList(con2).Except(DbList2).First();
+                Console.WriteLine("Хопа!");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+
+        }
+
+        public List<string> GetDatabasesList(MySqlConnection connection)
+        {
+            try
+            {
+                MySqlCommand command = (connection as MySqlConnection).CreateCommand();
+                command.CommandText = "SHOW DATABASES;";
+                using (MySqlDataReader Reader = command.ExecuteReader())
+                {
+                    List<string> rows = new List<string>();
+                    while (Reader.Read())
+                    {
+                        for (int i = 0; i < Reader.FieldCount; i++)
+                            rows.Add(Reader.GetValue(i).ToString());
+                    }
+                    return rows;
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
     }
 }
