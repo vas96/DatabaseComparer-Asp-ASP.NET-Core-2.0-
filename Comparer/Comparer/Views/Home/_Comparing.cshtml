@@ -261,7 +261,7 @@
                     data: { id: id, arrayN: arrayN, arrayU: arrayU },
                     success: function (result) {
                         waitingDialog.hide();
-                        let sql = result.insert + result.update;
+                        var sql = result.insert + result.update;
                         document.getElementById("Res" + id).innerText = sql;
                         $.getScript("/js/prism.js", function (jqxhr) {
                             console.log(jqxhr.status); // 200
