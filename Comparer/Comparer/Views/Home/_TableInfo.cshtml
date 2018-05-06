@@ -16,6 +16,8 @@
             <div class=" table-chooser panel panel-default panel-table">
                 @{
                     List<String> drcFirstDBNamesTB = Model.FirstDatabase.GetTablesList("TeamBuilding");
+
+                    drcFirstDBNamesTB.Sort();
                 }
 
                 <div class="panel-body">
@@ -49,54 +51,75 @@
 
             <div class=" table-chooser panel panel-default panel-table">
                 @{
-                List<String> drcSecondDBNamesTB = Model.SecondDatabase.GetTablesList();
+                    List<String> drcSecondDBNamesTB = Model.SecondDatabase.GetTablesList();
                 }
                 <div class="panel-body">
 
-                    <div class="tr">
+                    <div class="tr" id="container1">
                         @foreach (String nameTB in drcSecondDBNamesTB)
-                    {
-
-                        <div class="td table-chooser-item">
-                            <p class="TbName"> <strong> @nameTB </strong></p>
-                            <br />
-                            @foreach (DataRow typesTB in Model.SecondDatabase.GetTableInfo(nameTB).Rows)
                         {
-                            <p class="TbType"> @typesTB.ItemArray[3]</p>
-                    }
-                            <input class="tableRadio" type="radio" name="SecondDatabaseCH" value=@nameTB checked="checked">
-                        </div>
-                }
+                            <div class="box1 td table-chooser-item">
+                                <p class="TbName"> <strong> @nameTB </strong></p>
+                                <br />
+                                @foreach (DataRow typesTB in Model.SecondDatabase.GetTableInfo(nameTB).Rows)
+                                {
+                                    <p class="TbType"> @typesTB.ItemArray[3]</p>
+                                }
+                                <input class="tableRadio" type="radio" name="SecondDatabaseCH" value=@nameTB checked="checked">
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
         </div>
     </form>
 
-   
-        <button type="button" class="btn-lg btn-block btn-primary-custom" id="GoToColumnMapping">Check Columns</button>
-        <button type="button" class="btn-lg btn-block btn-default-custom" id="Back" style="margin-bottom:1.5vmin;">Step back</button>
+
+    <button type="button" class="btn-lg btn-block btn-primary-custom" id="GoToColumnMapping">Check Columns</button>
+    <button type="button" class="btn-lg btn-block btn-default-custom" id="Back" style="margin-bottom:1.5vmin;">Step back</button>
+
+    <button id="alphBnt">Numerical</button>
+
 </div>
 <script>
-    $(function () {
+
+    function tbChooser() {
         $('div.table-chooser').find('div.table-chooser-item').on('click', function () {
             $(this).parent().parent().find('div.table-chooser-item').removeClass('selected');
             $(this).addClass('selected');
             $(this).find('input[type="radio"]').prop("checked", true);
         });
-    });
+    };
+    tbChooser();
 
+    var $divsOriginFirst = $("div.box1");
+
+    $('#alphBnt').on('click', function () {
+        var $divs = $("div.box1");
+        var alphabeticallyOrderedDivs = $divs.sort(function (a, b) {
+
+            if ($(a).find("p.TbName").text().trim().toLowerCase() < $(b).find("p.TbName").text().trim().toLowerCase()) {
+                return -1;
+            } else if ($(a).find("p.TbName").text().trim().toLowerCase() > $(b).find("p.TbName").text().trim().toLowerCase()) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
+        ($("div.box1").text() == $divsOriginFirst.text()) ? $("#container1").html(alphabeticallyOrderedDivs) : $("#container1").html($divsOriginFirst);
+        tbChooser();
+    });
 
     $("#GoToColumnMapping").click(function () {
 
         var array = [];
         array.push($('input[name=FirstDatabaseCH]:checked').val());
         array.push($('input[name=SecondDatabaseCH]:checked').val());
-              
+
         console.log(array);
         waitingDialog.show();
         $.ajax({
-            async: true, 
+            async: true,
             url: "ColumnMapping",
             type: "POST",
             data: { array: array },
