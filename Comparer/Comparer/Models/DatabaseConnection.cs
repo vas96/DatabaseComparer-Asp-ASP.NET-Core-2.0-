@@ -8,8 +8,12 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using DBTest;
 using Jdforsythe.MySQLConnection;
@@ -28,14 +32,14 @@ namespace DbComparer
         /// Підключення до сервера
         /// </summary>
         /// <returns>True якщо підключення встановлено</returns>
-        bool ConnectToServer();
+        bool ConnectToServer(int port = Int32.MinValue);
 
         /// <summary>
         /// Підключення до конктретної бази даних на сервері
         /// </summary>
         /// <param name="databaseName">Ім'я бази даних</param>
         /// <returns>True якщо підключення встановлено</returns>
-        bool ConnectToDatabase(string databaseName);
+        bool ConnectToDatabase(string databaseName, int port = Int32.MinValue);
 
         /// <summary>
         /// Підключення до файлу бази данних
@@ -180,8 +184,13 @@ namespace DbComparer
         /// </summary>
         public Database_Type DbType;
 
-        public abstract bool ConnectToServer();
-        public abstract bool ConnectToDatabase(string databaseName);
+        /// <summary>
+        /// Вид активного підключення 
+        /// </summary>
+        public Connection_Type ConType;
+
+        public abstract bool ConnectToServer(int port = Int32.MinValue);
+        public abstract bool ConnectToDatabase(string databaseName, int port = Int32.MinValue);
         public abstract bool ConnectToFile(string location = null);
         public abstract bool RemoteConnection(string ip, string port, string db = null);
         public abstract List<string> GetDatabasesList();
@@ -376,6 +385,14 @@ namespace DbComparer
         }
 
         /// <summary>
+        /// Види підключення
+        /// </summary>
+        public enum Connection_Type
+        {
+            File, Remote, Server
+        }
+
+        /// <summary>
         /// Дані про колонки таблиці
         /// </summary>
         public class Column
@@ -412,7 +429,8 @@ namespace DbComparer
             DataConnectionString = "Data Source=.; Integrated Security=True;";
         }
 
-        public override bool ConnectToServer()
+
+        public override bool ConnectToServer(int port = Int32.MinValue)
         {
             try
             {
@@ -427,7 +445,7 @@ namespace DbComparer
             return true;
         }
 
-        public override bool ConnectToDatabase(string databaseName)
+        public override bool ConnectToDatabase(string databaseName, int port = Int32.MinValue)
         {
             try
             {
@@ -454,6 +472,7 @@ namespace DbComparer
                         ";Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False;";
                 connection = new SqlConnection(DataConnectionString);
                 connection.Open();
+                ConType = Connection_Type.File;
                 return true;
             }
             catch (Exception e)
@@ -592,31 +611,42 @@ namespace DbComparer
 
     public class MySqlDataBaseConnector : Database
     {
+        private int port = 0;
+        private string LocalInstance = "";
         public MySqlDataBaseConnector() : base()
         {
         }
 
-        public override bool ConnectToServer()
+        public override bool ConnectToServer(int port = Int32.MinValue)
         {
             try
             {
-                DataConnectionString = "SERVER=localhost;UID='root';PASSWORD='danyliv';";
+                if (port == Int32.MinValue)
+                    DataConnectionString = "SERVER=localhost;UID='root';PASSWORD='user';Pooling=True";
+                else
+                {
+                    Thread.Sleep(1000);
+                    DataConnectionString = $"SERVER=localhost;Port={port};UID='root';PASSWORD='user';Pooling=True";
+                }
                 connection = new MySqlConnection(DataConnectionString);
                 connection.Open();
                 return true;
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 return false;
             }
         }
 
-        public override bool ConnectToDatabase(string databaseName)
+        public override bool ConnectToDatabase(string databaseName, int port = Int32.MinValue)
         {
             try
             {
-                DataConnectionString = "SERVER=localhost;DATABASE=" + databaseName +
-                     ";UID=root;PASSWORD='danyliv';";
+                if (port == Int32.MinValue)
+                    DataConnectionString = "SERVER=localhost;DATABASE=" + databaseName +
+                         ";UID=root;PASSWORD='user';Pooling=True";
+                else
+                    DataConnectionString = $"SERVER=localhost;Port={port};DATABASE={databaseName};UID='root';PASSWORD='user';Pooling=True";
                 connection = new MySqlConnection(DataConnectionString);
                 connection.Open();
                 return true;
@@ -636,17 +666,67 @@ namespace DbComparer
         {
             try
             {
-                if (ConnectToServer())
+                var DestinationPath = Path.GetDirectoryName(location) + "\\data\\";
+                LocalInstance = Directory.GetParent(DestinationPath).Parent.Parent.Parent.FullName + "\\MySQLInstance\\data\\";
+                //Now Create all of the directories
+                foreach (string dirPath in Directory.GetDirectories(LocalInstance, "*",
+                    SearchOption.AllDirectories))
+                    Directory.CreateDirectory(dirPath.Replace(LocalInstance, DestinationPath));
+
+                //Copy all the files & Replaces any files with the same name
+                foreach (string newPath in Directory.GetFiles(LocalInstance, "*.*",
+                    SearchOption.AllDirectories))
+                    File.Copy(newPath, newPath.Replace(LocalInstance, DestinationPath), true);
+                port = GetAvailablePort(3306);
+                string fileName = Directory.GetParent(LocalInstance).Parent.FullName + "\\my.ini";
+                var file = File.ReadAllText(fileName);
+                file = file.Replace("MY_PORT", port.ToString());
+                file = file.Replace("MY_LOCATION", DestinationPath.Replace("\\", "/"));
+                File.WriteAllText(DestinationPath + @"\my.ini", file);
+
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = Directory.GetParent(LocalInstance).Parent.FullName + @"\bin\mysqld.exe",
+                    Arguments = $"--install MySQL{port} --defaults-file=" + '"' + DestinationPath.Replace(@"\", "/") + "my.ini" + '"',
+                    Verb = "runas",
+                    UseShellExecute = true
+                });
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = "net.exe",
+                    Arguments = $"start MYSQL{port}",
+                    Verb = "runas",
+                    UseShellExecute = true
+                });
+                //                Process proc = new Process();
+                //                proc.StartInfo.FileName = Directory.GetParent(LocalInstance).Parent.FullName + "\\bin\\mysqld.exe";
+                //                proc.StartInfo.UseShellExecute = true;
+                //                proc.StartInfo.CreateNoWindow = false;
+                //                proc.StartInfo.RedirectStandardOutput = false;
+                //                proc.StartInfo.Verb = "runas";
+                //                proc.StartInfo.Arguments = $"--install MySQL{port} --defaults-file='" + DestinationPath + "my.ini'";
+                //                proc.Start();
+                //                proc.WaitForExit();
+                //                var process = new System.Diagnostics.Process();
+                //                var startInfo = new System.Diagnostics.ProcessStartInfo();
+                //                startInfo.FileName = Environment.ExpandEnvironmentVariables("%SystemRoot%") + @"\System32\cmd.exe"; //Sets the FileName property of myProcessInfo to %SystemRoot%\System32\cmd.exe where %SystemRoot% is a system variable which is expanded using Environment.ExpandEnvironmentVariables
+                //                startInfo.Arguments = $"net start MYSQL{port}"; //Sets the arguments to cd..
+                //                startInfo.Verb = "runas";
+                //                process.StartInfo = startInfo;
+                //                process.Start();
+
+                if (ConnectToServer(port))
                 {
                     var DbList = GetDatabasesList();
                     MySqlScript script = new MySqlScript((connection as MySqlConnection), File.ReadAllText(location));
                     script.Delimiter = ";";
-                    Stopwatch sw =new Stopwatch();
+                    Stopwatch sw = new Stopwatch();
                     sw.Start();
                     script.Execute();
                     sw.Stop();
                     var NewDbName = GetDatabasesList().Except(DbList).First();
-                    ConnectToDatabase(NewDbName);
+                    ConnectToDatabase(NewDbName,port);
+                    ConType = Connection_Type.File;
                     return true;
                 }
                 throw new Exception();
@@ -655,6 +735,40 @@ namespace DbComparer
             {
                 return false;
             }
+        }
+
+        private int GetAvailablePort(int startingPort)
+        {
+            IPEndPoint[] endPoints;
+            List<int> portArray = new List<int>();
+
+            IPGlobalProperties properties = IPGlobalProperties.GetIPGlobalProperties();
+
+            //getting active connections
+            TcpConnectionInformation[] connections = properties.GetActiveTcpConnections();
+            portArray.AddRange(from n in connections
+                               where n.LocalEndPoint.Port >= startingPort
+                               select n.LocalEndPoint.Port);
+
+            //getting active tcp listners - WCF service listening in tcp
+            endPoints = properties.GetActiveTcpListeners();
+            portArray.AddRange(from n in endPoints
+                               where n.Port >= startingPort
+                               select n.Port);
+
+            //getting active udp listeners
+            endPoints = properties.GetActiveUdpListeners();
+            portArray.AddRange(from n in endPoints
+                               where n.Port >= startingPort
+                               select n.Port);
+
+            portArray.Sort();
+
+            for (int i = startingPort; i < UInt16.MaxValue; i++)
+                if (!portArray.Contains(i))
+                    return i;
+
+            return 0;
         }
 
         public override bool RemoteConnection(string ip, string port, string db = null)
@@ -767,6 +881,23 @@ namespace DbComparer
             if (connection != null && connection.State != ConnectionState.Closed)
             {
                 connection.Close();
+                if (ConType == Connection_Type.File)
+                {
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = "net.exe",
+                        Arguments = $"net stop MYSQL{port}",
+                        Verb = "runas",
+                        UseShellExecute = true
+                    });
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = Directory.GetParent(LocalInstance).Parent.FullName + @"\bin\mysqld.exe",
+                        Arguments = $"--remove MYSQL{port}",
+                        Verb = "runas",
+                        UseShellExecute = true
+                    });
+                }
                 MySqlConnection.ClearPool(connection as MySqlConnection);
             }
         }
