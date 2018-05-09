@@ -195,7 +195,7 @@
     });
     //generate button choose SQL database
     function chooseSQL_DB(IDbackToChoose, IDbtn_connectToSql_file, IDbtn_connectToSql_remote) {
-        let _chooseSQL_DB = "<hr class='custom-hr'/>" + "<div class='containerConnect container-fluid'>" +
+        var _chooseSQL_DB = "<hr class='custom-hr'/>" + "<div class='containerConnect container-fluid'>" +
             "<button type='button' class='btn btn-block btn-File-Remote' id=" + IDbtn_connectToSql_file +
             ">Connect to File</button>" +
             "<button type='button' class='btn btn-block btn-File-Remote' id=" + IDbtn_connectToSql_remote +
@@ -210,7 +210,7 @@
     }
     //generate button choose MySQL database
     function chooseMySQL_DB(IDbackToChoose, IDbtn_connectToMySql_remote) {
-        let _chooseMySQL_DB = "<hr class='custom-hr'/>" + "<div class='containerConnect container-fluid'>" +
+        var _chooseMySQL_DB = "<hr class='custom-hr'/>" + "<div class='containerConnect container-fluid'>" +
             "<button type='button' class='btn btn-block btn-File-Remote' id=" + IDbtn_connectToMySql_remote +
             ">Remote connection</button>" +
             "</div>" +
@@ -223,7 +223,7 @@
     }
     //connect to file func
     function connectToFile(ID_my_dropzon_div, ID_my_dropzon, IdUpload, backToChooseConnect) {
-        let _connectToFile = "<hr class='custom-hr'/>" +
+        var _connectToFile = "<hr class='custom-hr'/>" +
             '<div class=" containerConnect container-fluid col-md-12" id=' + ID_my_dropzon_div + '>' +
             '            <form action="/Home/Upload/?id='+IdUpload+'" class="dropzone dz-clickable dropable" id=' + ID_my_dropzon + '></form>' +
             '            <div class="panel" style="visibility:hidden" id="Res1">' +
@@ -239,7 +239,7 @@
     }
 
     function connectToRemote(Id_ip, Id_port, Id_name, Id_btnBack) {
-        let _connectToRemote = "<hr class='custom-hr'/>" + "<div class='containerConnect container-fluid'>" +
+        var _connectToRemote = "<hr class='custom-hr'/>" + "<div class='containerConnect container-fluid'>" +
             " <form>" +
             "<div class='form-group'>" +
             "<label for=" + Id_ip + ">IP address</label>" +
@@ -299,7 +299,7 @@
                     $("#chooseConnect-source-div").removeClass("inactiveDiv");
                 });
             };
-            let SourcedbType = "";
+            var SourcedbType = "";
             SourcedbType = $("input[name=dbCheck]:checked").val();
             switch (SourcedbType) {
                 case "mySql":
@@ -400,7 +400,7 @@
                     $("#chooseConnect-target-div").removeClass("inactiveDiv");
                 });
             };
-            let TargetdbType = "";
+            var TargetdbType = "";
             TargetdbType = $("input[name=dbCheckTarget]:checked").val();
             switch (TargetdbType) {
                 case "mySql":

@@ -156,11 +156,11 @@ namespace DbComparer
             DatabaseComparer dc = dbComp;
             foreach (var item in FirstSelectedCol.CheckedItems)
             {
-                dc.FirstDatabase.SelectedColumns.Add(item.ToString());
+//                dc.FirstDatabase.SelectedColumns.Add(item.ToString());
             }
             foreach (var item in SecondSelectedCol.CheckedItems)
             {
-                dc.SecondDatabase.SelectedColumns.Add(item.ToString());
+//                dc.SecondDatabase.SelectedColumns.Add(item.ToString());
             }
 //            dc.LoadFirstData(dc.FirstDatabase.BuildSelectQuery(), dc.FirstDatabase.FullSelector);
 //            dc.LoadSecondData(dc.SecondDatabase.BuildSelectQuery(), dc.SecondDatabase.FullSelector);

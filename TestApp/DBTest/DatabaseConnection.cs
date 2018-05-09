@@ -8,7 +8,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Jdforsythe.MySQLConnection;
 using MySql.Data.MySqlClient;
 
 namespace DbComparer
@@ -18,8 +17,9 @@ namespace DbComparer
         /// <summary>
         /// Підключення до сервера
         /// </summary>
+        /// <param name="port"></param>
         /// <returns>True якщо підключення встановлено</returns>
-        bool ConnectToServer();
+        bool ConnectToServer(string port = null);
 
         /// <summary>
         /// Підключення до конктретної бази даних на сервері
@@ -141,7 +141,7 @@ namespace DbComparer
 
         public Database_Type DbType;
 
-        public abstract bool ConnectToServer();
+        public abstract bool ConnectToServer(string port = null);
         public abstract bool ConnectToDatabase(string databaseName);
         public abstract bool ConnectToFile(string location = null);
         public abstract List<string> GetDatabasesList();
@@ -254,7 +254,7 @@ namespace DbComparer
             DataConnectionString = "Data Source=.; Integrated Security=True;";
         }
 
-        public override bool ConnectToServer()
+        public override bool ConnectToServer(string port = null)
         {
             try
             {
@@ -490,13 +490,16 @@ namespace DbComparer
     {
         public MySqlDataBaseConnector() : base()
         {
-            DataConnectionString = "SERVER=localhost;UID='root';" + "PASSWORD='';";
         }
 
-        public override bool ConnectToServer()
+        public override bool ConnectToServer(string port=null)
         {
             try
             {
+                if (port==null)
+                DataConnectionString = "SERVER=localhost;UID='root';PASSWORD='danyliv';";
+                else
+                    DataConnectionString = $"SERVER=localhost;Port={port};UID='root';PASSWORD='danyliv';";
                 connection = new MySqlConnection(DataConnectionString);
                 connection.Open();
                 return true;
@@ -512,7 +515,7 @@ namespace DbComparer
             try
             {
                 DataConnectionString = "SERVER=localhost;DATABASE=" + databaseName +
-                     ";UID=root; PASSWORD='';";
+                     ";UID=root;PASSWORD='danyliv';";
                 connection = new MySqlConnection(DataConnectionString);
                 connection.Open();
                 return true;
@@ -529,6 +532,31 @@ namespace DbComparer
         /// </summary>
         /// <returns></returns>
         public override bool ConnectToFile(string location = null)
+        {
+            try
+            {
+                if (ConnectToServer())
+                {
+                    var DbList = GetDatabasesList();
+                    MySqlScript script = new MySqlScript((connection as MySqlConnection), File.ReadAllText(location));
+                    script.Delimiter = ";";
+                    Stopwatch sw = new Stopwatch();
+                    sw.Start();
+                    script.Execute();
+                    sw.Stop();
+                    var NewDbName = GetDatabasesList().Except(DbList).First();
+                    ConnectToDatabase(NewDbName);
+                    return true;
+                }
+                throw new Exception();
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }
+
+        public bool RemoteConnection(string ip, string port, string db = null)
         {
             throw new NotImplementedException();
         }
@@ -562,7 +590,13 @@ namespace DbComparer
         {
             try
             {
-                ConnectToDatabase(database);
+
+                if (database != null)
+                {
+                    var connected = ConnectToDatabase(database);
+                    if (!connected)
+                        return null;
+                }
                 MySqlCommand command = (connection as MySqlConnection).CreateCommand();
                 command.CommandText = "SHOW TABLES;";
                 using (MySqlDataReader Reader = command.ExecuteReader())
@@ -587,9 +621,20 @@ namespace DbComparer
             try
             {
                 String[] columnRestrictions = new String[4];
-                columnRestrictions[2] = tableName;
+                if (tableName == null)
+                    columnRestrictions[2] = SelectedTable;
+                else
+                    columnRestrictions[2] = tableName;
 
                 DataTable departmentIDSchemaTable = connection.GetSchema("Columns", columnRestrictions);
+                TableColumns.Clear();
+                DataView dv = departmentIDSchemaTable.DefaultView;
+                departmentIDSchemaTable.DefaultView.Sort = "ORDINAL_POSITION Asc";
+                var SortedView = dv.ToTable();
+                foreach (DataRow row in SortedView.Rows)
+                {
+                    TableColumns.Add(new Column(row));
+                }
                 return departmentIDSchemaTable;
             }
             catch (Exception ex)
@@ -600,46 +645,28 @@ namespace DbComparer
 
         public override Selected[] Read<Selected>(string query, Func<IDataRecord, Selected> selector)
         {
+            throw new NotImplementedException();
+        }
+
+        public override DataTable Read(string query, Func<IDataRecord, DataRow> selector)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<string[]> Read(string query, Func<IDataRecord, string[]> selector)
+        {
             try
             {
                 using (var cmd = (connection as MySqlConnection).CreateCommand())
                 {
-                    counter = GetTableInfo(SelectedTable).Rows.Count;
                     cmd.CommandText = query;
                     using (MySqlDataReader r = cmd.ExecuteReader())
-                        return ((DbDataReader)r).Cast<IDataRecord>().Select(selector).ToArray();
+                        return ((DbDataReader)r).Cast<IDataRecord>().Select(selector).ToList();
                 }
             }
             catch (Exception EX_NAME)
             {
                 System.Console.WriteLine(EX_NAME.Message);
-                return null;
-            }
-        }
-
-        public override DataTable Read(string query, Func<IDataRecord, DataRow> selector)
-        {
-            try
-            {
-                DataTable dtLocal = QueryResult;
-                using (var cmd = (connection as MySqlConnection).CreateCommand())
-                {
-                    if (SelectedColumns.Count == 0)
-                    {
-                        counter = GetTableInfo(SelectedTable).Rows.Count;
-                    }
-                    else
-                    {
-                        counter = SelectedColumns.Count;
-                    }
-                    cmd.CommandText = query;
-                    using (MySqlDataReader r = cmd.ExecuteReader())
-                         ((DbDataReader)r).Cast<IDataRecord>().Select(selector).ToArray();
-                    return QueryResult;
-                }
-            }
-            catch (Exception EX_NAME)
-            {
                 return null;
             }
         }

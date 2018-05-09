@@ -5,6 +5,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\MySQLInstance\**" />
+    <Compile Remove="wwwroot\share\**" />
+    <Content Remove="wwwroot\MySQLInstance\**" />
+    <Content Remove="wwwroot\share\**" />
+    <EmbeddedResource Remove="wwwroot\MySQLInstance\**" />
+    <EmbeddedResource Remove="wwwroot\share\**" />
+    <None Remove="wwwroot\MySQLInstance\**" />
+    <None Remove="wwwroot\share\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Remove="wwwroot\js\Loading.js" />
   </ItemGroup>
 

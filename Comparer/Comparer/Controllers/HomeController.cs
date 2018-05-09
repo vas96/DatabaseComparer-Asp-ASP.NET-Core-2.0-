@@ -235,6 +235,17 @@ namespace Comparer.Controllers
             return false;
         }
 
+
+        [HttpPost]
+        public bool RemoteAccess(string[] attr)
+        {
+            string DbType = attr[0];
+            string IP = attr[0];
+            string Port = attr[0];
+            Database dbase = Database.InitializeType(DbType);
+            return false;
+        }
+
         public void CleanNotUsedData(int i)
         {
             switch (i)

@@ -42,8 +42,7 @@
     position: relative;
 }
 
-.image-db-source,
-.image-db-target,
+.image-db-source, .image-db-target
 {
     position: relative;
 }
@@ -79,7 +78,7 @@
 .btn-File-Remote {
     background-color: white !important;
     height: 15vmin !important;
-    width: 100 !important;
+    width: 100% !important;
     font-size: 4.2vmin !important;
     padding: 0% !important;
     margin: 0% !important;
@@ -157,6 +156,12 @@
 @keyframes animateElementAppear {
     0% {
         opacity: 0;
+        /* ReSharper disable once InvalidValue 
+            vmax - не стандартне значення
+            ReSharper обурений не стандартним значенням
+                ReSharper вибиває помилку в цьому рядку
+                    Для чого ти робиш так, ReSharper?
+        */
         transform: translate(0px, 5vmax);
     }
 
