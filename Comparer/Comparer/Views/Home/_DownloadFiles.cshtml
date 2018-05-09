@@ -132,6 +132,7 @@
 <script src="~/js/dropzone.js"></script>
 
 <script>
+    //transition to next view
     $("#GoTableInfo").click(function () {
         waitingDialog.show();
         $.ajax({
@@ -143,7 +144,7 @@
             }
         });
     });
-
+    //funcrion for show connection result info
     function ReturnInfo(elem, result) {
         $(elem).css("visibility", "visible");
         $(elem).removeClass("panel-danger panel-success");
@@ -180,6 +181,7 @@
         //});
     });
 
+    // button baack for previos view
     $("#Back").click(function () {
         waitingDialog.show();
         $.ajax({
@@ -191,9 +193,7 @@
             }
         });
     });
-
-
-
+    //generate button choose SQL database
     function chooseSQL_DB(IDbackToChoose, IDbtn_connectToSql_file, IDbtn_connectToSql_remote) {
         let _chooseSQL_DB = "<hr class='custom-hr'/>" + "<div class='containerConnect container-fluid'>" +
             "<button type='button' class='btn btn-block btn-File-Remote' id=" + IDbtn_connectToSql_file +
@@ -208,7 +208,7 @@
             "</div>" + "<hr class='custom-hr'/>";
         return _chooseSQL_DB;
     }
-
+    //generate button choose MySQL database
     function chooseMySQL_DB(IDbackToChoose, IDbtn_connectToMySql_remote) {
         let _chooseMySQL_DB = "<hr class='custom-hr'/>" + "<div class='containerConnect container-fluid'>" +
             "<button type='button' class='btn btn-block btn-File-Remote' id=" + IDbtn_connectToMySql_remote +
@@ -221,7 +221,7 @@
             "</div>" + "<hr class='custom-hr'/>";
         return _chooseMySQL_DB;
     }
-
+    //connect to file func
     function connectToFile(ID_my_dropzon_div, ID_my_dropzon, IdUpload, backToChooseConnect) {
         let _connectToFile = "<hr class='custom-hr'/>" +
             '<div class=" containerConnect container-fluid col-md-12" id=' + ID_my_dropzon_div + '>' +
@@ -264,6 +264,7 @@
             "</div>" + "<hr class='custom-hr'/>";
         return _connectToRemote;
     }
+
 
     $(document).ready(function (e) {
         $('.image-db-source').click(function (e) {
@@ -366,6 +367,7 @@
     });
 
     $(document).ready(function (e) {
+
         $('.image-db-target').click(function (e) {
             $('.image-db-target').not(this).removeClass('check')
                 .siblings('input').prop('checked', false);
