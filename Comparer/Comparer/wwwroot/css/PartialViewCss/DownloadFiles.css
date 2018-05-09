@@ -78,7 +78,7 @@
 .btn-File-Remote {
     background-color: white !important;
     height: 15vmin !important;
-    width: 100px !important;
+    width: 100% !important;
     font-size: 4.2vmin !important;
     padding: 0% !important;
     margin: 0% !important;
@@ -156,7 +156,13 @@
 @keyframes animateElementAppear {
     0% {
         opacity: 0;
-        transform: translate(0px, 5px);
+        /* ReSharper disable once InvalidValue 
+            vmax - не стандартне значення
+            ReSharper обурений не стандартним значенням
+                ReSharper вибиває помилку в цьому рядку
+                    Для чого ти робиш так, ReSharper?
+        */
+        transform: translate(0px, 5vmax);
     }
 
     100% {
