@@ -657,27 +657,22 @@ namespace DbComparer
             }
 
         }
-
-        /// <summary>
-        /// TODO
-        /// </summary>
-        /// <returns></returns>
+        
         public override bool ConnectToFile(string location = null)
         {
             try
             {
-                var DestinationPath = Path.GetDirectoryName(location) + "\\data\\";
+                port = GetAvailablePort(3306);
+                var DestinationPath = Path.GetDirectoryName(location) + $"\\data{port}\\";
                 LocalInstance = Directory.GetParent(DestinationPath).Parent.Parent.Parent.FullName + "\\MySQLInstance\\data\\";
                 //Now Create all of the directories
                 foreach (string dirPath in Directory.GetDirectories(LocalInstance, "*",
                     SearchOption.AllDirectories))
                     Directory.CreateDirectory(dirPath.Replace(LocalInstance, DestinationPath));
-
                 //Copy all the files & Replaces any files with the same name
                 foreach (string newPath in Directory.GetFiles(LocalInstance, "*.*",
                     SearchOption.AllDirectories))
                     File.Copy(newPath, newPath.Replace(LocalInstance, DestinationPath), true);
-                port = GetAvailablePort(3306);
                 string fileName = Directory.GetParent(LocalInstance).Parent.FullName + "\\my.ini";
                 var file = File.ReadAllText(fileName);
                 file = file.Replace("MY_PORT", port.ToString());
@@ -690,30 +685,14 @@ namespace DbComparer
                     Arguments = $"--install MySQL{port} --defaults-file=" + '"' + DestinationPath.Replace(@"\", "/") + "my.ini" + '"',
                     Verb = "runas",
                     UseShellExecute = true
-                });
+                }).WaitForExit();
                 Process.Start(new ProcessStartInfo
                 {
                     FileName = "net.exe",
                     Arguments = $"start MYSQL{port}",
                     Verb = "runas",
                     UseShellExecute = true
-                });
-                //                Process proc = new Process();
-                //                proc.StartInfo.FileName = Directory.GetParent(LocalInstance).Parent.FullName + "\\bin\\mysqld.exe";
-                //                proc.StartInfo.UseShellExecute = true;
-                //                proc.StartInfo.CreateNoWindow = false;
-                //                proc.StartInfo.RedirectStandardOutput = false;
-                //                proc.StartInfo.Verb = "runas";
-                //                proc.StartInfo.Arguments = $"--install MySQL{port} --defaults-file='" + DestinationPath + "my.ini'";
-                //                proc.Start();
-                //                proc.WaitForExit();
-                //                var process = new System.Diagnostics.Process();
-                //                var startInfo = new System.Diagnostics.ProcessStartInfo();
-                //                startInfo.FileName = Environment.ExpandEnvironmentVariables("%SystemRoot%") + @"\System32\cmd.exe"; //Sets the FileName property of myProcessInfo to %SystemRoot%\System32\cmd.exe where %SystemRoot% is a system variable which is expanded using Environment.ExpandEnvironmentVariables
-                //                startInfo.Arguments = $"net start MYSQL{port}"; //Sets the arguments to cd..
-                //                startInfo.Verb = "runas";
-                //                process.StartInfo = startInfo;
-                //                process.Start();
+                }).WaitForExit();
 
                 if (ConnectToServer(port))
                 {
@@ -725,7 +704,7 @@ namespace DbComparer
                     script.Execute();
                     sw.Stop();
                     var NewDbName = GetDatabasesList().Except(DbList).First();
-                    ConnectToDatabase(NewDbName,port);
+                    ConnectToDatabase(NewDbName, port);
                     ConType = Connection_Type.File;
                     return true;
                 }
@@ -886,17 +865,17 @@ namespace DbComparer
                     Process.Start(new ProcessStartInfo
                     {
                         FileName = "net.exe",
-                        Arguments = $"net stop MYSQL{port}",
+                        Arguments = $"stop MYSQL{port}",
                         Verb = "runas",
                         UseShellExecute = true
-                    });
+                    }).WaitForExit();
                     Process.Start(new ProcessStartInfo
                     {
                         FileName = Directory.GetParent(LocalInstance).Parent.FullName + @"\bin\mysqld.exe",
                         Arguments = $"--remove MYSQL{port}",
                         Verb = "runas",
                         UseShellExecute = true
-                    });
+                    }).WaitForExit();
                 }
                 MySqlConnection.ClearPool(connection as MySqlConnection);
             }
