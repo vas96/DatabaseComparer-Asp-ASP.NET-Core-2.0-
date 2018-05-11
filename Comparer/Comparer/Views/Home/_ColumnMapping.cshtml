@@ -61,6 +61,27 @@
 
 <script src="~/js/Sortable.js"></script>
 <script>
+    var Text_Family = [
+        "CHAR", "VARCHAR", "TINYTEXT", "TEXT", "BLOB", "MEDIUMTEXT",
+        "MEDIUMBLOB", "LONGTEXT", "LONGBLOB", "ENUM", "SET", "NCHAR", "NVARCHAR", "NTEXT",
+        "BINARY", "VARBINARY", "IMAGE"
+    ];
+    var Numeric_Family = [
+        "TINYINT", "SMALLINT", "MEDIUMINT", "INT", "BIGINT", "FLOAT", "DOUBLE", "DECIMAL",
+        "BIT", "BIGINT", "NUMERIC", "SMALLMONEY", "READ"
+    ];
+    var Date_Family = ["DATE", "DATETIME", "TIMESTAMP", "TIME", "YEAR", "DATETIME2", "SMALLDATETIME", "DATETIMEOFFSET"];
+
+    function IsTypesComparable(word1, word2) {
+        word1 = word1.toUpperCase();
+        word2 = word2.toUpperCase();
+        if ((Text_Family.includes(word1) && (Text_Family.includes(word2))) || 
+            (Numeric_Family.includes(word1) && (Numeric_Family.includes(word2))) || 
+            (Date_Family.includes(word1) && (Date_Family.includes(word2))))
+            return true;
+        else return false;
+    }
+
     function ValidateTypes() {
         var source_list = [];
         var target_list = [];
@@ -71,7 +92,10 @@
                 $(source_list[i].cells[3]).addClass("block");
                 continue;
             }
-            if (source_list[i].cells[2].innerText != target_list[i].cells[2].innerText) {
+            var type1, type2;
+            type1 = source_list[i].cells[2].innerText;
+            type2 = target_list[i].cells[2].innerText;
+            if (!IsTypesComparable(type1,type2)) {
                 $(source_list[i].cells[3]).addClass("bad");
             } else {
                 $(source_list[i].cells[3]).removeClass("bad");

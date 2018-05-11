@@ -251,7 +251,11 @@ namespace DBTest
             var list1 = FirstDatabase.TableColumns.Where(item => item.ISKey).Select(i => i.Position).ToArray();
             var list2 = SecondDatabase.TableColumns.Where(item => item.ISKey).Select(i => i.Position).ToArray();
             if (list1.Length!=list2.Length)
+            {
+                items.Add(3, new List<string[]>());
+                items.Add(4, new List<string[]>());
                 return;
+            }
             var first = items[1].KeyPlusDataSelection(list1);
             var second = items[2].KeyPlusDataSelection(list2);
             var temp = new List<string[]>();

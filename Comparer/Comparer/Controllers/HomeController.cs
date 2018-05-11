@@ -146,7 +146,7 @@ namespace Comparer.Controllers
                 db.FirstDatabase.SelectedColumns.Add(db.FirstDatabase.TableColumns[i]);
                 foreach (var column in db.SecondDatabase.TableColumns)
                 {
-                    if (column.Name == array[i] && column.Type == db.FirstDatabase.TableColumns[i].Type)
+                    if (column.Name == array[i] && AdditionalFunctions.IsTypesComparable(column.Type, db.FirstDatabase.TableColumns[i].Type))
                         db.SecondDatabase.SelectedColumns.Add(column);
                 }
             }
