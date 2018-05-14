@@ -1,28 +1,56 @@
-﻿@using System.Collections
-@using System.Data
+﻿
 @model DbComparer.Database
 @{
     ViewData["Title"] = "About";
 }
-<h2>@ViewData["Title"]</h2>
-<h3>@ViewData["Message"]</h3>
+<link rel="stylesheet" href="~/css/PartialViewCss/AboutUs.css" />
 
-<table class="tab-content table-striped table-responsive table-bordered">
-    @{
-        DataRowCollection ds1 = Model.GetTableInfo("NewEmployees").Rows;
-        DataRowCollection ds2 = Model.GetTableInfo("NewEmployees2").Rows;
-        DataColumnCollection dc = Model.GetTableInfo("NewEmployees").Columns;
-    }
-    @for (int i=0; i<dc.Count;i++)
-    {
-        <tr>
-            <td>@dc[i]</td>
-            @for (int j = 0; j < ds1.Count; j++)
-            {
-            <td>@ds1[j].ItemArray[i]---@ds2[j].ItemArray[i]</td>
-            }
-        </tr>
-    }
-</table>
+<div class="container-fluid" id="div-aboutUs">
+    <h1 id="aboutUs-title" style="padding-top:70px">About Us</h1>
+    <hr />
+    <div class=" aligner-center" id="textBlock-aboutUs">
+        <p>
+            <strong>Hi!</strong> We created this project for verification migrations from diiferent databases.
+            And also it was our graduate work ...
+        </p>
+    </div>
 
-<p>Use this area to provide additional information.</p>
+    <div class="container-fluid">
+        <div class="col-md-6 aligner-center" id="informDiv-aboutUs-img">
+            <img src="~/images/person-male.png" class="img-responsive" style="width:auto;height:30vmin" alt="Romannn" />
+        </div>
+        <div class="col-md-6" id="informDiv-aboutUs-text">
+            <div>
+                <ul>
+                    <li>back-end</li>
+                    <li>back-end</li>
+                    <li>back-end</li>
+                    <li>back-end</li>
+                    <li>back-end</li>
+                    <li>back-end</li>
+                </ul>
+            </div>
+            <div class="container-fluid">
+                <div class="col-md-3 col-md-offset-1 col-sm-4 col-sm-offset-0 text-center">
+                    <img src="~/images/icons8-dropbox.svg" class="img-responsive center-block" alt="Dropbox" />
+                </div>
+                <div class="col-md-2 col-md-offset-1 col-sm-4 col-sm-offset-0 text-center">
+
+                    <img src="~/images/icons8-onedrive.svg" class="img-responsive center-block" alt="Onedrive" />
+
+                </div>
+                <div class="col-md-2 col-md-offset-1 col-sm-4 col-sm-offset-0 text-center">
+
+                    <img src="~/images/icons8-google-drive.svg" class="img-responsive center-block" alt="Google_Drive" />
+                </div>
+            </div>
+        </div>
+        <div>
+
+        </div>
+    </div>
+</div>
+
+    @*<div class="col-md-12 aligner-center">
+            <img src="~/images/index1.5.svg" class="img-responsive center-block" alt="Onedrive" style="width: 100%; height: auto;" />
+        </div>*@

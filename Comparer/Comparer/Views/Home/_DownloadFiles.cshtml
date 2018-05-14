@@ -106,9 +106,7 @@
             <div id="connectTo-target-div"></div>
         </div>
     </div>
-
-
-
+    @*First Upload File*@
     @*<div class="row">
         <div class="container-fluid col-md-6" id="Drop1">
             <form action="/Home/Upload/?id=1" class="dropzone dz-clickable dropable" id="Upload1"></form>
@@ -144,7 +142,7 @@
             }
         });
     });
-    //funcrion for show connection result info
+    //function for show connection result info
     function ReturnInfo(elem, result) {
         $(elem).css("visibility", "visible");
         $(elem).removeClass("panel-danger panel-success");
@@ -221,7 +219,7 @@
             "</div>" + "<hr class='custom-hr'/>";
         return _chooseMySQL_DB;
     }
-    //connect to file func
+    //connect to file function
     function connectToFile(ID_my_dropzon_div, ID_my_dropzon, IdUpload, backToChooseConnect) {
         var _connectToFile = "<hr class='custom-hr'/>" +
             '<div class=" containerConnect container-fluid col-md-12" id=' + ID_my_dropzon_div + '>' +
@@ -237,7 +235,7 @@
 
         return _connectToFile;
     }
-
+    //remote connection function
     function connectToRemote(Id_ip, Id_port, Id_name, Id_btnBack) {
         var _connectToRemote = "<hr class='custom-hr'/>" + "<div class='containerConnect container-fluid'>" +
             " <form>" +
@@ -265,8 +263,9 @@
         return _connectToRemote;
     }
 
-
+    //source db generate front-end
     $(document).ready(function (e) {
+        //image with check
         $('.image-db-source').click(function (e) {
             $('.image-db-source').not(this).removeClass('check')
                 .siblings('input').prop('checked', false);
@@ -283,7 +282,7 @@
                 width: '5vmin',
                 height: '5vmin'
             });
-
+            //first back button
             function backToChooseSourceDB_Source() {
                 $("#backToChooseSource").click(function () {
                     $("#chooseConnect-source-div").empty();
@@ -292,13 +291,14 @@
                     $('.image-db-source').removeClass('check')
                 });
             };
-
+            //second back button
             function backToChooseConnect_Source() {
                 $("#backToChooseConnect").click(function () {
                     $("#connectTo-source-div").empty();
                     $("#chooseConnect-source-div").removeClass("inactiveDiv");
                 });
             };
+            //choose db type
             var SourcedbType = "";
             SourcedbType = $("input[name=dbCheck]:checked").val();
             switch (SourcedbType) {
@@ -336,7 +336,7 @@
                             timeout: 9999999,
                             acceptedFiles: ".mdf,.sql,.xml",
                         };
-
+                        //upload db
                         $("#Upload1").dropzone({
                             url: "/Home/Upload/?id=1",
                             success: function (file, response) {
@@ -365,9 +365,9 @@
             }
         });
     });
-
+    //target db genetate front-end
     $(document).ready(function (e) {
-
+        //image with check 
         $('.image-db-target').click(function (e) {
             $('.image-db-target').not(this).removeClass('check')
                 .siblings('input').prop('checked', false);
@@ -384,7 +384,7 @@
                 width: '5vmin',
                 height: '5vmin'
             });
-
+            //first back button
             function backToChooseSourceDB_Target() {
                 $("#backToChooseTarget").click(function () {
                     $("#chooseConnect-target-div").empty();
@@ -393,13 +393,14 @@
                     $('.image-db-target').removeClass('check')
                 });
             };
-
+            //second back button
             function backToChooseConnect_Target() {
                 $("#backToChooseConnectTarget").click(function () {
                     $("#connectTo-target-div").empty();
                     $("#chooseConnect-target-div").removeClass("inactiveDiv");
                 });
             };
+            //choose db type
             var TargetdbType = "";
             TargetdbType = $("input[name=dbCheckTarget]:checked").val();
             switch (TargetdbType) {
@@ -436,7 +437,7 @@
                             timeout: 9999999,
                             acceptedFiles: ".mdf,.sql,.xml",
                         };
-                        
+                        //upload file
                             $("#Upload2").dropzone({
                                 url: "/Home/Upload/?id=2" ,
                                 success: function (file, response) {
@@ -466,6 +467,5 @@
             }
         });
     });
-
 
 </script>
