@@ -1,2 +1,80 @@
-﻿body {
+﻿#map {
+    height: 33vmax;
+    width: 100%;
 }
+
+#map-container {
+    padding-left: 0% !important;
+    padding-right: 0% !important;
+    border-bottom: 1vmin solid #487eb0;
+    border-top: 1vmin solid #487eb0;
+}
+
+.container-contactUs {
+    padding-left: 0% !important;
+    padding-right: 0% !important;
+}
+
+.input-div {
+    padding-top: 5vmin;
+    padding-bottom: 5vmin;
+}
+
+    .input-div input {
+        border: none;
+        background-color: white;
+        /* border-top: #40739e solid 0.1vmin;
+        border-bottom: #40739e solid 0.1vmin; */
+        background: transparent;
+        border: none;
+        border-bottom: 0.19vmin solid #40739e;
+        -webkit-box-shadow: none;
+        box-shadow: none;
+        border-radius: 0;
+    }
+
+        .input-div input:focus {
+            -webkit-box-shadow: none;
+            box-shadow: none;
+            border-color: red;
+        }
+ 
+    .input-div span {
+        border: none;
+        background-color: white;
+        border-bottom: 0.19vmin solid #40739e;
+    }
+
+.focus-input {
+    border: none !important;
+    background-color: white;
+    border-bottom: 0.19vmin solid #40739e !important;
+}
+
+.focusout-input {
+    border: none !important;
+    background-color: white;
+    border-bottom: 0.19vmin solid red !important;
+}
+
+#map-down {
+    position: absolute;
+    margin-top: 30.6vmax;
+    z-index: 99;
+    height: auto;
+    width: auto;
+    background-color: white;
+    color: #40739e;
+    width: 2vmax;
+    height: 2vmax;
+    line-height: 1.33;
+    border-radius: 1vmax;
+    padding: 0.1vmax;
+    transition: all 0.5s ease;
+}
+
+    #map-down:hover {
+        background-color: #40739e;
+        color: white;
+    }
+
