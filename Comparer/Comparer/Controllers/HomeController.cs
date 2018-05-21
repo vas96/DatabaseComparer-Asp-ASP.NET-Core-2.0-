@@ -169,7 +169,7 @@ namespace Comparer.Controllers
         #region UploadFile
 
         [HttpPost]
-        public async Task<bool> Upload(IFormFile file, int? id)
+        public async Task<bool> Upload(IFormFile file, int? id, string type)
         {
             if (file != null)
             {

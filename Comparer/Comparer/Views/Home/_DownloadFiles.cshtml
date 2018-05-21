@@ -337,7 +337,7 @@
                         };
 
                         $("#Upload1").dropzone({
-                            url: "/Home/Upload/?id=1",
+                            url: "/Home/Upload/?id=1&type=SQL",
                             success: function (file, response) {
                                 if (response == true)
                                     ReturnInfo($("#Upload1").parent().find(".panel"), response);
