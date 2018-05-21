@@ -24,6 +24,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.EntityFrameworkCore.Query.Expressions;
 using MySql.Data.MySqlClient;
+using Npgsql;
 using ObjectsComparer;
 
 namespace DbComparer
@@ -998,6 +999,200 @@ namespace DbComparer
             {
                 connection.Close();
                 SQLiteConnection.ClearPool(connection as SQLiteConnection);
+            }
+        }
+    }
+
+    public class PostGreSQLDatabaseConnector : Database
+    {
+        public PostGreSQLDatabaseConnector() : base()
+        {
+            DataConnectionString =
+                "Server=127.0.0.1; Port=5432; User Id=root; Password=user;";
+        }
+
+        public override bool ConnectToServer(int port = 5432)
+        {
+            if (port != Int32.MinValue)
+            {
+                DataConnectionString = $"Server=127.0.0.1; Port={port}; User Id=root; Password=user; Database=postgres";
+            }
+            try
+            {
+                connection = new NpgsqlConnection(DataConnectionString);
+                connection.Open();
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public override bool ConnectToDatabase(string databaseName, int port = 5432)
+        {
+            DataConnectionString = $"Server=127.0.0.1; Port={port}; User Id=root; Password=user; Database={databaseName};";
+            try
+            {
+                connection = new NpgsqlConnection(DataConnectionString);
+                connection.Open();
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public override bool ConnectToFile(string location = null)
+        {
+            ///IMPORTANT!!!!!!
+            var path_to_bin = @"C:\Program Files\PostgreSQL\10\bin";
+            ///IMPORTANT!!!!!!
+            try
+            {
+                var db_list = GetDatabasesList();
+                var name = "";
+                for (int i = 0; i < 65536; i++)
+                {
+                    if (!db_list.Contains("PostUser" + i))
+                    {
+                        name = "PostUser" + i;
+                        break;
+                    }
+                }
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = path_to_bin + @"\createdb.exe",
+                    Arguments = $"-U root {name}",
+                    Verb = "runas",
+                    UseShellExecute = true,
+                    WindowStyle = ProcessWindowStyle.Hidden
+                }).WaitForExit();
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = path_to_bin + @"\pg_dump.exe",
+                    Arguments = $"-U root {name} < {location}",
+                    Verb = "runas",
+                    UseShellExecute = true,
+                    WindowStyle = ProcessWindowStyle.Hidden
+                }).WaitForExit();
+                ConnectToDatabase(name);
+                connection = new SQLiteConnection($"Data Source={location};Version=3;");
+                connection.Open();
+                ConType = Connection_Type.File;
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+
+        }
+
+        public override bool RemoteConnection(string ip, string port, string db = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override List<string> GetDatabasesList()
+        {
+            try
+            {
+                if (connection == null || connection.State != ConnectionState.Open)
+                    ConnectToServer();
+                NpgsqlCommand command = (connection as NpgsqlConnection).CreateCommand();
+                command.CommandText = "SELECT datname FROM pg_database;";
+                using (NpgsqlDataReader Reader = command.ExecuteReader())
+                {
+                    List<string> rows = new List<string>();
+                    while (Reader.Read())
+                    {
+                        for (int i = 0; i < Reader.FieldCount; i++)
+                            rows.Add(Reader.GetValue(i).ToString());
+                    }
+                    return rows;
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public override List<string> GetTablesList(string database = null)
+        {
+            List<string> tables = new List<string>();
+            try
+            {
+                DataTable dt = connection.GetSchema("Tables");
+                foreach (DataRow row in dt.Rows)
+                {
+                    if (row[1].ToString() == "public")
+                    {
+                        string tablename = (string)row[2];
+                        tables.Add(tablename);
+                    }
+                }
+                tables.Sort();
+                return tables;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+        }
+
+        public override DataTable GetTableInfo(string tableName = null)
+        {
+            try
+            {
+                String[] columnRestrictions = new String[4];
+                if (tableName == null)
+                    columnRestrictions[2] = SelectedTable;
+                else
+                    columnRestrictions[2] = tableName;
+
+                DataTable departmentIDSchemaTable = connection.GetSchema("Columns", columnRestrictions);
+                TableColumns.Clear();
+                DataView dv = departmentIDSchemaTable.DefaultView;
+                departmentIDSchemaTable.DefaultView.Sort = "ORDINAL_POSITION Asc";
+                var SortedView = dv.ToTable();
+                foreach (DataRow row in SortedView.Rows)
+                {
+                    TableColumns.Add(new Column(row, DbType));
+                }
+                return departmentIDSchemaTable;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        public override List<string[]> Read(string query, Func<IDataRecord, string[]> selector)
+        {
+            try
+            {
+                using (var cmd = (connection as NpgsqlConnection).CreateCommand())
+                {
+                    cmd.CommandText = query;
+                    using (NpgsqlDataReader r = cmd.ExecuteReader())
+                        return ((DbDataReader)r).Cast<IDataRecord>().Select(selector).ToList();
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return null;
+            }
+        }
+
+        public override void CloseConnection()
+        {
+            if (connection != null && connection.State != ConnectionState.Closed)
+            {
+                connection.Close();
             }
         }
     }

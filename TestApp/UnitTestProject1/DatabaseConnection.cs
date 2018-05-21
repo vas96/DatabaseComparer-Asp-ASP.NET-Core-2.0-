@@ -15,8 +15,11 @@ using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 using Comparer.Models;
+using DBTest;
 using MySql.Data.MySqlClient;
+using Npgsql;
 
 namespace DbComparer
 {
@@ -224,7 +227,7 @@ namespace DbComparer
         {
             string[] Result = new string[selected.Length];
             int[] arr = selected.Select(i => Int32.Parse(i)).ToArray();
-            string columns = "(" + SelectedColumns.Select(i => i.Name) + ")";
+            string columns = "(" + String.Join(",", SelectedColumns.Select(i => i.Name)) + ")";
             for (int i = 0; i < selected.Length; i++)
             {
                 string Insert = "INSERT INTO "
@@ -293,14 +296,38 @@ namespace DbComparer
              */
         }
 
+        /*
         /// <summary>
         /// Визначає тип БД
         /// </summary>
         /// <param name="file"></param>
         /// <returns></returns>
-        public static Database_Type GetDBType(string file)
+        public static Database_Type GetDBType(IFormFile file)
         {
-            throw new NotImplementedException();
+            string ext = Path.GetExtension(file.FileName).Replace(".", "").ToLower();
+            switch (ext)
+            {
+                case "mdf":
+                    {
+                        return Database_Type.SqlServer; break;
+                    }
+                case "sql":
+                    {
+                        return Database_Type.MySql; break;
+                    }
+                case "xml":
+                    {
+                        return Database_Type.XML; break;
+                    }
+                case "db":
+                    {
+                        return Database_Type.SQLite; break;
+                    }
+                default:
+                    {
+                        return Database_Type.NONE; break;
+                    }
+            }
         }
 
         /// <summary>
@@ -308,9 +335,50 @@ namespace DbComparer
         /// </summary>
         /// <param name="file"></param>
         /// <returns></returns>
-        public static Database InitializeType(string file)
+        public static Database InitializeType(IFormFile file)
         {
-            throw new NotImplementedException();
+
+            Database.Database_Type type = Database.GetDBType(file);
+            switch (type)
+            {
+                case Database_Type.MySql:
+                    { return new MySqlDataBaseConnector() { DbType = Database_Type.MySql }; break; }
+                case Database_Type.SqlServer:
+                    { return new SqlDataBaseConnector() { DbType = Database_Type.SqlServer }; ; break; }
+                case Database_Type.SQLite:
+                    { return new SQLiteDatabaseConnector() { DbType = Database_Type.SQLite }; ; break; }
+                default:
+                    {
+                        return null;
+                        break;
+                    }
+            }
+        }
+
+
+        */
+
+        /// <summary>
+        /// Визначає тип БД та виконує присвоєння
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        public static Database InitializeType(string type)
+        {
+            switch (type)
+            {
+                case "MySQL":
+                    { return new MySqlDataBaseConnector() { DbType = Database_Type.MySql }; break; }
+                case "SQL Server":
+                    { return new SqlDataBaseConnector() { DbType = Database_Type.SqlServer }; ; break; }
+                case "SQLite":
+                    { return new SQLiteDatabaseConnector() { DbType = Database_Type.SQLite }; ; break; }
+                default:
+                    {
+                        return null;
+                        break;
+                    }
+            }
         }
 
         /// <summary>
@@ -320,8 +388,8 @@ namespace DbComparer
         {
             SqlServer,
             MySql,
-            SQLite,
             Oracle,
+            SQLite,
             XML,
             NONE
         }
@@ -354,30 +422,31 @@ namespace DbComparer
             {
                 switch (type)
                 {
-                    case Database_Type.SqlServer : case Database_Type.MySql :
-                    {
-                        var array = dr.ItemArray;
-                        Position = Int32.Parse(array[4].ToString()) - 1;//Позиція
-                        Name = array[3].ToString();//Імя
-                        Type = array[7].ToString();//Тип
-                        Length = array[8].ToString();//Довжина
-                        if (array[15] != "PRI")
-                            ISKey = false; //Ключ
-                        else ISKey = true;
+                    case Database_Type.SqlServer:
+                    case Database_Type.MySql:
+                        {
+                            var array = dr.ItemArray;
+                            Position = Int32.Parse(array[4].ToString()) - 1; //Позиція
+                            Name = array[3].ToString(); //Імя
+                            Type = array[7].ToString(); //Тип
+                            Length = array[8].ToString(); //Довжина
+                            if (array[15] != "PRI")
+                                ISKey = false; //Ключ
+                            else ISKey = true;
                             break;
-                    }
+                        }
                     case Database_Type.SQLite:
-                    {
-                        var array = dr.ItemArray;
-                        Position = Int32.Parse(array[6].ToString());//Позиція
-                        Name = array[3].ToString();//Імя
-                        Type = array[11].ToString();//Тип
-                        Length = array[13].ToString();//Довжина
-                        if (array[27].ToString() != "True")
-                            ISKey = false; //Ключ
-                        else ISKey = true;
+                        {
+                            var array = dr.ItemArray;
+                            Position = Int32.Parse(array[6].ToString()); //Позиція
+                            Name = array[3].ToString(); //Імя
+                            Type = array[11].ToString(); //Тип
+                            Length = array[13].ToString(); //Довжина
+                            if (array[27].ToString() != "True")
+                                ISKey = false; //Ключ
+                            else ISKey = true;
                             break;
-                    }
+                        }
                 }
             }
         }
@@ -577,6 +646,7 @@ namespace DbComparer
         private string LocalInstance = "";
         public MySqlDataBaseConnector() : base()
         {
+            DbType = Database_Type.MySql;
         }
 
         public override bool ConnectToServer(int port = Int32.MinValue)
@@ -646,14 +716,16 @@ namespace DbComparer
                     FileName = Directory.GetParent(LocalInstance).Parent.FullName + @"\bin\mysqld.exe",
                     Arguments = $"--install MySQL{port} --defaults-file=" + '"' + DestinationPath.Replace(@"\", "/") + "my.ini" + '"',
                     Verb = "runas",
-                    UseShellExecute = true
+                    UseShellExecute = true,
+                    WindowStyle = ProcessWindowStyle.Hidden
                 }).WaitForExit();
                 Process.Start(new ProcessStartInfo
                 {
                     FileName = "net.exe",
                     Arguments = $"start MYSQL{port}",
                     Verb = "runas",
-                    UseShellExecute = true
+                    UseShellExecute = true,
+                    WindowStyle = ProcessWindowStyle.Hidden
                 }).WaitForExit();
 
                 if (ConnectToServer(port))
@@ -796,14 +868,16 @@ namespace DbComparer
                         FileName = "net.exe",
                         Arguments = $"stop MYSQL{port}",
                         Verb = "runas",
-                        UseShellExecute = true
+                        UseShellExecute = true,
+                        WindowStyle = ProcessWindowStyle.Hidden
                     }).WaitForExit();
                     Process.Start(new ProcessStartInfo
                     {
                         FileName = Directory.GetParent(LocalInstance).Parent.FullName + @"\bin\mysqld.exe",
                         Arguments = $"--remove MYSQL{port}",
                         Verb = "runas",
-                        UseShellExecute = true
+                        UseShellExecute = true,
+                        WindowStyle = ProcessWindowStyle.Hidden
                     }).WaitForExit();
                 }
                 MySqlConnection.ClearPool(connection as MySqlConnection);
@@ -922,7 +996,160 @@ namespace DbComparer
             if (connection != null && connection.State != ConnectionState.Closed)
             {
                 connection.Close();
-                SQLiteConnection.ClearPool(connection as SQLiteConnection);  
+                SQLiteConnection.ClearPool(connection as SQLiteConnection);
+            }
+        }
+    }
+
+    public class PostGreSQLDatabaseConnector : Database
+    {
+        public PostGreSQLDatabaseConnector() : base()
+        {
+            DataConnectionString =
+                "Server=127.0.0.1; Port=5432; User Id=root; Password=user;";
+        }
+
+        public override bool ConnectToServer(int port = Int32.MinValue)
+        {
+            if (port != Int32.MinValue)
+            {
+                DataConnectionString = $"Server=127.0.0.1; Port={port}; User Id=root; Password=user; Database=postgres";
+            }
+            try
+            {
+                connection = new NpgsqlConnection(DataConnectionString);
+                connection.Open();
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public override bool ConnectToDatabase(string databaseName, int port = Int32.MinValue)
+        {
+            DataConnectionString = $"Server=127.0.0.1; Port={port}; User Id=root; Password=user; Database={databaseName};";
+            try
+            {
+                connection = new NpgsqlConnection(DataConnectionString);
+                connection.Open();
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public override bool ConnectToFile(string location = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool RemoteConnection(string ip, string port, string db = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override List<string> GetDatabasesList()
+        {
+            try
+            {
+                if (connection == null || connection.State != ConnectionState.Open)
+                    ConnectToServer();
+                NpgsqlCommand command = (connection as NpgsqlConnection).CreateCommand();
+                command.CommandText = "SELECT datname FROM pg_database;";
+                using (NpgsqlDataReader Reader = command.ExecuteReader())
+                {
+                    List<string> rows = new List<string>();
+                    while (Reader.Read())
+                    {
+                        for (int i = 0; i < Reader.FieldCount; i++)
+                            rows.Add(Reader.GetValue(i).ToString());
+                    }
+                    return rows;
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public override List<string> GetTablesList(string database = null)
+        {
+            List<string> tables = new List<string>();
+            try
+            {
+                DataTable dt = connection.GetSchema("Tables");
+                foreach (DataRow row in dt.Rows)
+                {
+                    if (row[1].ToString() == "public")
+                    {
+                        string tablename = (string)row[2];
+                        tables.Add(tablename);
+                    }
+                }
+                tables.Sort();
+                return tables;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+        }
+
+        public override DataTable GetTableInfo(string tableName = null)
+        {
+            try
+            {
+                String[] columnRestrictions = new String[4];
+                if (tableName == null)
+                    columnRestrictions[2] = SelectedTable;
+                else
+                    columnRestrictions[2] = tableName;
+
+                DataTable departmentIDSchemaTable = connection.GetSchema("Columns", columnRestrictions);
+                TableColumns.Clear();
+                DataView dv = departmentIDSchemaTable.DefaultView;
+                departmentIDSchemaTable.DefaultView.Sort = "ORDINAL_POSITION Asc";
+                var SortedView = dv.ToTable();
+                foreach (DataRow row in SortedView.Rows)
+                {
+                    TableColumns.Add(new Column(row, DbType));
+                }
+                return departmentIDSchemaTable;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        public override List<string[]> Read(string query, Func<IDataRecord, string[]> selector)
+        {
+            try
+            {
+                using (var cmd = (connection as NpgsqlConnection).CreateCommand())
+                {
+                    cmd.CommandText = query;
+                    using (NpgsqlDataReader r = cmd.ExecuteReader())
+                        return ((DbDataReader)r).Cast<IDataRecord>().Select(selector).ToList();
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return null;
+            }
+        }
+
+        public override void CloseConnection()
+        {
+            if (connection != null && connection.State != ConnectionState.Closed)
+            {
+                connection.Close();
             }
         }
     }

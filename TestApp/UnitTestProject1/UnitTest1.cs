@@ -13,6 +13,7 @@ using DbComparer;
 using DBTest;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MySql.Data.MySqlClient;
+using Npgsql;
 
 namespace UnitTestProject1
 {
@@ -114,6 +115,28 @@ namespace UnitTestProject1
                 var list = db.GetTablesList();
                 var list2 = db.GetTableInfo(list[3]);
                 var list3 = db.Read($"Select * from {list[3]}", db.FullStringArraySelector);
+                Assert.IsTrue(true);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                Assert.Fail();
+            }
+
+        }
+
+        [TestMethod]
+        public void PostGreSQLConnection()
+        {
+            try
+            {
+                var db = new PostGreSQLDatabaseConnector();
+                db.ConnectToServer(5432);
+                var list = db.GetDatabasesList();
+                db.ConnectToDatabase("sakila",5432);
+                var list2 = db.GetTablesList("sakila");
+                var list3 = db.GetTableInfo(list2[0]);
+                var list4 = db.Read($"Select * from {list2[0]}", db.FullStringArraySelector);
                 Assert.IsTrue(true);
             }
             catch (Exception e)

@@ -153,8 +153,9 @@ namespace Comparer.Controllers
             if (db.FirstDatabase.SelectedColumns.Count !=
                 db.SecondDatabase.SelectedColumns.Count)
                 return PartialView("_Error");
-            var readed = db.ReadDataFromDb();
+            if (db.ReadDataFromDb())
             db.ComparingResult = db.CompareFullData();
+            else return PartialView("_Error");
             return PartialView("_Comparing", db);
         }
 
