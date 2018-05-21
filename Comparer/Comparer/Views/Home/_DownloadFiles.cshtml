@@ -45,7 +45,7 @@
                         <div class="parent">
                             <label class="btn">
                                 <img class="image-db-source" src="~/images/postgreSQL.svg" alt="MySql" srcset="" style="width: 15vmin;height: 15vmin;">
-                                <input type="radio" name="dbCheck" id="PostgreSQL" value="mySql" class="hidden" autocomplete="off">
+                                <input type="radio" name="dbCheck" id="dbCheck" value="PostgreSQL" class="hidden" autocomplete="off">
                                 <img class="img-ok-source hidden" src="~/images/OK.svg" style="width: 5vmin;height: 5vmin;" />
                             </label>
                         </div>
@@ -331,15 +331,13 @@
             SourcedbType = $("input[name=dbCheck]:checked").val();
             switch (SourcedbType) {
                 case "MySQL":
-                    $("#chooseConnect-source-div").empty();
-                    $("#chooseConnect-source-div").append(chooseMySQL_DB("backToChooseSource",
+                    $("#chooseConnect-source-div").empty().append(chooseMySQL_DB("backToChooseSource",
                         "btn-connectToMySql-remote", "btn-connectToMySql-file"));
                     $(".containerChooseSource").addClass("inactiveDiv");
                     backToChooseSourceDB_Source();
 
                     $('#btn-connectToMySql-file').click(function () {
-                        $("#connectTo-source-div").empty();
-                        $("#connectTo-source-div").append(connectToFile("Drop1", "Upload1", 1,
+                        $("#connectTo-source-div").empty().append(connectToFile("Drop1", "Upload1", 1,
                             "backToChooseConnect"));
                         $("#chooseConnect-source-div").addClass("inactiveDiv");
 
@@ -365,8 +363,7 @@
                     });
 
                     $('#btn-connectToMySql-remote').click(function () {
-                        $("#connectTo-source-div").empty();
-                        $("#connectTo-source-div").append(connectToRemote('ipSource',
+                        $("#connectTo-source-div").empty().append(connectToRemote('ipSource',
                             'portSource', 'nameSource', 'backToChooseConnect'));
                         $("#chooseConnect-source-div").addClass("inactiveDiv");
                         backToChooseConnect_Source();
@@ -374,14 +371,12 @@
                     break;
 
                 case "SQLServer":
-                    $("#chooseConnect-source-div").empty();
-                    $("#chooseConnect-source-div").append(chooseSQL_DB("backToChooseSource",
+                    $("#chooseConnect-source-div").empty().append(chooseSQL_DB("backToChooseSource",
                         "btn-connectToSql-file", "btn-connectToSql-remote"));
                     $(".containerChooseSource").addClass("inactiveDiv");
                     backToChooseSourceDB_Source();
                     $('#btn-connectToSql-file').click(function () {
-                        $("#connectTo-source-div").empty();
-                        $("#connectTo-source-div").append(connectToFile("Drop1","Upload1", 1,
+                        $("#connectTo-source-div").empty().append(connectToFile("Drop1","Upload1", 1,
                             "backToChooseConnect"));
                         $("#chooseConnect-source-div").addClass("inactiveDiv");
 
@@ -407,11 +402,73 @@
                     });
                    
                     $('#btn-connectToSql-remote').click(function () {
-                        $("#connectTo-source-div").empty();
-                        $("#connectTo-source-div").append(connectToRemote('ipSourceSQL',
+                        $("#connectTo-source-div").empty().append(connectToRemote('ipSourceSQL',
                             'portSourceSQL', 'nameSourceSQL', 'backToChooseConnect'));
                         $("#chooseConnect-source-div").addClass("inactiveDiv");
                         backToChooseConnect_Source();
+                    });
+                    break;
+
+
+                case "SQLite":
+                    $("#chooseConnect-source-div").empty().append(chooseSqlLite_DB("backToChooseSource",
+                        "btn-connectSQLite-file"));
+                    $(".containerChooseSource").addClass("inactiveDiv");
+                    backToChooseSourceDB_Source();
+                    $('#btn-connectSQLite-file').click(function () {
+                        $("#connectTo-source-div").empty().append(connectToFile("Drop1", "Upload1", 1,
+                            "backToChooseConnect"));
+                        $("#chooseConnect-source-div").addClass("inactiveDiv");
+
+                        backToChooseConnect_Source();
+
+                        Dropzone.options.Upload1 = {
+                            uploadMultiple: false,
+                            timeout: 9999999,
+                            acceptedFiles: ".mdf,.sql,.xml,.db",
+                        };
+                        //upload db
+                        $("#Upload1").dropzone({
+                            url: "/Home/Upload/?id=1&type=" + SourcedbType,
+                            success: function (file, response) {
+                                if (response == true)
+                                    ReturnInfo($("#Upload1").parent().find(".panel"), response);
+                                else
+                                    $('#myModal').modal('show');
+
+                            }
+                        });
+                   });
+                    break;
+
+                case "PostgreSQL":
+                    $("#chooseConnect-source-div").empty().append(choosePostgreSQL_DB("backToChooseSource",
+                        "btn-connectPostgreSQL-file"));
+                    $(".containerChooseSource").addClass("inactiveDiv");
+                    backToChooseSourceDB_Source();
+                    $('#btn-connectPostgreSQL-file').click(function () {
+                        $("#connectTo-source-div").empty().append(connectToFile("Drop1", "Upload1", 1,
+                            "backToChooseConnect"));
+                        $("#chooseConnect-source-div").addClass("inactiveDiv");
+
+                        backToChooseConnect_Source();
+
+                        Dropzone.options.Upload1 = {
+                            uploadMultiple: false,
+                            timeout: 9999999,
+                            acceptedFiles: ".mdf,.sql,.xml,.db",
+                        };
+                        //upload db
+                        $("#Upload1").dropzone({
+                            url: "/Home/Upload/?id=1&type=" + SourcedbType,
+                            success: function (file, response) {
+                                if (response == true)
+                                    ReturnInfo($("#Upload1").parent().find(".panel"), response);
+                                else
+                                    $('#myModal').modal('show');
+
+                            }
+                        });
                     });
                     break;
 
@@ -461,15 +518,13 @@
             TargetdbType = $("input[name=dbCheckTarget]:checked").val();
             switch (TargetdbType) {
                 case "MySQL":
-                    $("#chooseConnect-target-div").empty();
-                    $("#chooseConnect-target-div").append(chooseMySQL_DB("backToChooseTarget",
+                    $("#chooseConnect-target-div").empty().append(chooseMySQL_DB("backToChooseTarget",
                         "btn-connectToMySql-remote-target", "btn-connectToMySql-file-target"));
                     $(".containerChooseTarget").addClass("inactiveDiv");
                     backToChooseSourceDB_Target();
 
                     $('#btn-connectToMySql-file-target').click(function () {
-                        $("#connectTo-target-div").empty();
-                        $("#connectTo-target-div").append(connectToFile("Drop2", "Upload2", 2,
+                        $("#connectTo-target-div").empty().append(connectToFile("Drop2", "Upload2", 2,
                             "backToChooseConnectTarget"));
                         backToChooseConnect_Target();
                         $("#chooseConnect-target-div").addClass("inactiveDiv");
@@ -494,8 +549,7 @@
                     });
 
                     $('#btn-connectToMySql-remote-target').click(function () {
-                        $("#connectTo-target-div").empty();
-                        $("#connectTo-target-div").append(connectToRemote('ipTarget',
+                        $("#connectTo-target-div").empty().append(connectToRemote('ipTarget',
                             'portTarget', 'nameTarget', 'backToChooseConnectTarget'));
                         $("#chooseConnect-target-div").addClass("inactiveDiv");
                         backToChooseConnect_Target();
@@ -503,14 +557,12 @@
                     break;
 
                 case "SQLServer":
-                    $("#chooseConnect-target-div").empty();
-                    $("#chooseConnect-target-div").append(chooseSQL_DB("backToChooseTarget",
+                    $("#chooseConnect-target-div").empty().append(chooseSQL_DB("backToChooseTarget",
                         "btn-connectToSql-file-target", "btn-connectToSql-remote-target"));
                     $(".containerChooseTarget").addClass("inactiveDiv");
                     backToChooseSourceDB_Target();
                     $('#btn-connectToSql-file-target').click(function () {
-                        $("#connectTo-target-div").empty();
-                        $("#connectTo-target-div").append(connectToFile("Drop2", "Upload2", 2,
+                        $("#connectTo-target-div").empty().append(connectToFile("Drop2", "Upload2", 2,
                             "backToChooseConnectTarget"));
                         backToChooseConnect_Target();
                         $("#chooseConnect-target-div").addClass("inactiveDiv");
@@ -528,21 +580,80 @@
                                         ReturnInfo($("#Upload2").parent().find(".panel"), response);
                                     else
                                         $('#myModal').modal('show');
-
                                 } 
                         }); 
                         
                     });
 
                     $('#btn-connectToSql-remote-target').click(function () {
-                        $("#connectTo-target-div").empty();
-                        $("#connectTo-target-div").append(connectToRemote('ipTargetSQL',
+                        $("#connectTo-target-div").empty().append(connectToRemote('ipTargetSQL',
                             'portTargetSQL', 'nameTargetSQL',
                             'backToChooseConnectTarget'));
                         $("#chooseConnect-target-div").addClass("inactiveDiv");
                         backToChooseConnect_Target();
                     });
                     break;
+
+                case "SQLite":
+                    $("#chooseConnect-target-div").empty().append(choosePostgreSQL_DB("backToChooseTarget",
+                        "btn-connectToSQLite-file-target"));
+                    $(".containerChooseTarget").addClass("inactiveDiv");
+                    backToChooseSourceDB_Target();
+                    $('#btn-connectToSQLite-file-target').click(function () {
+                        $("#connectTo-target-div").empty().append(connectToFile("Drop2", "Upload2", 2,
+                            "backToChooseConnectTarget"));
+                        backToChooseConnect_Target();
+                        $("#chooseConnect-target-div").addClass("inactiveDiv");
+
+                        Dropzone.options.Upload2 = {
+                            uploadMultiple: false,
+                            timeout: 9999999,
+                            acceptedFiles: ".mdf,.sql,.xml,.db",
+                        };
+                        //upload file
+                        $("#Upload2").dropzone({
+                            url: "/Home/Upload/?id=2&type=" + TargetdbType,
+                            success: function (file, response) {
+                                if (response == true)
+                                    ReturnInfo($("#Upload2").parent().find(".panel"), response);
+                                else
+                                    $('#myModal').modal('show');
+                            }
+                        });
+
+                    });
+                    break;
+
+                case "PostgreSQL":
+                    $("#chooseConnect-target-div").empty().append(choosePostgreSQL_DB("backToChooseTarget",
+                        "btn-connectToPostgreSQL-file-target"));
+                    $(".containerChooseTarget").addClass("inactiveDiv");
+                    backToChooseSourceDB_Target();
+                    $('#btn-connectToPostgreSQL-file-target').click(function () {
+                        $("#connectTo-target-div").empty().append(connectToFile("Drop2", "Upload2", 2,
+                            "backToChooseConnectTarget"));
+                        backToChooseConnect_Target();
+                        $("#chooseConnect-target-div").addClass("inactiveDiv");
+
+                        Dropzone.options.Upload2 = {
+                            uploadMultiple: false,
+                            timeout: 9999999,
+                            acceptedFiles: ".mdf,.sql,.xml,.db",
+                        };
+                        //upload file
+                        $("#Upload2").dropzone({
+                            url: "/Home/Upload/?id=2&type=" + TargetdbType,
+                            success: function (file, response) {
+                                if (response == true)
+                                    ReturnInfo($("#Upload2").parent().find(".panel"), response);
+                                else
+                                    $('#myModal').modal('show');
+                            }
+                        });
+
+                    });             
+                    break;
+
 
                 case "none":
                     alert("kurrwa");
