@@ -18,7 +18,7 @@
                         <div class="parent">
                             <label class="btn">
                                 <img class="image-db-source" src="~/images/SqlServerChoose.svg" alt="SqlServer" srcset="" style="width: 15vmin;height: 15vmin;">
-                                <input type="radio" name="dbCheck" id="dbCheck" value="sqlServer" class="hidden" autocomplete="off">
+                                <input type="radio" name="dbCheck" id="dbCheck" value="SQLServer" class="hidden" autocomplete="off">
                                 <img class="img-ok-source hidden" src="~/images/OK.svg" style="width: 0vmin;height: 0vmin;" />
                             </label>
                         </div>
@@ -27,7 +27,7 @@
                         <div class="parent">
                             <label class="btn">
                                 <img class="image-db-source" src="~/images/MySqlChoose.svg" alt="MySql" srcset="" style="width: 15vmin;height: 15vmin;">
-                                <input type="radio" name="dbCheck" id="dbCheck" value="mySql" class="hidden" autocomplete="off">
+                                <input type="radio" name="dbCheck" id="dbCheck" value="MySQL" class="hidden" autocomplete="off">
                                 <img class="img-ok-source hidden" src="~/images/OK.svg" style="width: 5vmin;height: 5vmin;" />
                             </label>
                         </div>
@@ -35,8 +35,8 @@
                     <li>
                         <div class="parent">
                             <label class="btn">
-                                <img class="image-db-source" src="~/images/SqlServerChoose.svg" alt="SqlServer" srcset="" style="width: 15vmin;height: 15vmin;">
-                                <input type="radio" name="dbCheck" id="dbCheck" value="sqlServer" class="hidden" autocomplete="off">
+                                <img class="image-db-source" src="~/images/SqlServerChoose.svg" alt="SQLite" srcset="" style="width: 15vmin;height: 15vmin;">
+                                <input type="radio" name="dbCheck" id="dbCheck" value="SQLite" class="hidden" autocomplete="off">
                                 <img class="img-ok-source hidden" src="~/images/OK.svg" style="width: 5vmin;height: 5vmin;" />
                             </label>
                         </div>
@@ -45,7 +45,7 @@
                         <div class="parent">
                             <label class="btn">
                                 <img class="image-db-source" src="~/images/MySqlChoose.svg" alt="MySql" srcset="" style="width: 15vmin;height: 15vmin;">
-                                <input type="radio" name="dbCheck" id="dbCheck" value="mySql" class="hidden" autocomplete="off">
+                                <input type="radio" name="dbCheck" id="PostgreSQL" value="mySql" class="hidden" autocomplete="off">
                                 <img class="img-ok-source hidden" src="~/images/OK.svg" style="width: 5vmin;height: 5vmin;" />
                             </label>
                         </div>
@@ -66,8 +66,8 @@
                     <li>
                         <div class="parent">
                             <label class="btn">
-                                <img class="image-db-target" src="~/images/SqlServerChoose.svg" alt="SqlServer" srcset="" style="width: 15vmin;height: 15vmin;">
-                                <input type="radio" name="dbCheckTarget" id="dbCheck" value="sqlServer" class="hidden" autocomplete="off">
+                                <img class="image-db-target" src="~/images/SqlServerChoose.svg" alt="SQLServer" srcset="" style="width: 15vmin;height: 15vmin;">
+                                <input type="radio" name="dbCheckTarget" id="dbCheck" value="SQLServer" class="hidden" autocomplete="off">
                                 <img class="img-ok-target hidden" src="~/images/OK.svg" style="width: 0vmin;height: 0vmin;" />
                             </label>
                         </div>
@@ -76,7 +76,7 @@
                         <div class="parent">
                             <label class="btn">
                                 <img class="image-db-target" src="~/images/MySqlChoose.svg" alt="MySql" srcset="" style="width: 15vmin;height: 15vmin;">
-                                <input type="radio" name="dbCheckTarget" id="dbCheck" value="mySql" class="hidden" autocomplete="off">
+                                <input type="radio" name="dbCheckTarget" id="dbCheck" value="MySQL" class="hidden" autocomplete="off">
                                 <img class="img-ok-target hidden" src="~/images/OK.svg" style="width: 5vmin;height: 5vmin;" />
                             </label>
                         </div>
@@ -84,8 +84,8 @@
                     <li>
                         <div class="parent">
                             <label class="btn">
-                                <img class="image-db-target" src="~/images/SqlServerChoose.svg" alt="SqlServer" srcset="" style="width: 15vmin;height: 15vmin;">
-                                <input type="radio" name="dbCheckTarget" id="dbCheck" value="sqlServer" class="hidden" autocomplete="off">
+                                <img class="image-db-target" src="~/images/SqlServerChoose.svg" alt="SQLite" srcset="" style="width: 15vmin;height: 15vmin;">
+                                <input type="radio" name="dbCheckTarget" id="dbCheck" value="SQLite" class="hidden" autocomplete="off">
                                 <img class="img-ok-target hidden" src="~/images/OK.svg" style="width: 5vmin;height: 5vmin;" />
                             </label>
                         </div>
@@ -93,8 +93,8 @@
                     <li>
                         <div class="parent">
                             <label class="btn">
-                                <img class="image-db-target" src="~/images/MySqlChoose.svg" alt="MySql" srcset="" style="width: 15vmin;height: 15vmin;">
-                                <input type="radio" name="dbCheckTarget" id="dbCheck" value="mySql" class="hidden" autocomplete="off">
+                                <img class="image-db-target" src="~/images/MySqlChoose.svg" alt="PostgreSQL" srcset="" style="width: 15vmin;height: 15vmin;">
+                                <input type="radio" name="dbCheckTarget" id="dbCheck" value="PostgreSQL" class="hidden" autocomplete="off">
                                 <img class="img-ok-target hidden" src="~/images/OK.svg" style="width: 5vmin;height: 5vmin;" />
                             </label>
                         </div>
@@ -207,7 +207,22 @@
         return _chooseSQL_DB;
     }
     //generate button choose MySQL database
-    function chooseMySQL_DB(IDbackToChoose, IDbtn_connectToMySql_remote) {
+    function chooseMySQL_DB(IDbackToChoose, IDbtn_connectToMySql_remote,IDbtn_connectToSql_file) {
+        var _chooseMySQL_DB = "<hr class='custom-hr'/>" + "<div class='containerConnect container-fluid'>" +
+            "<button type='button' class='btn btn-block btn-File-Remote' id=" + IDbtn_connectToSql_file +
+            ">Connect to File</button>" +
+            "<button type='button' class='btn btn-block btn-File-Remote' id=" + IDbtn_connectToMySql_remote +
+            ">Remote connection</button>" +
+            "</div>" +
+            "<div class='containerConnect container-fluid  text-center'>" +
+            "<div class='wrapper-btn'>" +
+            " <button id=" + IDbackToChoose + " class='btn-back' type='submit'>Back!</button>" +
+            "</div>" +
+            "</div>" + "<hr class='custom-hr'/>";
+        return _chooseMySQL_DB;
+    }
+    //generate button choose SqlLite database
+    function chooseLite_DB(IDbackToChoose, IDbtn_connectToMySql_remote, IDbtn_connectToSql_file) {
         var _chooseMySQL_DB = "<hr class='custom-hr'/>" + "<div class='containerConnect container-fluid'>" +
             "<button type='button' class='btn btn-block btn-File-Remote' id=" + IDbtn_connectToMySql_remote +
             ">Remote connection</button>" +
@@ -302,12 +317,40 @@
             var SourcedbType = "";
             SourcedbType = $("input[name=dbCheck]:checked").val();
             switch (SourcedbType) {
-                case "mySql":
+                case "MySQL":
                     $("#chooseConnect-source-div").empty();
                     $("#chooseConnect-source-div").append(chooseMySQL_DB("backToChooseSource",
-                        "btn-connectToMySql-remote"));
+                        "btn-connectToMySql-remote", "btn-connectToMySql-file"));
                     $(".containerChooseSource").addClass("inactiveDiv");
                     backToChooseSourceDB_Source();
+
+                    $('#btn-connectToMySql-file').click(function () {
+                        $("#connectTo-source-div").empty();
+                        $("#connectTo-source-div").append(connectToFile("Drop1", "Upload1", 1,
+                            "backToChooseConnect"));
+                        $("#chooseConnect-source-div").addClass("inactiveDiv");
+
+                        backToChooseConnect_Source();
+
+                        Dropzone.options.Upload1 = {
+                            uploadMultiple: false,
+                            timeout: 9999999,
+                            acceptedFiles: ".mdf,.sql,.xml,.db",
+                        };
+                        //upload db
+                        $("#Upload1").dropzone({
+                            url: "/Home/Upload/?id=1&type=" + SourcedbType,
+                            success: function (file, response) {
+                                if (response == true)
+                                    ReturnInfo($("#Upload1").parent().find(".panel"), response);
+                                else
+                                    $('#myModal').modal('show');
+
+                            }
+                        });
+
+                    });
+
                     $('#btn-connectToMySql-remote').click(function () {
                         $("#connectTo-source-div").empty();
                         $("#connectTo-source-div").append(connectToRemote('ipSource',
@@ -317,7 +360,7 @@
                     });
                     break;
 
-                case "sqlServer":
+                case "SQLServer":
                     $("#chooseConnect-source-div").empty();
                     $("#chooseConnect-source-div").append(chooseSQL_DB("backToChooseSource",
                         "btn-connectToSql-file", "btn-connectToSql-remote"));
@@ -338,7 +381,7 @@
                         };
                         //upload db
                         $("#Upload1").dropzone({
-                            url: "/Home/Upload/?id=1",
+                            url: "/Home/Upload/?id=1&type=" + SourcedbType,
                             success: function (file, response) {
                                 if (response == true)
                                     ReturnInfo($("#Upload1").parent().find(".panel"), response);
@@ -407,9 +450,36 @@
                 case "mySql":
                     $("#chooseConnect-target-div").empty();
                     $("#chooseConnect-target-div").append(chooseMySQL_DB("backToChooseTarget",
-                        "btn-connectToMySql-remote-target"));
+                        "btn-connectToMySql-remote-target", "btn-connectToMySql-file-target"));
                     $(".containerChooseTarget").addClass("inactiveDiv");
                     backToChooseSourceDB_Target();
+
+                    $('#btn-connectToMySql-file-target').click(function () {
+                        $("#connectTo-target-div").empty();
+                        $("#connectTo-target-div").append(connectToFile("Drop2", "Upload2", 2,
+                            "backToChooseConnectTarget"));
+                        backToChooseConnect_Target();
+                        $("#chooseConnect-target-div").addClass("inactiveDiv");
+
+                        Dropzone.options.Upload2 = {
+                            uploadMultiple: false,
+                            timeout: 9999999,
+                            acceptedFiles: ".mdf,.sql,.xml,.db",
+                        };
+                        //upload file
+                        $("#Upload2").dropzone({
+                            url: "/Home/Upload/?id=2&type=" + TargetdbType,
+                            success: function (file, response) {
+                                if (response == true)
+                                    ReturnInfo($("#Upload2").parent().find(".panel"), response);
+                                else
+                                    $('#myModal').modal('show');
+
+                            }
+                        });
+
+                    });
+
                     $('#btn-connectToMySql-remote-target').click(function () {
                         $("#connectTo-target-div").empty();
                         $("#connectTo-target-div").append(connectToRemote('ipTarget',
@@ -439,7 +509,7 @@
                         };
                         //upload file
                             $("#Upload2").dropzone({
-                                url: "/Home/Upload/?id=2" ,
+                                url: "/Home/Upload/?id=2&type=" + TargetdbType,
                                 success: function (file, response) {
                                     if (response == true)
                                         ReturnInfo($("#Upload2").parent().find(".panel"), response);
