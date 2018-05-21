@@ -221,6 +221,32 @@
             "</div>" + "<hr class='custom-hr'/>";
         return _chooseMySQL_DB;
     }
+    //generate button choose SqlLite database
+    function chooseSqlLite_DB(IDbackToChoose, IDbtn_connectToSqlLite_file) {
+        var _chooseSqlLite_DB = "<hr class='custom-hr'/>" + "<div class='containerConnect container-fluid'>" +
+            "<button type='button' class='btn btn-block btn-File-Remote' id=" + IDbtn_connectToSqlLite_file +
+            ">Connect to File</button>" +
+            "</div>" +
+            "<div class='containerConnect container-fluid  text-center'>" +
+            "<div class='wrapper-btn'>" +
+            " <button id=" + IDbackToChoose + " class='btn-back' type='submit'>Back!</button>" +
+            "</div>" +
+            "</div>" + "<hr class='custom-hr'/>";
+        return _chooseSqlLite_DB;
+    }
+    //generate button choose PostgreSQL database
+    function choosePostgreSQL_DB(IDbackToChoose, IDbtn_connectToPostgreSQL_file) {
+        var _choosePostgreSQL_DB = "<hr class='custom-hr'/>" + "<div class='containerConnect container-fluid'>" +
+            "<button type='button' class='btn btn-block btn-File-Remote' id=" + IDbtn_connectToPostgreSQL_file +
+            ">Connect to File</button>" +
+            "</div>" +
+            "<div class='containerConnect container-fluid  text-center'>" +
+            "<div class='wrapper-btn'>" +
+            " <button id=" + IDbackToChoose + " class='btn-back' type='submit'>Back!</button>" +
+            "</div>" +
+            "</div>" + "<hr class='custom-hr'/>";
+        return _choosePostgreSQL_DB;
+    }
     //connect to file function
     function connectToFile(ID_my_dropzon_div, ID_my_dropzon, IdUpload, backToChooseConnect) {
         var _connectToFile = "<hr class='custom-hr'/>" +
