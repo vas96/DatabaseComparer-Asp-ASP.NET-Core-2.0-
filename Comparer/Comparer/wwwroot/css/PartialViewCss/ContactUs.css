@@ -1,4 +1,5 @@
 ﻿#map {
+    /* ReSharper disable once InvalidValue */
     height: 33vmax;
     width: 100%;
 }
@@ -59,16 +60,21 @@
 
 #map-down {
     position: absolute;
+    /* ReSharper disable once InvalidValue */
     margin-top: 30.6vmax;
     z-index: 99;
     height: auto;
     width: auto;
     background-color: white;
     color: #40739e;
+    /* ReSharper disable once InvalidValue */
     width: 2vmax;
+    /* ReSharper disable once InvalidValue */
     height: 2vmax;
     line-height: 1.33;
+    /* ReSharper disable once InvalidValue */
     border-radius: 1vmax;
+    /* ReSharper disable once InvalidValue */
     padding: 0.1vmax;
     transition: all 0.5s ease;
 }
