@@ -197,7 +197,7 @@ namespace Comparer.Controllers
                         fileWriter.AutoFlush = true;
                         await file.CopyToAsync(fileStream);
                     }
-                    Database dbase = Database.InitializeType(file);
+                    Database dbase = Database.InitializeType(type);
                     var a = dbase.ConnectToFile(path);
                     dbase.FileName = Path.GetFileNameWithoutExtension(file.FileName);
                     switch (id)

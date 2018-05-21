@@ -20,46 +20,46 @@
 
     <div class="tab-content">
         <div id="home" class="tab-pane fade in active">
-            <table class="table table-condensed">
-                <thead>
-                    <tr>
-                        <th class="text-center"><input type="checkbox" id="checkAllFirstDatabase" checked /><span id="checkAllFirstDatabaseText">Uncheck all</span></th>
-                        @for (int i = 0; i < @Model.FirstDatabase.SelectedColumns.Count; i++)
+                <table class="table table-condensed">
+                    <thead>
+                        <tr>
+                            <th class="text-center"><input type="checkbox" id="checkAllFirstDatabase" checked /><span id="checkAllFirstDatabaseText">Uncheck all</span></th>
+                            @for (int i = 0; i < @Model.FirstDatabase.SelectedColumns.Count; i++)
+                            {
+                                <th>  @Model.FirstDatabase.SelectedColumns[i].Name  </th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < FirstToSecond.Count; i++)
                         {
-                            <th>  @Model.FirstDatabase.SelectedColumns[i].Name  </th>
+                            List<string> temp = FirstToSecond[i].ToList();
+                            <tr>
+                                <td class="warning text-center"> <input type="checkbox" name="FirstDatabaseCheckbox" checked value="@i"></td>
+                                @for (int j = 0; j < temp.Count; j++)
+                                {
+                                    <td class="success">
+                                        @temp[j]
+                                    </td>
+                                }
+                            </tr>
                         }
-                    </tr>
-                </thead>
-                <tbody>
-                    @for (int i = 0; i < FirstToSecond.Count; i++)
-                    {
-                        List<string> temp = FirstToSecond[i].ToList();
-                        <tr>
-                            <td class="warning text-center"> <input type="checkbox" name="FirstDatabaseCheckbox" checked value="@i"></td>
-                            @for (int j = 0; j < temp.Count; j++)
-                            {
-                                <td class="success">
-                                    @temp[j]
-                                </td>
-                            }
-                        </tr>
-                    }
-                    @for (int i = 0; i < FirstToSecond_unique.Count; i++)
-                    {
-                        List<string> temp = FirstToSecond_unique[i].ToList();
-                        <tr>
-                            <td class="warning text-center"> <input type="checkbox" name="FirstDatabaseCheckboxUnique" checked value="@i"></td>
-                            @for (int j = 0; j < temp.Count; j++)
-                            {
-                                <td class="danger">
-                                    @temp[j]
-                                </td>
-                            }
-                        </tr>
-                    }
+                        @for (int i = 0; i < FirstToSecond_unique.Count; i++)
+                        {
+                            List<string> temp = FirstToSecond_unique[i].ToList();
+                            <tr>
+                                <td class="warning text-center"> <input type="checkbox" name="FirstDatabaseCheckboxUnique" checked value="@i"></td>
+                                @for (int j = 0; j < temp.Count; j++)
+                                {
+                                    <td class="danger">
+                                        @temp[j]
+                                    </td>
+                                }
+                            </tr>
+                        }
 
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
             <div class="container-fluid">
                 <div class="panel-group">
                     <div class="panel panel-default">
@@ -71,7 +71,7 @@
                         <div id="collapse1" class="panel-collapse collapse">
                             <div class="panel-body">
                                 <pre>
-                                    <code readonly class="language-sql" id="Res1">
+                                <code readonly class="language-sql" id="Res1">
                                     </code>
                                 </pre>
                                 @*  <textarea readonly class="form-control disabled" rows="3" id="Res1"></textarea>*@
@@ -223,6 +223,11 @@
 </div>
 <button type="button" class="btn-lg btn-block btn-default-custom" id="Back" style="margin-bottom:1.5vmin;">STEP BACK</button>
 
+<div class="container-fluid">
+    <button class="btn btn-primary btn-block" onclick="download('myfilename.html', 'text/plain')">Generate</button>
+    <a href="" id="a">click here to download your file</a>
+</div>
+
 <script type="text/javascript">
     $(function () {
         var buttons = $(".ColapsableScript").toArray();
@@ -313,6 +318,272 @@
             (checked === true) ? $("#checkAllFromTwoText").text('Uncheck all') : $("#checkAllFromTwoText").text('Check all');
         });
     });
+
+    $(function () {
+
+        var stringArray =  @Html.Raw(Json.Serialize(@Model.ComparingResult[1]));
+        var stringArray2 =  @Html.Raw(Json.Serialize(@Model.FirstDatabase.SelectedColumns));
+
+        });
+
+
+    var node = document.getElementById("firstTable");
+
+    var htmlContent = node.innerHTML;
+        alert(htmlContent);
+
+    var lol = '<div class="containerData">' +
+        '        <style>' +
+        '            table {' +
+        '                border-collapse: collapse;' +
+        '                border-spacing: 0;' +
+        '                width: 100%;' +
+        '                border: 0.vmin solid #ddd;' +
+        '            }' +
+        '' +
+        '            th,' +
+        '            td {' +
+        '                text-align: left;' +
+        '                padding: 8px;' +
+        '            }' +
+        '' +
+        '            tr:nth-child(even) {' +
+        '                background-color: #40739e;' +
+        '                color: white;' +
+        '            }' +
+        '' +
+        '            #reportHeader {' +
+        '                background-color: #40739e;' +
+        '                height: 10vmin;' +
+        '                color: white;' +
+        '                display: flex;' +
+        '                justify-content: center;' +
+        '                align-items: center;' +
+        '            }' +
+        '' +
+        '            .diffBtn {' +
+        '                color: #40739e;' +
+        '                background-color: white;' +
+        '                border: solid #40739e 0.3vmin;' +
+        '                transition: all 0.5s ease;' +
+        '                font-size: 1.5em;' +
+        '                border: none;' +
+        '            }' +
+        '' +
+        '            .diffBtn:hover {' +
+        '                background: #40739e;' +
+        '                color: #ddd;' +
+        '            }' +
+        '' +
+        '            .diffDiv {' +
+        '                margin-left: 1.5vmin;' +
+        '                padding: 0.5vmin;' +
+        '                border-bottom: #40739e 1vmax solid;' +
+        '            }' +
+        '' +
+        '           ' +
+        '        </style>' +
+        '' +
+        '        <div id="reportHeader">' +
+        '            <h2>Comparing results</h2>' +
+        '        </div>' +
+        '        <div class="diffDiv">' +
+        '            <h2>Differences in first database table:</h2>' +
+        '            <button class="diffBtn" id="firstTableRes" onclick="ShowResFT(\'firstTableResDiv\',\'firstTableRes\')">Show result</button>' +
+        '            <button class="diffBtn" id="firstTableScript" onclick="ShowScriptFT(\'firstTableScriptDiv\',\'firstTableScript\')">Show script</button>' +
+        '            <div style="overflow-x:auto; display: none;" id="firstTableResDiv">' +
+        htmlContent +
+        '            </div>' +
+        '            <div id="firstTableScriptDiv" style="display: none">' +
+        '                <hr>' +
+        '                <pre>' +
+        '                Script' +
+        '                </pre>' +
+        '            </div>' +
+        '        </div>' +
+        '        <hr>' +
+        '        <div class="diffDiv">' +
+        '            <h2>Differences in second database table:</h2>' +
+        '            <button class="diffBtn" id="secondTableRes" onclick="ShowResFT(\'secondTableResDiv\',\'secondTableRes\')">Show results</button>' +
+        '            <button class="diffBtn" id="secondTableScript" onclick="ShowScriptFT(\'secondTableScriptDiv\',\'secondTableScript\')">Show script</button>' +
+        '            <div style="overflow-x:auto;display: none;" id="secondTableResDiv">' +
+        '                <table>' +
+        '                    <tr>' +
+        '                        <th>First Name</th>' +
+        '                        <th>Last Name</th>' +
+        '                        <th>Points</th>' +
+        '                        <th>Points</th>' +
+        '                        <th>Points</th>' +
+        '                        <th>Points</th>' +
+        '                        <th>Points</th>' +
+        '                        <th>Points</th>' +
+        '                        <th>Points</th>' +
+        '                        <th>Points</th>' +
+        '                        <th>Points</th>' +
+        '                        <th>Points</th>' +
+        '                    </tr>' +
+        '                    <tr>' +
+        '                        <td>Jill</td>' +
+        '                        <td>Smith</td>' +
+        '                        <td>50</td>' +
+        '                        <td>50</td>' +
+        '                        <td>50</td>' +
+        '                        <td>50</td>' +
+        '                        <td>50</td>' +
+        '                        <td>50</td>' +
+        '                        <td>50</td>' +
+        '                        <td>50</td>' +
+        '                        <td>50</td>' +
+        '                        <td>50</td>' +
+        '                    </tr>' +
+        '                    <tr>' +
+        '                        <td>Eve</td>' +
+        '                        <td>Jackson</td>' +
+        '                        <td>94</td>' +
+        '                        <td>94</td>' +
+        '                        <td>94</td>' +
+        '                        <td>94</td>' +
+        '                        <td>94</td>' +
+        '                        <td>94</td>' +
+        '                        <td>94</td>' +
+        '                        <td>94</td>' +
+        '                        <td>94</td>' +
+        '                        <td>94</td>' +
+        '                    </tr>' +
+        '                    <tr>' +
+        '                        <td>Adam</td>' +
+        '                        <td>Johnson</td>' +
+        '                        <td>67</td>' +
+        '                        <td>67</td>' +
+        '                        <td>67</td>' +
+        '                        <td>67</td>' +
+        '                        <td>67</td>' +
+        '                        <td>67</td>' +
+        '                        <td>67</td>' +
+        '                        <td>67</td>' +
+        '                        <td>67</td>' +
+        '                        <td>67</td>' +
+        '                    </tr>' +
+        '                </table>' +
+        '            </div>' +
+        '            <div id="secondTableScriptDiv" style="display: none">' +
+        '                <hr>' +
+        '                <pre>' +
+        '                    Script' +
+        '                    </pre>' +
+        '            </div>' +
+        '        </div>' +
+        '        <hr>' +
+        '        <div class="diffDiv">' +
+        '            <h2>Differences in first and second database tables:</h2>' +
+        '            <button class="diffBtn" id="twiceTableRes" onclick="ShowResFT(\'twiceTableResDiv\',\'twiceTableRes\')">Show results</button>' +
+        '            <button class="diffBtn" id="twiceTableScript" onclick="ShowScriptFT(\'twiceTableScriptDiv\',\'twiceTableScript\')">Show script</button>' +
+        '            <div style="overflow-x:auto; display: none " id="twiceTableResDiv">' +
+        '                <table>' +
+        '                    <tr>' +
+        '                        <th>First Name</th>' +
+        '                        <th>Last Name</th>' +
+        '                        <th>Points</th>' +
+        '                        <th>Points</th>' +
+        '                        <th>Points</th>' +
+        '                        <th>Points</th>' +
+        '                        <th>Points</th>' +
+        '                        <th>Points</th>' +
+        '                        <th>Points</th>' +
+        '                        <th>Points</th>' +
+        '                        <th>Points</th>' +
+        '                        <th>Points</th>' +
+        '                    </tr>' +
+        '                    <tr>' +
+        '                        <td>Jill</td>' +
+        '                        <td>Smith</td>' +
+        '                        <td>50</td>' +
+        '                        <td>50</td>' +
+        '                        <td>50</td>' +
+        '                        <td>50</td>' +
+        '                        <td>50</td>' +
+        '                        <td>50</td>' +
+        '                        <td>50</td>' +
+        '                        <td>50</td>' +
+        '                        <td>50</td>' +
+        '                        <td>50</td>' +
+        '                    </tr>' +
+        '                    <tr>' +
+        '                        <td>Eve</td>' +
+        '                        <td>Jackson</td>' +
+        '                        <td>94</td>' +
+        '                        <td>94</td>' +
+        '                        <td>94</td>' +
+        '                        <td>94</td>' +
+        '                        <td>94</td>' +
+        '                        <td>94</td>' +
+        '                        <td>94</td>' +
+        '                        <td>94</td>' +
+        '                        <td>94</td>' +
+        '                        <td>94</td>' +
+        '                    </tr>' +
+        '                    <tr>' +
+        '                        <td>Adam</td>' +
+        '                        <td>Johnson</td>' +
+        '                        <td>67</td>' +
+        '                        <td>67</td>' +
+        '                        <td>67</td>' +
+        '                        <td>67</td>' +
+        '                        <td>67</td>' +
+        '                        <td>67</td>' +
+        '                        <td>67</td>' +
+        '                        <td>67</td>' +
+        '                        <td>67</td>' +
+        '                        <td>67</td>' +
+        '                    </tr>' +
+        '                </table>' +
+        '            </div>' +
+        '            <div id="twiceTableScriptDiv" style="display: none">' +
+        '                <hr>' +
+        '                <pre>' +
+        '                        Script' +
+        '                        </pre>' +
+        '            </div>' +
+        '        </div>' +
+        '        <hr>' +
+        '    </div>' +
+        '    <script>' +
+        '        function ShowResFT(idDiv, idBtn) {' +
+        '            var x = document.getElementById(idDiv);' +
+        '            if (x.style.display === "none") {' +
+        '                x.style.display = "block";' +
+        '                document.getElementById(idBtn).innerText = "Hide result";' +
+        '' +
+        '            } else {' +
+        '                x.style.display = "none";' +
+        '                document.getElementById(idBtn).innerText = "Show result";' +
+        '            }' +
+        '        }' +
+        '' +
+        '        function ShowScriptFT(idDiv, idBtn) {' +
+        '            var x = document.getElementById(idDiv);' +
+        '            if (x.style.display === "none") {' +
+        '                x.style.display = "block";' +
+        '                document.getElementById(idBtn).innerText = "Hide script";' +
+        '' +
+        '            } else {' +
+        '                x.style.display = "none";' +
+        '                document.getElementById(idBtn).innerText = "Show script";' +
+        '            }' +
+        '        }' +
+        '    <' + '/script>';
+
+
+
+    function download(name, type) {
+        var a = document.getElementById("a");
+        var file = new Blob([lol], {
+            type: type
+        });
+        a.href = URL.createObjectURL(file);
+        a.download = name;
+    }
+
 
 </script>
 

@@ -1,17 +1,77 @@
 ﻿@{
     ViewData["Title"] = "Contact";
 }
-<h2>@ViewData["Title"]</h2>
-<h3>@ViewData["Message"]</h3>
+<link rel="stylesheet" href="~/css/PartialViewCss/ContactUs.css" />
+<h1 style="padding-top:70px">Contact Us</h1>
+<hr>
+<div class="container-fluid text-center" id="map-container">
+    <button class="btn" id="map-down">
+        <span class="glyphicon glyphicon-chevron-down"></span>
+    </button>
+    <div id="map">
+    </div>
+</div>
+<div class="container-fluid text-center container-contactUs">
+    <h1>Let's Connect</h1>
+    <h3 style=" text-decoration: underline;
+text-decoration-color: #40739e;">
+        We'd love to hear your feedback or proposition.
+    </h3>
+    <div class="container-fluid  container-contactUs">
+        <form>
+            <div class="col-md-5 col-md-offset-1 col-sm-12 col-sm-offset-0 input-div">
+                <div class="input-group">
+                    <span class="input-group-addon">
+                        <i class="glyphicon glyphicon-user"></i>
+                    </span>
+                    <input id="user-name" type="text" class="form-control" name="user-name" placeholder="Your name">
+                </div>
+            </div>
 
-<address>
-    One Microsoft Way<br />
-    Redmond, WA 98052-6399<br />
-    <abbr title="Phone">P:</abbr>
-    425.555.0100
-</address>
+            <div class="col-md-5  col-sm-12 col-sm-offset-0 input-div">
+                <div class="input-group">
+                    <span class="input-group-addon">
+                        <i class="glyphicon glyphicon-envelope"></i>
+                    </span>
+                    <input id="email" type="text" class="form-control" name="email" placeholder="Email">
+                </div>
+            </div>
+    </div>
+    <div class="col-md-10 col-md-offset-1 input-div">
+        <div class="input-group">
+            <span class="input-group-addon">Text</span>
+            <input id="msg" type="text" class="form-control" name="msg" placeholder="Additional Info">
+        </div>
+    </div>
+    <div class="col-md-10 col-md-offset-1 input-div">
+        <button class="btn btn-block btn-lg btn-default-custom">Send</button>
+    </div>
+    </form>
+</div>
 
-<address>
-    <strong>Support:</strong> <a href="mailto:Support@example.com">Support@example.com</a><br />
-    <strong>Marketing:</strong> <a href="mailto:Marketing@example.com">Marketing@example.com</a>
-</address>
+
+<script>
+    function myMap() {
+        var mapCanvas = document.getElementById("map");
+        var mapOptions = {
+            center: new google.maps.LatLng(49.85, 24.0166666667),
+            zoom: 10,
+            panControl: false,
+            scrollwheel: false,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+        var map = new google.maps.Map(mapCanvas, mapOptions);
+    }
+    $(".input-div input").focus(function () {
+        $(this).prev().removeClass("focus-input").addClass("focusout-input");
+    });
+    $(".input-div input").focusout(function () {
+        $(this).prev().removeClass("focusout-input").addClass("focus-input");
+    });
+    $("#map-down").click(function () {
+        $('html, body').animate({
+            scrollTop: ($('#email').offset().top)
+        }, 1500);
+    });
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCXqnx9SnE5lW-4bD1HNcnMaQyAWBl5EaU&callback=myMap"></script>

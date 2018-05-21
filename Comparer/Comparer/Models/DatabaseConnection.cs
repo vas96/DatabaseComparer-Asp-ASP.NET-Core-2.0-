@@ -371,10 +371,12 @@ namespace DbComparer
             {
                 case "MySQL":
                     { return new MySqlDataBaseConnector() { DbType = Database_Type.MySql }; break; }
-                case "SQL Server":
+                case "SQLServer":
                     { return new SqlDataBaseConnector() { DbType = Database_Type.SqlServer }; ; break; }
                 case "SQLite":
                     { return new SQLiteDatabaseConnector() { DbType = Database_Type.SQLite }; ; break; }
+                case "PostgreSQL":
+                    { return new PostGreSQLDatabaseConnector() { DbType = Database_Type.PostgreSQL }; ; break; }
                 default:
                     {
                         return null;
@@ -393,6 +395,7 @@ namespace DbComparer
             Oracle,
             SQLite,
             XML,
+            PostgreSQL,
             NONE
         }
 

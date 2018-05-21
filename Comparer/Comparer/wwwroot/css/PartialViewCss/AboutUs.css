@@ -1,0 +1,131 @@
+﻿#aboutUs-title {
+    text-decoration: underline;
+    text-decoration-color: #40739e;
+    text-decoration-style: solid;
+}
+
+.aboutUs-inform {
+    height: 13vmin;
+    background-color: #40739e;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: underline;
+    text-decoration-color: #40739e;
+}
+
+    .aboutUs-inform h1 {
+        color: white;
+        font-size: 10vmin;
+        margin: 0.5vmin;
+    }
+
+#aboutUs-title-txt {
+    font-size: 3.0vmin;
+    list-style-type: none;
+}
+
+.no-margin-padding {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+#containers-aboutUs {
+    border-bottom: 0.4vmin solid #40739e;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+.person-img {
+    height: 45vmin;
+    background-color: rgb(255, 255, 255);
+}
+
+    .person-img img {
+        width: 39vmin;
+        height: auto;
+        margin-top: 3vmin;
+        margin-bottom: 3vmin;
+    }
+
+.person-txt {
+    height: 40vmin;
+    background-color: rgb(255, 255, 255);
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+    .person-txt li {
+        /* text-decoration: underline; */
+        text-decoration-color: #038387;
+        /* text-decoration-style: solid; */
+        font-size: 2.2vmin;
+        list-style-type: none;
+    }
+
+    .person-txt ul {
+        margin-left: 0;
+        padding-left: 0;
+    }
+
+.ul-left-border {
+    border-left: #40739e solid 0.3vmin;
+    padding-left: 1vmin !important;
+}
+
+.ul-right-border {
+    border-right: #40739e solid 0.3vmin;
+    padding-right: 1vmin !important;
+}
+
+.person-social {
+    height: 5vmin;
+    background-color: rgb(255, 255, 255);
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    /* border-top: 0.4vmin solid #038387; */
+    transition: all 1s ease-out;
+}
+
+    .person-social img {
+        height: 4vmin;
+        margin: 0.5vmin;
+    }
+
+        .person-social img:hover {
+            transition: all 2s ease-out;
+            transform: scale(1.1);
+            height: 4vmin;
+            margin: 0.5vmin;
+            border-bottom: solid #038387 0.2vmin;
+        }
+.aboutUs-ideas{
+    height:5vmin;
+    font-size:4vmin;
+    padding-bottom:0.5vmin;
+    padding-top:0.5vmin;
+}
+
+    .aboutUs-ideas a {
+        color: #40739e;
+        z-index: 1;
+    }
+
+@media screen and (max-width: 992px) {
+    .person-img, #aboutUs-title-img {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center;
+    }
+    .aboutUs-ideas {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center;
+    }
+}
