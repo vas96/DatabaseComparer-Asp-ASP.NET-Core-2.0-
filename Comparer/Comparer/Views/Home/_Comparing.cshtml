@@ -20,46 +20,46 @@
 
     <div class="tab-content">
         <div id="home" class="tab-pane fade in active">
-                <table class="table table-condensed">
-                    <thead>
+            <table class="table table-condensed">
+                <thead>
+                    <tr>
+                        <th class="text-center"><input type="checkbox" id="checkAllFirstDatabase" checked /><span id="checkAllFirstDatabaseText">Uncheck all</span></th>
+                        @for (int i = 0; i < @Model.FirstDatabase.SelectedColumns.Count; i++)
+                        {
+                            <th>  @Model.FirstDatabase.SelectedColumns[i].Name  </th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < FirstToSecond.Count; i++)
+                    {
+                        List<string> temp = FirstToSecond[i].ToList();
                         <tr>
-                            <th class="text-center"><input type="checkbox" id="checkAllFirstDatabase" checked /><span id="checkAllFirstDatabaseText">Uncheck all</span></th>
-                            @for (int i = 0; i < @Model.FirstDatabase.SelectedColumns.Count; i++)
+                            <td class="warning text-center"> <input type="checkbox" name="FirstDatabaseCheckbox" checked value="@i"></td>
+                            @for (int j = 0; j < temp.Count; j++)
                             {
-                                <th>  @Model.FirstDatabase.SelectedColumns[i].Name  </th>
+                                <td class="success">
+                                    @temp[j]
+                                </td>
                             }
                         </tr>
-                    </thead>
-                    <tbody>
-                        @for (int i = 0; i < FirstToSecond.Count; i++)
-                        {
-                            List<string> temp = FirstToSecond[i].ToList();
-                            <tr>
-                                <td class="warning text-center"> <input type="checkbox" name="FirstDatabaseCheckbox" checked value="@i"></td>
-                                @for (int j = 0; j < temp.Count; j++)
-                                {
-                                    <td class="success">
-                                        @temp[j]
-                                    </td>
-                                }
-                            </tr>
-                        }
-                        @for (int i = 0; i < FirstToSecond_unique.Count; i++)
-                        {
-                            List<string> temp = FirstToSecond_unique[i].ToList();
-                            <tr>
-                                <td class="warning text-center"> <input type="checkbox" name="FirstDatabaseCheckboxUnique" checked value="@i"></td>
-                                @for (int j = 0; j < temp.Count; j++)
-                                {
-                                    <td class="danger">
-                                        @temp[j]
-                                    </td>
-                                }
-                            </tr>
-                        }
+                    }
+                    @for (int i = 0; i < FirstToSecond_unique.Count; i++)
+                    {
+                        List<string> temp = FirstToSecond_unique[i].ToList();
+                        <tr>
+                            <td class="warning text-center"> <input type="checkbox" name="FirstDatabaseCheckboxUnique" checked value="@i"></td>
+                            @for (int j = 0; j < temp.Count; j++)
+                            {
+                                <td class="danger">
+                                    @temp[j]
+                                </td>
+                            }
+                        </tr>
+                    }
 
-                    </tbody>
-                </table>
+                </tbody>
+            </table>
             <div class="container-fluid">
                 <div class="panel-group">
                     <div class="panel panel-default">
@@ -148,7 +148,7 @@
                                 link for download db <a href="#">Updated DB</a>
                             </div>
                         </div>
-                    </div>
+                    </div>-
                 </div>
             </div>
         </div>
@@ -326,12 +326,6 @@
 
         });
 
-
-    var node = document.getElementById("firstTable");
-
-    var htmlContent = node.innerHTML;
-        alert(htmlContent);
-
     var lol = '<div class="containerData">' +
         '        <style>' +
         '            table {' +
@@ -392,7 +386,7 @@
         '            <button class="diffBtn" id="firstTableRes" onclick="ShowResFT(\'firstTableResDiv\',\'firstTableRes\')">Show result</button>' +
         '            <button class="diffBtn" id="firstTableScript" onclick="ShowScriptFT(\'firstTableScriptDiv\',\'firstTableScript\')">Show script</button>' +
         '            <div style="overflow-x:auto; display: none;" id="firstTableResDiv">' +
-        htmlContent +
+
         '            </div>' +
         '            <div id="firstTableScriptDiv" style="display: none">' +
         '                <hr>' +
