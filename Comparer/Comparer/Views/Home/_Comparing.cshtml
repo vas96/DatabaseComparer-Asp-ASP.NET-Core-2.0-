@@ -319,14 +319,112 @@
         });
     });
 
-    $(function () {
 
-        var firstToSecondJson =  @Html.Raw(Json.Serialize(FirstToSecond));
-        console.log(FirstToSecond);
-        alert(firstToSecondJson);
-        });
+    ///creating string for first table report
+    var firstToSecondJson =  @Html.Raw(Json.Serialize(FirstToSecond));
+    var firstToSecondUniqueJson =  @Html.Raw(Json.Serialize(FirstToSecond_unique));
+    var firstToSecondJsonAddInf =  @Html.Raw(Json.Serialize(@Model.FirstDatabase.SelectedColumns));
+    var firstTableStr = '';
+    var firstTableLen = Object.keys(firstToSecondJson).length;
+    var firstTableUniqueLen = Object.keys(firstToSecondUniqueJson).length;
+    firstTableStr += '<table>';
+    firstTableStr += '<thead>';
+    firstTableStr += '<tr>';
+     for (var i = 0; i <  @Html.Raw(Json.Serialize(@Model.FirstDatabase.SelectedColumns.Count)); i++)
+                        {
+         firstTableStr += '<th>';
+         firstTableStr += firstToSecondJsonAddInf[i].name; 
+         firstTableStr += '</th >';
+    }
+    firstTableStr += '</tr>';
+    firstTableStr += '<thead>';
+        for (var i = 0; i < firstTableLen; i++) {
+            firstTableStr += '<tr>';
+            for (var j = 0; j < firstToSecondJson[i].length; j++) {
+                firstTableStr += '<th>';
+                firstTableStr += firstToSecondJson[i][j];
+                firstTableStr += '</th>';
+            }
+            firstTableStr += '</tr>';
+    }
+    for (var i = 0; i < firstTableUniqueLen; i++) {
+        firstTableStr += '<tr>';
+        for (var j = 0; j < firstToSecondUniqueJson[i].length; j++) {
+            firstTableStr += '<th>';
+            firstTableStr += firstToSecondUniqueJson[i][j];
+            firstTableStr += '</th>';
+        }
+        firstTableStr += '</tr>';
+    }
+        firstTableStr += '</table>';
 
-    var lol = '<div class="containerData">' +
+
+    
+    ///creating string for second table report
+    var secondToFirstJson =  @Html.Raw(Json.Serialize(SecondToFirst));
+    var secondToFirstUniqueJson =  @Html.Raw(Json.Serialize(SecondToFirst_unique));
+    var secondTofirstJsonAddInf =  @Html.Raw(Json.Serialize(@Model.SecondDatabase.SelectedColumns));
+    var secondTableStr = '';
+    var secondTableLen = Object.keys(secondToFirstJson).length;
+    var secondTableUniqueLen = Object.keys(secondToFirstUniqueJson).length;
+    secondTableStr += '<table>';
+    secondTableStr += '<thead>';
+    secondTableStr += '<tr>';
+     for (var i = 0; i <  @Html.Raw(Json.Serialize(@Model.SecondDatabase.SelectedColumns.Count)); i++)
+                        {
+         secondTableStr += '<th>';
+         secondTableStr += secondTofirstJsonAddInf[i].name; 
+         secondTableStr += '</th >';
+    }
+    secondTableStr += '</tr>';
+    secondTableStr += '<thead>';
+    for (var i = 0; i < secondTableLen; i++) {
+        secondTableStr += '<tr>';
+        for (var j = 0; j < secondToFirstJson[i].length; j++) {
+                secondTableStr += '<th>';
+            secondTableStr += secondToFirstJson[i][j];
+                secondTableStr += '</th>';
+            }
+            secondTableStr += '</tr>';
+    }
+    for (var i = 0; i < secondTableUniqueLen; i++) {
+        secondTableStr += '<tr>';
+        for (var j = 0; j < secondToFirstUniqueJson[i].length; j++) {
+            secondTableStr += '<th>';
+            secondTableStr += secondToFirstUniqueJson[i][j];
+            secondTableStr += '</th>';
+        }
+        secondTableStr += '</tr>';
+    }
+    secondTableStr += '</table>';
+
+
+    ///creating string for third table report
+    var thirdTableStr = '';
+    thirdTableStr += '<table>';
+    thirdTableStr += '<thead>';
+    thirdTableStr += '<tr>';
+     for (var i = 0; i <  @Html.Raw(Json.Serialize(@Model.SecondDatabase.SelectedColumns.Count)); i++)
+                        {
+         thirdTableStr += '<th>';
+         thirdTableStr += firstToSecondJsonAddInf[i].name +" / " + secondTofirstJsonAddInf[i].name; 
+         thirdTableStr += '</th >';
+    }
+    thirdTableStr += '</tr>';
+    thirdTableStr += '<thead>';
+    for (var i = 0; i < secondTableLen; i++) {
+        thirdTableStr += '<tr>';
+        for (var j = 0; j < secondToFirstJson[i].length; j++) {
+            thirdTableStr += '<th>';
+            thirdTableStr += firstToSecondJson[i][j]+ " / " +secondToFirstJson[i][j];
+            thirdTableStr += '</th>';
+            }
+        thirdTableStr += '</tr>';
+    }
+    
+    thirdTableStr += '</table>';
+
+    var smallHtmlReport = '<div class="containerData">' +
         '        <style>' +
         '            table {' +
         '                border-collapse: collapse;' +
@@ -346,6 +444,10 @@
         '                color: white;' +
         '            }' +
         '' +
+        '            tbody {' +
+        '                background-color: #dfe6e9;' +
+        '                color: white;' +
+        '            }' +
         '            #reportHeader {' +
         '                background-color: #40739e;' +
         '                height: 10vmin;' +
@@ -385,8 +487,7 @@
         '            <h2>Differences in first database table:</h2>' +
         '            <button class="diffBtn" id="firstTableRes" onclick="ShowResFT(\'firstTableResDiv\',\'firstTableRes\')">Show result</button>' +
         '            <button class="diffBtn" id="firstTableScript" onclick="ShowScriptFT(\'firstTableScriptDiv\',\'firstTableScript\')">Show script</button>' +
-        '            <div style="overflow-x:auto; display: none;" id="firstTableResDiv">' +
-
+        '            <div style="overflow-x:auto; display: none;" id="firstTableResDiv">' + firstTableStr +
         '            </div>' +
         '            <div id="firstTableScriptDiv" style="display: none">' +
         '                <hr>' +
@@ -401,64 +502,7 @@
         '            <button class="diffBtn" id="secondTableRes" onclick="ShowResFT(\'secondTableResDiv\',\'secondTableRes\')">Show results</button>' +
         '            <button class="diffBtn" id="secondTableScript" onclick="ShowScriptFT(\'secondTableScriptDiv\',\'secondTableScript\')">Show script</button>' +
         '            <div style="overflow-x:auto;display: none;" id="secondTableResDiv">' +
-        '                <table>' +
-        '                    <tr>' +
-        '                        <th>First Name</th>' +
-        '                        <th>Last Name</th>' +
-        '                        <th>Points</th>' +
-        '                        <th>Points</th>' +
-        '                        <th>Points</th>' +
-        '                        <th>Points</th>' +
-        '                        <th>Points</th>' +
-        '                        <th>Points</th>' +
-        '                        <th>Points</th>' +
-        '                        <th>Points</th>' +
-        '                        <th>Points</th>' +
-        '                        <th>Points</th>' +
-        '                    </tr>' +
-        '                    <tr>' +
-        '                        <td>Jill</td>' +
-        '                        <td>Smith</td>' +
-        '                        <td>50</td>' +
-        '                        <td>50</td>' +
-        '                        <td>50</td>' +
-        '                        <td>50</td>' +
-        '                        <td>50</td>' +
-        '                        <td>50</td>' +
-        '                        <td>50</td>' +
-        '                        <td>50</td>' +
-        '                        <td>50</td>' +
-        '                        <td>50</td>' +
-        '                    </tr>' +
-        '                    <tr>' +
-        '                        <td>Eve</td>' +
-        '                        <td>Jackson</td>' +
-        '                        <td>94</td>' +
-        '                        <td>94</td>' +
-        '                        <td>94</td>' +
-        '                        <td>94</td>' +
-        '                        <td>94</td>' +
-        '                        <td>94</td>' +
-        '                        <td>94</td>' +
-        '                        <td>94</td>' +
-        '                        <td>94</td>' +
-        '                        <td>94</td>' +
-        '                    </tr>' +
-        '                    <tr>' +
-        '                        <td>Adam</td>' +
-        '                        <td>Johnson</td>' +
-        '                        <td>67</td>' +
-        '                        <td>67</td>' +
-        '                        <td>67</td>' +
-        '                        <td>67</td>' +
-        '                        <td>67</td>' +
-        '                        <td>67</td>' +
-        '                        <td>67</td>' +
-        '                        <td>67</td>' +
-        '                        <td>67</td>' +
-        '                        <td>67</td>' +
-        '                    </tr>' +
-        '                </table>' +
+                     secondTableStr +
         '            </div>' +
         '            <div id="secondTableScriptDiv" style="display: none">' +
         '                <hr>' +
@@ -472,65 +516,8 @@
         '            <h2>Differences in first and second database tables:</h2>' +
         '            <button class="diffBtn" id="twiceTableRes" onclick="ShowResFT(\'twiceTableResDiv\',\'twiceTableRes\')">Show results</button>' +
         '            <button class="diffBtn" id="twiceTableScript" onclick="ShowScriptFT(\'twiceTableScriptDiv\',\'twiceTableScript\')">Show script</button>' +
-        '            <div style="overflow-x:auto; display: none " id="twiceTableResDiv">' +
-        '                <table>' +
-        '                    <tr>' +
-        '                        <th>First Name</th>' +
-        '                        <th>Last Name</th>' +
-        '                        <th>Points</th>' +
-        '                        <th>Points</th>' +
-        '                        <th>Points</th>' +
-        '                        <th>Points</th>' +
-        '                        <th>Points</th>' +
-        '                        <th>Points</th>' +
-        '                        <th>Points</th>' +
-        '                        <th>Points</th>' +
-        '                        <th>Points</th>' +
-        '                        <th>Points</th>' +
-        '                    </tr>' +
-        '                    <tr>' +
-        '                        <td>Jill</td>' +
-        '                        <td>Smith</td>' +
-        '                        <td>50</td>' +
-        '                        <td>50</td>' +
-        '                        <td>50</td>' +
-        '                        <td>50</td>' +
-        '                        <td>50</td>' +
-        '                        <td>50</td>' +
-        '                        <td>50</td>' +
-        '                        <td>50</td>' +
-        '                        <td>50</td>' +
-        '                        <td>50</td>' +
-        '                    </tr>' +
-        '                    <tr>' +
-        '                        <td>Eve</td>' +
-        '                        <td>Jackson</td>' +
-        '                        <td>94</td>' +
-        '                        <td>94</td>' +
-        '                        <td>94</td>' +
-        '                        <td>94</td>' +
-        '                        <td>94</td>' +
-        '                        <td>94</td>' +
-        '                        <td>94</td>' +
-        '                        <td>94</td>' +
-        '                        <td>94</td>' +
-        '                        <td>94</td>' +
-        '                    </tr>' +
-        '                    <tr>' +
-        '                        <td>Adam</td>' +
-        '                        <td>Johnson</td>' +
-        '                        <td>67</td>' +
-        '                        <td>67</td>' +
-        '                        <td>67</td>' +
-        '                        <td>67</td>' +
-        '                        <td>67</td>' +
-        '                        <td>67</td>' +
-        '                        <td>67</td>' +
-        '                        <td>67</td>' +
-        '                        <td>67</td>' +
-        '                        <td>67</td>' +
-        '                    </tr>' +
-        '                </table>' +
+        '            <div style="overflow-x:auto; display: none " id="twiceTableResDiv">' + thirdTableStr +
+                   
         '            </div>' +
         '            <div id="twiceTableScriptDiv" style="display: none">' +
         '                <hr>' +
@@ -567,18 +554,16 @@
         '        }' +
         '    <' + '/script>';
 
-
-
     function download(name, type) {
         var a = document.getElementById("a");
-        var file = new Blob([lol], {
+        var file = new Blob([smallHtmlReport], {
             type: type
         });
         a.href = URL.createObjectURL(file);
         a.download = name;
     }
-
-
 </script>
+
+
 
 
