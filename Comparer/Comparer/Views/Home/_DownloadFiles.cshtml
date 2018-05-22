@@ -316,15 +316,12 @@
 
     function findRemoteConVal(classDB) {
         var items = document.getElementsByClassName(classDB);
-        var sourceStr = '';
+        var JSon = {};
         for (var i = 0; i < items.length; i++) {
-            var temp = {
-                [items[i].id]: items[i].value,
-            }
+                JSon[items[i].id] = items[i].value,
             console.log(items[i].value);
-            sourceStr += JSON.stringify(temp);
         }
-        return sourceStr;
+        return JSon;
     }
 
     //source db generate front-end
@@ -405,14 +402,15 @@
                         $("#RemoteConnSource").click(function () {
 
                             var returnVal = findRemoteConVal('sourceDB');
-                            returnVal += JSON.stringify({ "from": "source" });
-                            returnVal += JSON.stringify({ "dbType": SourcedbType });
+                            returnVal["from"] = "source";
+                            returnVal["dbType"] = SourcedbType;
+                            returnVal = JSON.stringify(returnVal);
                             console.log(returnVal);
                             $.ajax({
                                 async: true,
                                 url: "RemoteAccess",
                                 type: "POST",
-                                data: { val: returnVal },
+                                data: { data: returnVal },
                                 success: function (response) {                                 
                                     if (response == true)
                                         ReturnInfo($(".sourceDB").first().parent().parent().find(".panel"), response);
@@ -463,14 +461,15 @@
                         $("#RemoteConnSource").click(function () {
 
                             var returnVal = findRemoteConVal('sourceDB');
-                            returnVal += JSON.stringify({ "from": "source" });
-                            returnVal += JSON.stringify({ "dbType": SourcedbType });
+                            returnVal["from"] = "source";
+                            returnVal["dbType"] = SourcedbType;
+                            returnVal = JSON.stringify(returnVal);
                             console.log(returnVal);
                             $.ajax({
                                 async: true,
                                 url: "RemoteAccess",
                                 type: "POST",
-                                data: { val: returnVal },
+                                data: { data: returnVal },
                                 success: function (response) {
                                     if (response == true)
                                         ReturnInfo($(".sourceDB").first().parent().parent().find(".panel"), response);
@@ -628,14 +627,15 @@
                         $("#RemoteConnTarget").click(function () {
 
                             var returnVal = findRemoteConVal('targetDB');
-                            returnVal += JSON.stringify({ "from": "target" });
-                            returnVal += JSON.stringify({ "dbType": TargetdbType });
+                            returnVal["from"] = "target";
+                            returnVal["dbType"] = TargetdbType;
+                            returnVal = JSON.stringify(returnVal);
                             console.log(returnVal);
                             $.ajax({
                                 async: true,
                                 url: "RemoteAccess",
                                 type: "POST",
-                                data: { val: returnVal },
+                                data: { data: returnVal },
                                 success: function (response) {
                                     if (response == true)
                                         ReturnInfo($(".targetDB").first().parent().parent().find(".panel"), response);
@@ -683,14 +683,15 @@
                         $("#RemoteConnTarget").click(function () {
 
                             var returnVal = findRemoteConVal('targetDB');
-                            returnVal += JSON.stringify({ "from": "target" });
-                            returnVal += JSON.stringify({ "dbType": TargetdbType });
+                            returnVal["from"] = "target";
+                            returnVal["dbType"] = TargetdbType;
+                            returnVal = JSON.stringify(returnVal);
                             console.log(returnVal);
                             $.ajax({
                                 async: true,
                                 url: "RemoteAccess",
                                 type: "POST",
-                                data: { val: returnVal },
+                                data: { data: returnVal },
                                 success: function (response) {
                                     if (response == true)
                                         ReturnInfo($(".targetDB").first().parent().parent().find(".panel"), response);

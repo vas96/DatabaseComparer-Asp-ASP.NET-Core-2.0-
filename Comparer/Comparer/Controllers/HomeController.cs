@@ -239,18 +239,19 @@ namespace Comparer.Controllers
 
 
         [HttpPost]
-        public bool RemoteAccess(int? id,string type,string data)
+        public bool RemoteAccess(string data)
         {
             try
             {
                 string[] DbWithoutRemote = new string[] {"SQLite","PostgreSQL"};
-                if (DbWithoutRemote.Contains(type)) return false;
-                Database dbase = Database.InitializeType(type);
                 var values = JsonConvert.DeserializeObject<Dictionary<string, string>>(data);
+                Database dbase = Database.InitializeType(values["dbType"]);
+                if (DbWithoutRemote.Contains(values["dbType"])) return false;
+                string id = values["from"];
                 var a = dbase.RemoteConnection(values);
                 switch (id)
                 {
-                    case 1:
+                    case "source":
                     {
                         if (db.FirstDatabase != null)
                         {
@@ -259,7 +260,7 @@ namespace Comparer.Controllers
                         db.FirstDatabase = dbase;
                         break;
                     }
-                    case 2:
+                    case "target":
                     {
                         if (db.SecondDatabase != null)
                         {
