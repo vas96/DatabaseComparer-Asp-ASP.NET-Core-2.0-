@@ -130,6 +130,17 @@
 <script src="~/js/dropzone.js"></script>
 
 <script>
+    //only numbers validation
+    function validate(evt) {
+        var theEvent = evt || window.event;
+        var key = theEvent.keyCode || theEvent.which;
+        key = String.fromCharCode(key);
+        var regex = /[0-9]|\./;
+        if (!regex.test(key)) {
+            theEvent.returnValue = false;
+            if (theEvent.preventDefault) theEvent.preventDefault();
+        }
+    }
     //transition to next view
     $("#GoTableInfo").click(function () {
         waitingDialog.show();
@@ -264,31 +275,56 @@
         return _connectToFile;
     }
     //remote connection function
-    function connectToRemote(Id_ip, Id_port, Id_name, Id_btnBack) {
+    function connectToRemote(classDb, Id_btnNext, Id_btnBack) {
         var _connectToRemote = "<hr class='custom-hr'/>" + "<div class='containerConnect container-fluid'>" +
-            " <form>" +
+            " <div>" +
             "<div class='form-group'>" +
-            "<label for=" + Id_ip + ">IP address</label>" +
-            "<input type='number' class='form-control' id= " + Id_ip + " placeholder='Enter IP'>" +
+            "<label for='userName'>User name</label>" +
+            "<input type='text' class='form-control "+classDb+" ' id='user' placeholder='Enter User name'>" +
             "</div>" +
             "<div class='form-group'>" +
-            "<label for=" + Id_port + ">Port</label>" +
-            "<input type='number' class='form-control' id=" + Id_port + " placeholder='Enter Port'>" +
+            "<label for= 'password'>User password</label>" +
+            "<input type='password' class='form-control " + classDb +"' id = 'pass'  placeholder='Enter db password'>" +
             "</div>" +
             "<div class='form-group'>" +
-            "<label for=" + Id_name + ">Database name</label>" +
-            "<input type='text' class='form-control' id=" + Id_name + " placeholder='Enter db name'>" +
+            "<label for= 'db'>Database name</label>" +
+            "<input type='password' class='form-control " + classDb + "' id = 'db'  placeholder='Enter db name'>" +
             "</div>" +
-            "<button type='submit' class='btn btn-block btn-primary'>Next</button>" +
+            "<div class='form-group'>" +
+            "<label for='ip'>IP address</label>" +
+            "<input type='text' class='form-control " + classDb +"' id='ip' placeholder='Enter IP' onkeypress='validate(event)'>" +
+            "</div>" +
+            "<div class='form-group'>" +
+            "<label for='Id_port'>Port</label>" +
+            "<input type='text' class='form-control " + classDb +"' id='port' placeholder='Enter Port' onkeypress='validate(event)'>" +
+            "</div>" +
+            "<button class='btn btn-block btn-primary'id ="+Id_btnNext+">Next</button>" +
             "<small id='emailHelp' class='form-text text-muted'>We'll never share your credits with anyone else.</small>" +
-            "</form>" +
+            "</div>" +
             "<div class='containerConnect container-fluid  text-center'>" +
             "<div class='wrapper-btn'>" +
             " <button id=" + Id_btnBack + " class='btn-back' type='submit'>Back!</button>" +
             "</div>" +
             "</div>" +
-            "</div>" + "<hr class='custom-hr'/>";
+            "</div>" +
+            '            <div class="panel" style="visibility:hidden"' +
+            "                <div class='panel-heading'></div>" +
+            "            </div>" +
+            "<hr class='custom-hr'/>";
         return _connectToRemote;
+    }
+
+    function findRemoteConVal(classDB) {
+        var items = document.getElementsByClassName(classDB);
+        var sourceStr = '';
+        for (var i = 0; i < items.length; i++) {
+            var temp = {
+                [items[i].id]: items[i].value,
+            }
+            console.log(items[i].value);
+            sourceStr += JSON.stringify(temp);
+        }
+        return sourceStr;
     }
 
     //source db generate front-end
@@ -363,11 +399,30 @@
                     });
 
                     $('#btn-connectToMySql-remote').click(function () {
-                        $("#connectTo-source-div").empty().append(connectToRemote('ipSource',
-                            'portSource', 'nameSource', 'backToChooseConnect'));
+                        $("#connectTo-source-div").empty().append(connectToRemote('sourceDB', 'RemoteConnSource', 'backToChooseConnect'));
                         $("#chooseConnect-source-div").addClass("inactiveDiv");
                         backToChooseConnect_Source();
+                        $("#RemoteConnSource").click(function () {
+
+                            var returnVal = findRemoteConVal('sourceDB');
+                            returnVal += JSON.stringify({ "from": "source" });
+                            returnVal += JSON.stringify({ "dbType": SourcedbType });
+                            console.log(returnVal);
+                            $.ajax({
+                                async: true,
+                                url: "RemoteAccess",
+                                type: "POST",
+                                data: { val: returnVal },
+                                success: function (response) {                                 
+                                    if (response == true)
+                                        ReturnInfo($(".sourceDB").first().parent().parent().find(".panel"), response);
+                                    else
+                                        $('#myModal').modal('show');                            
+                                }
+                            });
+                        });
                     });
+
                     break;
 
                 case "SQLServer":
@@ -402,10 +457,28 @@
                     });
                    
                     $('#btn-connectToSql-remote').click(function () {
-                        $("#connectTo-source-div").empty().append(connectToRemote('ipSourceSQL',
-                            'portSourceSQL', 'nameSourceSQL', 'backToChooseConnect'));
+                        $("#connectTo-source-div").empty().append(connectToRemote('sourceDB','RemoteConnSource','backToChooseConnect'));
                         $("#chooseConnect-source-div").addClass("inactiveDiv");
                         backToChooseConnect_Source();
+                        $("#RemoteConnSource").click(function () {
+
+                            var returnVal = findRemoteConVal('sourceDB');
+                            returnVal += JSON.stringify({ "from": "source" });
+                            returnVal += JSON.stringify({ "dbType": SourcedbType });
+                            console.log(returnVal);
+                            $.ajax({
+                                async: true,
+                                url: "RemoteAccess",
+                                type: "POST",
+                                data: { val: returnVal },
+                                success: function (response) {
+                                    if (response == true)
+                                        ReturnInfo($(".sourceDB").first().parent().parent().find(".panel"), response);
+                                    else
+                                        $('#myModal').modal('show');
+                                }
+                            });
+                        });
                     });
                     break;
 
@@ -478,6 +551,7 @@
             }
         });
     });
+
     //target db genetate front-end
     $(document).ready(function (e) {
         //image with check 
@@ -545,14 +619,31 @@
 
                             }
                         });
-
                     });
 
                     $('#btn-connectToMySql-remote-target').click(function () {
-                        $("#connectTo-target-div").empty().append(connectToRemote('ipTarget',
-                            'portTarget', 'nameTarget', 'backToChooseConnectTarget'));
+                        $("#connectTo-target-div").empty().append(connectToRemote('targetDB', 'RemoteConnTarget', 'backToChooseConnectTarget'));
                         $("#chooseConnect-target-div").addClass("inactiveDiv");
                         backToChooseConnect_Target();
+                        $("#RemoteConnTarget").click(function () {
+
+                            var returnVal = findRemoteConVal('targetDB');
+                            returnVal += JSON.stringify({ "from": "target" });
+                            returnVal += JSON.stringify({ "dbType": TargetdbType });
+                            console.log(returnVal);
+                            $.ajax({
+                                async: true,
+                                url: "RemoteAccess",
+                                type: "POST",
+                                data: { val: returnVal },
+                                success: function (response) {
+                                    if (response == true)
+                                        ReturnInfo($(".targetDB").first().parent().parent().find(".panel"), response);
+                                    else
+                                        $('#myModal').modal('show');
+                                }
+                            });
+                        });
                     });
                     break;
 
@@ -585,12 +676,29 @@
                         
                     });
 
-                    $('#btn-connectToSql-remote-target').click(function () {
-                        $("#connectTo-target-div").empty().append(connectToRemote('ipTargetSQL',
-                            'portTargetSQL', 'nameTargetSQL',
-                            'backToChooseConnectTarget'));
-                        $("#chooseConnect-target-div").addClass("inactiveDiv");
-                        backToChooseConnect_Target();
+                    $('#btn-connectToSql-remote-target').click(function () {                      
+                            $("#connectTo-target-div").empty().append(connectToRemote('targetDB', 'RemoteConnTarget', 'backToChooseConnectTarget'));
+                            $("#chooseConnect-target-div").addClass("inactiveDiv");
+                            backToChooseConnect_Target();
+                        $("#RemoteConnTarget").click(function () {
+
+                            var returnVal = findRemoteConVal('targetDB');
+                            returnVal += JSON.stringify({ "from": "target" });
+                            returnVal += JSON.stringify({ "dbType": TargetdbType });
+                            console.log(returnVal);
+                            $.ajax({
+                                async: true,
+                                url: "RemoteAccess",
+                                type: "POST",
+                                data: { val: returnVal },
+                                success: function (response) {
+                                    if (response == true)
+                                        ReturnInfo($(".targetDB").first().parent().parent().find(".panel"), response);
+                                    else
+                                        $('#myModal').modal('show');
+                                }
+                            });
+                        });
                     });
                     break;
 
