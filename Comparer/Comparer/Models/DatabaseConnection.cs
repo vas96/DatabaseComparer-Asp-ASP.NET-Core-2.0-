@@ -58,7 +58,7 @@ namespace DbComparer
         /// <param name="port">Порт</param>
         /// <param name="db">Назва БД (за потребою)</param>
         /// <returns></returns>
-        bool RemoteConnection(string ip, string port, string db = null);
+        bool RemoteConnection(Dictionary<string, string> dictionary);
 
         /// <summary>
         /// Повертає список баз даних на сервері
@@ -195,7 +195,7 @@ namespace DbComparer
         public abstract bool ConnectToServer(int port = Int32.MinValue);
         public abstract bool ConnectToDatabase(string databaseName, int port = Int32.MinValue);
         public abstract bool ConnectToFile(string location = null);
-        public abstract bool RemoteConnection(string ip, string port, string db = null);
+        public abstract bool RemoteConnection(Dictionary<string, string> dictionary);
         public abstract List<string> GetDatabasesList();
         public abstract List<string> GetTablesList(string database = null);
         public abstract DataTable GetTableInfo(string tableName = null);
@@ -495,8 +495,9 @@ namespace DbComparer
         {
             try
             {
-                DataConnectionString =
-                    "Data Source=.; Integrated Security=True; Initial Catalog =" + databaseName + ";";
+
+                if (databaseName != null)
+                    DataConnectionString += "Initial Catalog =" + databaseName + ";"; ;
                 connection = new SqlConnection(DataConnectionString);
                 connection.Open();
             }
@@ -527,14 +528,15 @@ namespace DbComparer
             }
         }
 
-        public override bool RemoteConnection(string ip, string port, string db = null)
+        public override bool RemoteConnection(Dictionary<string, string> param)
         {
             try
             {
                 DataConnectionString =
-                    $"Data Source={ip}\\SQLEXPRESS,{port};Network Library=DBMSSOCN;User ID=sa;Password=password";
+                    $"Data Source={param["ip"]},{param["port"]};Network Library=DBMSSOCN;User ID={param["user"]};Password={param["pass"]};Connect Timeout=30;";
                 connection = new SqlConnection(DataConnectionString);
                 connection.Open();
+                ConType = Connection_Type.Remote;
                 return true;
             }
             catch (Exception e)
@@ -547,20 +549,16 @@ namespace DbComparer
         {
             List<string> list = new List<string>();
 
-            using (connection)
+            using (SqlCommand cmd = new SqlCommand("SELECT name from sys.databases", (connection as SqlConnection)))
             {
-                using (SqlCommand cmd = new SqlCommand("SELECT name from sys.databases", (connection as SqlConnection)))
+                using (IDataReader dr = cmd.ExecuteReader())
                 {
-                    using (IDataReader dr = cmd.ExecuteReader())
+                    while (dr.Read())
                     {
-                        while (dr.Read())
-                        {
-                            list.Add(dr[0].ToString());
-                        }
+                        list.Add(dr[0].ToString());
                     }
                 }
             }
-
             return list;
         }
 
@@ -689,11 +687,10 @@ namespace DbComparer
         {
             try
             {
-                if (port == Int32.MinValue)
-                    DataConnectionString = "SERVER=localhost;DATABASE=" + databaseName +
-                         ";UID=root;PASSWORD='user';Pooling=True";
-                else
-                    DataConnectionString = $"SERVER=localhost;Port={port};DATABASE={databaseName};UID='root';PASSWORD='user';Pooling=True";
+                if (databaseName != null)
+                    DataConnectionString += $"DATABASE={databaseName};";
+                if (port != Int32.MinValue)
+                    DataConnectionString += $"Port={port};";
                 connection = new MySqlConnection(DataConnectionString);
                 connection.Open();
                 return true;
@@ -766,17 +763,30 @@ namespace DbComparer
             }
         }
 
-        public override bool RemoteConnection(string ip, string port, string db = null)
+        public override bool RemoteConnection(Dictionary<string, string> param)
         {
-            throw new NotImplementedException();
+            try
+            {
+                DataConnectionString =
+                                       $"Server={param["ip"]};" +
+                                       $"User = {param["user"]}; Password = {param["pass"]};";
+                connection = new MySqlConnection(DataConnectionString);
+                connection.Open();
+                ConType = Connection_Type.Remote;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return false;
+            }
+
+            return true;
         }
 
         public override List<string> GetDatabasesList()
         {
             try
             {
-                if (connection == null || connection.State != ConnectionState.Open)
-                    ConnectToServer();
                 MySqlCommand command = (connection as MySqlConnection).CreateCommand();
                 command.CommandText = "SHOW DATABASES;";
                 using (MySqlDataReader Reader = command.ExecuteReader())
@@ -900,6 +910,7 @@ namespace DbComparer
         }
     }
 
+
     public class SQLiteDatabaseConnector : Database
     {
         public SQLiteDatabaseConnector() : base()
@@ -932,7 +943,7 @@ namespace DbComparer
             }
         }
 
-        public override bool RemoteConnection(string ip, string port, string db = null)
+        public override bool RemoteConnection(Dictionary<string, string> dictionary)
         {
             throw new NotImplementedException();
         }
@@ -1110,16 +1121,7 @@ namespace DbComparer
 
         }
 
-        public static string EncodeParameterArgument(string original)
-        {
-            if (string.IsNullOrEmpty(original))
-                return original;
-            string s = Regex.Replace(original, @"(\\*)" + "\"", @"$1$1\" + "\"");
-            s = "\"" + Regex.Replace(s, @"(\\+)$", @"$1$1") + "\"";
-            return s;
-        }
-
-        public override bool RemoteConnection(string ip, string port, string db = null)
+        public override bool RemoteConnection(Dictionary<string, string> dictionary)
         {
             throw new NotImplementedException();
         }

@@ -133,7 +133,7 @@ namespace UnitTestProject1
                 var db = new PostGreSQLDatabaseConnector();
                 db.ConnectToServer(5432);
                 var list = db.GetDatabasesList();
-                db.ConnectToDatabase("sakila",5432);
+                db.ConnectToDatabase("sakila", 5432);
                 var list2 = db.GetTablesList("sakila");
                 var list3 = db.GetTableInfo(list2[0]);
                 var list4 = db.Read($"Select * from {list2[0]}", db.FullStringArraySelector);
@@ -145,6 +145,62 @@ namespace UnitTestProject1
                 Assert.Fail();
             }
 
+        }
+
+        [TestMethod]
+        public void RemoteMySQL()
+        {
+            Database db = new MySqlDataBaseConnector();
+            Dictionary<string, string> param = new Dictionary<string, string>();
+            param.Add("port", "3306");
+            param.Add("ip", "192.168.0.100");
+            param.Add("user", "Vasyl");
+            param.Add("pass", "12345");
+            var a = db.RemoteConnection(param);
+            var l1 = db.GetDatabasesList();
+            var l2 = db.GetTablesList(l1[3]);
+            Assert.IsNotNull(l2);
+            Func<IDataRecord, string[]> select = delegate (IDataRecord s)
+            {
+                return new string[] { s[0].ToString(), s[1].ToString() };
+            };
+            var l3 = db.GetTableInfo(l2[0]);
+            Assert.IsNotNull(l3);
+            sw = new Stopwatch();
+            sw.Start();
+            var l4 = db.Read("Select * from " + l2[0], select);
+            sw.Stop();
+            var time = sw.Elapsed;
+            Assert.IsNotNull(l4);
+            db.CloseConnection();
+        }
+
+        [TestMethod]
+        public void RemoteSQLServer()
+        {
+            SqlDataBaseConnector db = new SqlDataBaseConnector();
+            Dictionary<string, string> param = new Dictionary<string, string>();
+            param.Add("port", "1433");
+            param.Add("ip", "192.168.0.100");
+            param.Add("user", "Vasyl");
+            param.Add("pass", "12345");
+            var a = db.RemoteConnection(param);
+            var l1 = db.GetDatabasesList();
+            var l2 = db.GetTablesList(l1[3]);
+            Assert.IsNotNull(l2);
+            Func<IDataRecord, string[]> select = delegate (IDataRecord s)
+            {
+                return new string[] { s[0].ToString(), s[1].ToString() };
+            };
+            var l3 = db.GetTableInfo(l2[0]);
+            Assert.IsNotNull(l3);
+            sw = new Stopwatch();
+            sw.Start();
+            var l4 = db.Read("Select * from " + l2[0], select);
+            sw.Stop();
+            var time = sw.Elapsed;
+            Assert.IsNotNull(l4);
+            db.CloseConnection();
         }
     }
 }
