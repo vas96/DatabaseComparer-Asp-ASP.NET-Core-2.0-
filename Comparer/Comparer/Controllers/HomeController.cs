@@ -50,8 +50,12 @@ namespace Comparer.Controllers
 
         public IActionResult About()
         {
+            db.CloseConnection();
             ViewData["Message"] = "Your application description page.";
-            return View();
+            var db1 = db.FirstDatabase;
+            db1 = new SqlDataBaseConnector();
+            db1.ConnectToDatabase("Repair");
+            return View(db1);
         }
 
         public IActionResult Contact()
@@ -149,8 +153,9 @@ namespace Comparer.Controllers
             if (db.FirstDatabase.SelectedColumns.Count !=
                 db.SecondDatabase.SelectedColumns.Count)
                 return PartialView("_Error");
-            var readed = db.ReadDataFromDb();
+            if (db.ReadDataFromDb())
             db.ComparingResult = db.CompareFullData();
+            else return PartialView("_Error");
             return PartialView("_Comparing", db);
         }
 
@@ -192,7 +197,7 @@ namespace Comparer.Controllers
                         fileWriter.AutoFlush = true;
                         await file.CopyToAsync(fileStream);
                     }
-                    Database dbase = Database.InitializeType(file);
+                    Database dbase = Database.InitializeType(type);
                     var a = dbase.ConnectToFile(path);
                     dbase.FileName = Path.GetFileNameWithoutExtension(file.FileName);
                     switch (id)
