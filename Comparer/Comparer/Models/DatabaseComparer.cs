@@ -36,7 +36,7 @@ namespace DBTest
         /// <summary>
         /// Статистика про порівняні рядки
         /// </summary>
-        public Statistick[] AdditionalInfo;
+        public Statistic AdditionalInfo;
 
         /// <summary>
         /// Ініціалізація полів
@@ -48,9 +48,7 @@ namespace DBTest
             FirstDatabase = null;
             SecondDatabase = null;
             Folder = null;
-            AdditionalInfo = new Statistick[2];
-            AdditionalInfo[0] = new Statistick();
-            AdditionalInfo[1] = new Statistick();
+            AdditionalInfo = new Statistic();
             ComparingResult = new Dictionary<int, List<string[]>>();
         }
 
@@ -119,7 +117,7 @@ namespace DBTest
 
         public void DeleteDirectory(string path, bool recursive)
         {
-            if (path == null) path = Folder; 
+            if (path == null) path = Folder;
             if (recursive)
             {
                 var subfolders = Directory.GetDirectories(path);
@@ -151,7 +149,7 @@ namespace DBTest
         }
 
         /// <summary>
-        /// Читає дані з 1-ї і 2-ї БД
+        /// Читає дані з 1-ї і 2-ї БД.
         /// Запити генеруються на основі SelectedColumns
         /// </summary>
         /// <returns></returns>
@@ -159,19 +157,25 @@ namespace DBTest
         {
             try
             {
+                Stopwatch sw = new Stopwatch();
                 var FirstTask = new Task(() =>
                 {
                     FirstData = FirstDatabase.Read(FirstDatabase.BuildSelectQuery(),
                         FirstDatabase.FullStringArraySelector);
+                    AdditionalInfo.Rows[1] = FirstData.Count;
                 });
+                sw.Start();
                 FirstTask.Start();
                 var SecondTask = new Task(() =>
                 {
                     SecondData = SecondDatabase.Read(SecondDatabase.BuildSelectQuery(),
                         SecondDatabase.FullStringArraySelector);
+                    AdditionalInfo.Rows[2] = SecondData.Count;
                 });
                 SecondTask.Start();
                 Task.WaitAll(FirstTask, SecondTask);
+                sw.Stop();
+                AdditionalInfo.SelectTime = sw.Elapsed;
             }
             catch (Exception ex)
             {
@@ -194,6 +198,7 @@ namespace DBTest
             try
             {
                 List<string[]> col1 = null, col2 = null;
+                Stopwatch sw = new Stopwatch();
                 var FirstTask = new Task(() =>
                 {
                     col1 = FirstData.Except(SecondData, new StringArrayComparer()).ToList();
@@ -210,6 +215,7 @@ namespace DBTest
                         col1 = temp.ToList();
                     }
                 });
+                sw.Start();
                 FirstTask.Start();
                 var SecondTask = new Task(() =>
                 {
@@ -232,6 +238,15 @@ namespace DBTest
                 Result.Add(1, col1);
                 Result.Add(2, col2);
                 FindUniqueDifferencess(ref Result);
+                sw.Stop();
+                AdditionalInfo.CompareTime = sw.Elapsed;
+                AdditionalInfo.Different[1] = AdditionalInfo.Different[2] = Result[1].Count;
+                AdditionalInfo.Unique[1] = Result[3].Count;
+                AdditionalInfo.Unique[2] = Result[4].Count;
+                AdditionalInfo.Same[1] =
+                    AdditionalInfo.Rows[1] - (AdditionalInfo.Different[1] + AdditionalInfo.Unique[1]);
+                AdditionalInfo.Same[2] =
+                    AdditionalInfo.Rows[2] - (AdditionalInfo.Different[2] + AdditionalInfo.Unique[2]);
             }
             catch (Exception ex)
             {
@@ -250,7 +265,7 @@ namespace DBTest
         {
             var list1 = FirstDatabase.TableColumns.Where(item => item.ISKey).Select(i => i.Position).ToArray();
             var list2 = SecondDatabase.TableColumns.Where(item => item.ISKey).Select(i => i.Position).ToArray();
-            if (list1.Length!=list2.Length)
+            if (list1.Length != list2.Length)
             {
                 items.Add(3, new List<string[]>());
                 items.Add(4, new List<string[]>());
@@ -328,10 +343,6 @@ namespace DBTest
                 Task.WaitAll(task1, task2);
                 Result.Add(1, col1);
                 Result.Add(2, col2);
-                AdditionalInfo[0].SameInColumn.Add(SelectedColumn, Result[0].Count() - Result[0].Count());
-                AdditionalInfo[0].DifferentInColumn.Add(SelectedColumn, Result[0].Count());
-                AdditionalInfo[1].SameInColumn.Add(SelectedColumn, Result[1].Count() - Result[1].Count());
-                AdditionalInfo[1].DifferentInColumn.Add(SelectedColumn, Result[1].Count());
             }
             catch (Exception e)
             {
@@ -351,16 +362,12 @@ namespace DBTest
                 {
                     int[] col = new[] { FirstDatabase.TableColumns[SelectedColumn].Position };
                     col1 = FirstData.KeyPlusDataSelection(col).ToList();
-                    AdditionalInfo[0].SameInColumn.Add(SelectedColumn, Result[0].Count() - Result[0].Count());
-                    AdditionalInfo[0].DifferentInColumn.Add(SelectedColumn, Result[0].Count());
                 });
                 task1.Start();
                 var task2 = new Task(() =>
                 {
                     int[] col = new[] { SecondDatabase.TableColumns[SelectedColumn].Position };
                     col2 = SecondData.KeyPlusDataSelection(col).ToList();
-                    AdditionalInfo[1].SameInColumn.Add(SelectedColumn, Result[1].Count() - Result[1].Count());
-                    AdditionalInfo[1].DifferentInColumn.Add(SelectedColumn, Result[1].Count());
                 });
                 task2.Start();
                 Task.WaitAll(task1, task2);
@@ -379,21 +386,43 @@ namespace DBTest
     /// <summary>
     /// Для статистики пошуку
     /// </summary>
-    public class Statistick
+    public class Statistic
     {
         /// <summary>
-        /// Одинакових колонок
+        /// Одинакових записів
         /// </summary>
-        public Dictionary<int, int> SameInColumn;
-        /// <summary>
-        /// Відмінних колонок
-        /// </summary>
-        public Dictionary<int, int> DifferentInColumn;
+        public Dictionary<int, int> Same;
 
-        public Statistick()
+        /// <summary>
+        /// Відмінних записів
+        /// </summary>
+        public Dictionary<int, int> Different;
+
+        /// <summary>
+        /// Унікальних записів
+        /// </summary>
+        public Dictionary<int, int> Unique;
+
+        /// <summary>
+        /// Загалом рядків
+        /// </summary>
+        public Dictionary<int, int> Rows;
+
+        /// <summary>
+        /// Час порівняння
+        /// </summary>
+        public TimeSpan CompareTime;
+
+        /// <summary>
+        /// Час вибірки
+        /// </summary>
+        public TimeSpan SelectTime;
+
+        public Statistic()
         {
-            SameInColumn = new Dictionary<int, int>();
-            DifferentInColumn = new Dictionary<int, int>();
+            Same = new Dictionary<int, int>();
+            Different = new Dictionary<int, int>();
+            Unique = new Dictionary<int, int>();
         }
     }
 
@@ -444,22 +473,6 @@ namespace DBTest
         {
             return (from item in arr1 select (from col in arr2 select item.ToArray()[col]).ToArray()).ToList();
         }
-        /*
-         На всяк випадок 
-         Юзабельний код
-         Update - виявилося, шо ет не сильно юзабельний код
-         Але най ше побуде - мож пригодиться
-            System.Data.DataView view = new System.Data.DataView(dtMaths);
-            System.Data.DataTable selected = view.ToTable("Selected", false, dtMaths.Columns[0].ToString());
-            IEnumerable<DataRow> l1 = dtMaths.EnumerateRows();
-            IEnumerable<DataRow> l2 = dtEnglish.EnumerateRows();
-
-            var dtOnlyMaths = (from cust in l1
-                    select cust.ItemArray[1])
-                .Except
-                (from emp in l2
-                    select emp.ItemArray[1]);
-         */
     }
 
     class StringArrayComparer : IEqualityComparer<string[]>

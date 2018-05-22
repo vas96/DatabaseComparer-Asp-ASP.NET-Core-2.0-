@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Net.Http.Headers;
 using Microsoft.EntityFrameworkCore.Internal;
+using Newtonsoft.Json;
 
 namespace Comparer.Controllers
 {
@@ -238,13 +239,45 @@ namespace Comparer.Controllers
 
 
         [HttpPost]
-        public bool RemoteAccess(string[] attr)
+        public bool RemoteAccess(int? id,string type,string data)
         {
-            string DbType = attr[0];
-            string IP = attr[0];
-            string Port = attr[0];
-            Database dbase = Database.InitializeType(DbType);
-            return false;
+            try
+            {
+                Database dbase = Database.InitializeType(type);
+                var values = JsonConvert.DeserializeObject<Dictionary<string, string>>(data);
+                var a = dbase.RemoteConnection(values);
+                switch (id)
+                {
+                    case 1:
+                    {
+                        if (db.FirstDatabase != null)
+                        {
+                            db.FirstDatabase.CloseConnection();
+                        }
+                        db.FirstDatabase = dbase;
+                        break;
+                    }
+                    case 2:
+                    {
+                        if (db.SecondDatabase != null)
+                        {
+                            db.SecondDatabase.CloseConnection();
+                        }
+                        db.SecondDatabase = dbase;
+                        break;
+                    }
+                    default: return false;
+                }
+                if (dbase.connection.State != ConnectionState.Open)
+                    return false;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return false;
+            }
+
+            return true;
         }
 
         public void CleanNotUsedData(int i)
