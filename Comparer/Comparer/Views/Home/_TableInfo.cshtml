@@ -1,4 +1,5 @@
 ﻿@using System.Data
+@using DbComparer
 @model DBTest.DatabaseComparer
 
 
@@ -25,9 +26,9 @@
                         <div class="box-source td table-chooser-item">
                             <p class="TbName"> <strong> @nameTB </strong></p>
                             <br />
-                            @foreach (DataRow typesTB in Model.FirstDatabase.GetTableInfo(nameTB).Rows)
+                            @foreach (Database.Column typesTB in Model.FirstDatabase.TableColumns)
                             {
-                                <p class="TbType"> @typesTB.ItemArray[3]</p>
+                                <p class="TbType"> @typesTB.Name</p>
                             }
                             <input class="tableRadio" type="radio" name="FirstDatabaseCH" value=@nameTB checked="checked">
                         </div>
@@ -55,9 +56,9 @@
                         <div class="box-target td table-chooser-item">
                             <p class="TbName"> <strong> @nameTB </strong></p>
                             <br />
-                            @foreach (DataRow typesTB in Model.SecondDatabase.GetTableInfo(nameTB).Rows)
+                            @foreach (Database.Column typesTB in Model.SecondDatabase.TableColumns)
                             {
-                                <p class="TbType"> @typesTB.ItemArray[3]</p>
+                                <p class="TbType"> @typesTB.Name</p>
                             }
                             <input class="tableRadio" type="radio" name="SecondDatabaseCH" value=@nameTB checked="checked">
                         </div>
