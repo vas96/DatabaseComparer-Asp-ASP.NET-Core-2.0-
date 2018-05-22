@@ -452,6 +452,16 @@ namespace DbComparer
                             else ISKey = true;
                             break;
                         }
+                    case Database_Type.PostgreSQL:
+                        {
+                            var array = dr.ItemArray;
+                            Position = Int32.Parse(array[4].ToString()) - 1; //Позиція
+                            Name = array[3].ToString(); //Імя
+                            Type = array[7].ToString(); //Тип
+                            Length = array[8].ToString(); //Довжина
+                            ISKey = false; //Ключ
+                            break;
+                        }
                 }
             }
         }
@@ -1008,6 +1018,12 @@ namespace DbComparer
 
     public class PostGreSQLDatabaseConnector : Database
     {
+        private string OnServerName = "";
+
+        ///IMPORTANT!!!!!!
+        string path_to_bin = @"C:\Program Files\PostgreSQL\10\bin";
+        ///IMPORTANT!!!!!!
+
         public PostGreSQLDatabaseConnector() : base()
         {
             DataConnectionString =
@@ -1049,38 +1065,40 @@ namespace DbComparer
 
         public override bool ConnectToFile(string location = null)
         {
-            ///IMPORTANT!!!!!!
-            var path_to_bin = @"C:\Program Files\PostgreSQL\10\bin";
-            ///IMPORTANT!!!!!!
             try
             {
                 var db_list = GetDatabasesList();
-                var name = "";
+                OnServerName = "";
                 for (int i = 0; i < 65536; i++)
                 {
                     if (!db_list.Contains("PostUser" + i))
                     {
-                        name = "PostUser" + i;
+                        OnServerName = "PostUser" + i;
                         break;
                     }
                 }
+                string DestinationPath = Path.GetDirectoryName(location);
+                var LocalInstance = Directory.GetParent(DestinationPath).Parent.FullName + @"\PostgreSQL\";
+                string fileName = LocalInstance + "Import.bat";
+                var file = File.ReadAllText(fileName);
+                file = file.Replace("FROM", path_to_bin);
+                file = file.Replace("IMPORT_PARAM", $"-U root {OnServerName} < {location}");
+                File.WriteAllText(DestinationPath + $"\\{OnServerName}.bat", file);
                 Process.Start(new ProcessStartInfo
                 {
                     FileName = path_to_bin + @"\createdb.exe",
-                    Arguments = $"-U root {name}",
+                    Arguments = $"-U root {OnServerName}",
                     Verb = "runas",
                     UseShellExecute = true,
                     WindowStyle = ProcessWindowStyle.Hidden
                 }).WaitForExit();
                 Process.Start(new ProcessStartInfo
                 {
-                    FileName = path_to_bin + @"\psql.exe",
-                    Arguments = $"-U root {name} < {location}",
+                    FileName = DestinationPath + $"\\{OnServerName}.bat",
                     Verb = "runas",
-                    UseShellExecute = true,
-                    WindowStyle = ProcessWindowStyle.Hidden
-                });
-                if (ConnectToDatabase(name))
+                    UseShellExecute = true
+                }).WaitForExit();
+                if (ConnectToDatabase(OnServerName))
                     ConType = Connection_Type.File;
                 else return false;
                 return true;
@@ -1090,6 +1108,15 @@ namespace DbComparer
                 return false;
             }
 
+        }
+
+        public static string EncodeParameterArgument(string original)
+        {
+            if (string.IsNullOrEmpty(original))
+                return original;
+            string s = Regex.Replace(original, @"(\\*)" + "\"", @"$1$1\" + "\"");
+            s = "\"" + Regex.Replace(s, @"(\\+)$", @"$1$1") + "\"";
+            return s;
         }
 
         public override bool RemoteConnection(string ip, string port, string db = null)
@@ -1194,6 +1221,14 @@ namespace DbComparer
         {
             if (connection != null && connection.State != ConnectionState.Closed)
             {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = path_to_bin + @"\dropdb.exe",
+                    Arguments = $"-U root {OnServerName}",
+                    Verb = "runas",
+                    UseShellExecute = true,
+                    WindowStyle = ProcessWindowStyle.Hidden
+                }).WaitForExit();
                 connection.Close();
             }
         }

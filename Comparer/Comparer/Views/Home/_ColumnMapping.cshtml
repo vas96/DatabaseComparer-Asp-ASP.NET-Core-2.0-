@@ -64,19 +64,20 @@
     var Text_Family = [
         "CHAR", "VARCHAR", "TINYTEXT", "TEXT", "BLOB", "MEDIUMTEXT",
         "MEDIUMBLOB", "LONGTEXT", "LONGBLOB", "ENUM", "SET", "NCHAR", "NVARCHAR", "NTEXT",
-        "BINARY", "VARBINARY", "IMAGE"
+        "BINARY", "VARBINARY", "IMAGE", "CHARACTER"
     ];
-    var Numeric_Family = [
-        "TINYINT", "SMALLINT", "MEDIUMINT", "INT", "BIGINT", "FLOAT", "DOUBLE", "DECIMAL",
-        "BIT", "BIGINT", "NUMERIC", "SMALLMONEY", "READ"
+    var Numeric_Family = ["TINYINT", "SMALLINT", "MEDIUMINT", "INT", "BIGINT", "FLOAT", "DOUBLE", "DECIMAL",
+        "BIT", "BIGINT", "NUMERIC", "SMALLMONEY", "REAL", "DOUBLE PRECISION", "SMALLSERIAL", "SERIAL", "BIGSERIAL"
+        , "INT2",
+        "INT4", "INT8", "SERIAL2", "SERIAL4", "SERIAL8", "FLOAT8"
     ];
-    var Date_Family = ["DATE", "DATETIME", "TIMESTAMP", "TIME", "YEAR", "DATETIME2", "SMALLDATETIME", "DATETIMEOFFSET"];
-
+    var Date_Family = ["DATE", "DATETIME", "TIMESTAMP", "TIME", "YEAR", "DATETIME2",
+        "SMALLDATETIME", "DATETIMEOFFSET", "INTERVAL", "TIMETZ", "TIMESTAMPTZ"];
     function IsTypesComparable(word1, word2) {
         word1 = word1.toUpperCase();
         word2 = word2.toUpperCase();
-        if ((Text_Family.includes(word1) && (Text_Family.includes(word2))) || 
-            (Numeric_Family.includes(word1) && (Numeric_Family.includes(word2))) || 
+        if ((Text_Family.includes(word1) && (Text_Family.includes(word2))) ||
+            (Numeric_Family.includes(word1) && (Numeric_Family.includes(word2))) ||
             (Date_Family.includes(word1) && (Date_Family.includes(word2))))
             return true;
         else return false;
@@ -95,7 +96,7 @@
             var type1, type2;
             type1 = source_list[i].cells[2].innerText;
             type2 = target_list[i].cells[2].innerText;
-            if (!IsTypesComparable(type1,type2)) {
+            if (!IsTypesComparable(type1, type2)) {
                 $(source_list[i].cells[3]).addClass("bad");
             } else {
                 $(source_list[i].cells[3]).removeClass("bad");
@@ -103,7 +104,7 @@
         }
     }
 
-    $(function() {
+    $(function () {
         ValidateTypes();
     });
     var adjustment;
@@ -146,21 +147,21 @@
     });
 
 
-    $("#GoToComparing").click(function() {
+    $("#GoToComparing").click(function () {
         var list = [];
         var array = [];
         list = $("table#target").find("tr").toArray();
-        list.forEach(function(item, i) {
+        list.forEach(function (item, i) {
             array.push(item.cells[1].innerText);
         });
         console.log(array);
         waitingDialog.show();
         $.ajax({
-            async: true, 
+            async: true,
             url: "Comparing",
             type: "POST",
             data: { array: array },
-            success: function(result) {
+            success: function (result) {
                 waitingDialog.hide();
                 $("#Partial").html(result);
             }
