@@ -321,9 +321,9 @@
 
     $(function () {
 
-        var stringArray =  @Html.Raw(Json.Serialize(@Model.ComparingResult[1]));
-        var stringArray2 =  @Html.Raw(Json.Serialize(@Model.FirstDatabase.SelectedColumns));
-
+        var firstToSecondJson =  @Html.Raw(Json.Serialize(FirstToSecond));
+        console.log(FirstToSecond);
+        alert(firstToSecondJson);
         });
 
     var lol = '<div class="containerData">' +
