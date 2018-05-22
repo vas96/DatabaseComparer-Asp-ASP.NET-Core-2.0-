@@ -243,6 +243,8 @@ namespace Comparer.Controllers
         {
             try
             {
+                string[] DbWithoutRemote = new string[] {"SQLite","PostgreSQL"};
+                if (DbWithoutRemote.Contains(type)) return false;
                 Database dbase = Database.InitializeType(type);
                 var values = JsonConvert.DeserializeObject<Dictionary<string, string>>(data);
                 var a = dbase.RemoteConnection(values);
@@ -345,7 +347,7 @@ namespace Comparer.Controllers
         }
 
         [HttpPost]
-        public JsonResult CreateScript(int id, string[] arrayN, string[] arrayU = null)
+        public JsonResult CreateScript(int id, string[] arrayN=null, string[] arrayU = null)
         {
             string[] Insert=null, Update=null;
             switch (id)
