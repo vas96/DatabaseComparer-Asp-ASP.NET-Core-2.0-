@@ -1074,16 +1074,15 @@ namespace DbComparer
                 }).WaitForExit();
                 Process.Start(new ProcessStartInfo
                 {
-                    FileName = path_to_bin + @"\pg_dump.exe",
+                    FileName = path_to_bin + @"\psql.exe",
                     Arguments = $"-U root {name} < {location}",
                     Verb = "runas",
                     UseShellExecute = true,
                     WindowStyle = ProcessWindowStyle.Hidden
-                }).WaitForExit();
-                ConnectToDatabase(name);
-                connection = new SQLiteConnection($"Data Source={location};Version=3;");
-                connection.Open();
-                ConType = Connection_Type.File;
+                });
+                if (ConnectToDatabase(name))
+                    ConType = Connection_Type.File;
+                else return false;
                 return true;
             }
             catch (Exception e)
