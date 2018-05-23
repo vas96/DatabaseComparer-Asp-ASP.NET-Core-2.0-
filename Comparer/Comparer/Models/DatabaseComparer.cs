@@ -158,11 +158,12 @@ namespace DBTest
             try
             {
                 Stopwatch sw = new Stopwatch();
+                AdditionalInfo = new Statistic();
                 var FirstTask = new Task(() =>
                 {
                     FirstData = FirstDatabase.Read(FirstDatabase.BuildSelectQuery(),
                         FirstDatabase.FullStringArraySelector);
-                    AdditionalInfo.Rows[1] = FirstData.Count;
+                    AdditionalInfo.Rows.Add(1, FirstData.Count);
                 });
                 sw.Start();
                 FirstTask.Start();
@@ -170,7 +171,7 @@ namespace DBTest
                 {
                     SecondData = SecondDatabase.Read(SecondDatabase.BuildSelectQuery(),
                         SecondDatabase.FullStringArraySelector);
-                    AdditionalInfo.Rows[2] = SecondData.Count;
+                    AdditionalInfo.Rows.Add(2, SecondData.Count);
                 });
                 SecondTask.Start();
                 Task.WaitAll(FirstTask, SecondTask);
@@ -240,13 +241,12 @@ namespace DBTest
                 FindUniqueDifferencess(ref Result);
                 sw.Stop();
                 AdditionalInfo.CompareTime = sw.Elapsed;
-                AdditionalInfo.Different[1] = AdditionalInfo.Different[2] = Result[1].Count;
-                AdditionalInfo.Unique[1] = Result[3].Count;
-                AdditionalInfo.Unique[2] = Result[4].Count;
-                AdditionalInfo.Same[1] =
-                    AdditionalInfo.Rows[1] - (AdditionalInfo.Different[1] + AdditionalInfo.Unique[1]);
-                AdditionalInfo.Same[2] =
-                    AdditionalInfo.Rows[2] - (AdditionalInfo.Different[2] + AdditionalInfo.Unique[2]);
+                AdditionalInfo.Different.Add(1, Result[1].Count);
+                AdditionalInfo.Different.Add(2, Result[2].Count);
+                AdditionalInfo.Unique.Add(1, Result[3].Count);
+                AdditionalInfo.Unique.Add(2, Result[4].Count);
+                AdditionalInfo.Same.Add(1, AdditionalInfo.Rows[1] - (AdditionalInfo.Different[1] + AdditionalInfo.Unique[1]));
+                AdditionalInfo.Same.Add(2, AdditionalInfo.Rows[2] - (AdditionalInfo.Different[2] + AdditionalInfo.Unique[2]));
             }
             catch (Exception ex)
             {
@@ -423,6 +423,9 @@ namespace DBTest
             Same = new Dictionary<int, int>();
             Different = new Dictionary<int, int>();
             Unique = new Dictionary<int, int>();
+            Rows = new Dictionary<int, int>();
+            CompareTime = new TimeSpan();
+            SelectTime = new TimeSpan();
         }
     }
 

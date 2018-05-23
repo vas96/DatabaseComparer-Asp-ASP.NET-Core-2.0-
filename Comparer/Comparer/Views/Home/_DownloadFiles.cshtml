@@ -379,7 +379,7 @@
                         Dropzone.options.Upload1 = {
                             uploadMultiple: false,
                             timeout: 9999999,
-                            acceptedFiles: ".mdf,.sql,.xml,.db",
+                            acceptedFiles: ".sql",
                         };
                         //upload db
                         $("#Upload1").dropzone({
@@ -423,7 +423,10 @@
 
                     break;
 
-                case "SQLServer":
+                case "" +
+                        "SQLServer" +
+                        "" +
+                        "":
                     $("#chooseConnect-source-div").empty().append(chooseSQL_DB("backToChooseSource",
                         "btn-connectToSql-file", "btn-connectToSql-remote"));
                     $(".containerChooseSource").addClass("inactiveDiv");
@@ -438,7 +441,7 @@
                         Dropzone.options.Upload1= {
                             uploadMultiple: false,
                             timeout: 9999999,
-                            acceptedFiles: ".mdf,.sql,.xml,.db",
+                            acceptedFiles: ".mdf",
                         };
                         //upload db
                         $("#Upload1").dropzone({
@@ -497,7 +500,7 @@
                         Dropzone.options.Upload1 = {
                             uploadMultiple: false,
                             timeout: 9999999,
-                            acceptedFiles: ".mdf,.sql,.xml,.db",
+                            acceptedFiles: ".db",
                         };
                         //upload db
                         $("#Upload1").dropzone({
@@ -528,7 +531,7 @@
                         Dropzone.options.Upload1 = {
                             uploadMultiple: false,
                             timeout: 9999999,
-                            acceptedFiles: ".mdf,.sql,.xml,.db",
+                            acceptedFiles: ".sql,.tz",
                         };
                         //upload db
                         $("#Upload1").dropzone({
@@ -605,7 +608,7 @@
                         Dropzone.options.Upload2 = {
                             uploadMultiple: false,
                             timeout: 9999999,
-                            acceptedFiles: ".mdf,.sql,.xml,.db",
+                            acceptedFiles: ".sql",
                         };
                         //upload file
                         $("#Upload2").dropzone({
@@ -661,7 +664,7 @@
                         Dropzone.options.Upload2 = {
                             uploadMultiple: false,
                             timeout: 9999999,
-                            acceptedFiles: ".mdf,.sql,.xml,.db",
+                            acceptedFiles: ".mdf",
                         };
                         //upload file
                             $("#Upload2").dropzone({
@@ -717,7 +720,7 @@
                         Dropzone.options.Upload2 = {
                             uploadMultiple: false,
                             timeout: 9999999,
-                            acceptedFiles: ".mdf,.sql,.xml,.db",
+                            acceptedFiles: ".db",
                         };
                         //upload file
                         $("#Upload2").dropzone({
@@ -747,7 +750,7 @@
                         Dropzone.options.Upload2 = {
                             uploadMultiple: false,
                             timeout: 9999999,
-                            acceptedFiles: ".mdf,.sql,.xml,.db",
+                            acceptedFiles: ".sql",
                         };
                         //upload file
                         $("#Upload2").dropzone({

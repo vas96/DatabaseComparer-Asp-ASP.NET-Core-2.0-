@@ -155,7 +155,7 @@ namespace Comparer.Controllers
                 db.SecondDatabase.SelectedColumns.Count)
                 return PartialView("_Error");
             if (db.ReadDataFromDb())
-            db.ComparingResult = db.CompareFullData();
+                db.ComparingResult = db.CompareFullData();
             else return PartialView("_Error");
             return PartialView("_Comparing", db);
         }
@@ -243,7 +243,7 @@ namespace Comparer.Controllers
         {
             try
             {
-                string[] DbWithoutRemote = new string[] {"SQLite","PostgreSQL"};
+                string[] DbWithoutRemote = new string[] { "SQLite", "PostgreSQL" };
                 var values = JsonConvert.DeserializeObject<Dictionary<string, string>>(data);
                 Database dbase = Database.InitializeType(values["dbType"]);
                 if (DbWithoutRemote.Contains(values["dbType"])) return false;
@@ -252,23 +252,23 @@ namespace Comparer.Controllers
                 switch (id)
                 {
                     case "source":
-                    {
-                        if (db.FirstDatabase != null)
                         {
-                            db.FirstDatabase.CloseConnection();
+                            if (db.FirstDatabase != null)
+                            {
+                                db.FirstDatabase.CloseConnection();
+                            }
+                            db.FirstDatabase = dbase;
+                            break;
                         }
-                        db.FirstDatabase = dbase;
-                        break;
-                    }
                     case "target":
-                    {
-                        if (db.SecondDatabase != null)
                         {
-                            db.SecondDatabase.CloseConnection();
+                            if (db.SecondDatabase != null)
+                            {
+                                db.SecondDatabase.CloseConnection();
+                            }
+                            db.SecondDatabase = dbase;
+                            break;
                         }
-                        db.SecondDatabase = dbase;
-                        break;
-                    }
                     default: return false;
                 }
                 if (dbase.connection.State != ConnectionState.Open)
@@ -309,7 +309,7 @@ namespace Comparer.Controllers
                     }
                 case 4:
                     {
-                        db.ComparingResult.Clear();
+                        db.ComparingResult = null;
                         db.FirstData = null;
                         db.SecondData = null;
                         db.AdditionalInfo = null;
@@ -348,9 +348,9 @@ namespace Comparer.Controllers
         }
 
         [HttpPost]
-        public JsonResult CreateScript(int id, string[] arrayN=null, string[] arrayU = null)
+        public JsonResult CreateScript(int id, string[] arrayN = null, string[] arrayU = null)
         {
-            string[] Insert=null, Update=null;
+            string[] Insert = null, Update = null;
             switch (id)
             {
                 case 1:
@@ -373,7 +373,7 @@ namespace Comparer.Controllers
                     }
             }
 
-            var ForReturn = new {Insert = Insert.Join("\n"), Update = Update.Join("\n")};
+            var ForReturn = new { Insert = Insert.Join("\n"), Update = Update.Join("\n") };
             return Json(ForReturn);
         }
         #endregion
