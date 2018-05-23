@@ -190,7 +190,7 @@
         //});
     });
 
-    // button baack for previos view
+    // button baack for previous view
     $("#Back").click(function () {
         waitingDialog.show();
         $.ajax({
@@ -271,7 +271,6 @@
             "<div class='wrapper-btn'>" +
             " <button id=" + backToChooseConnect + " class='btn-back' type='submit'>Back!</button>" +
             "</div>" +"</div>" + "<hr class='custom-hr'/>";
-
         return _connectToFile;
     }
     //remote connection function
@@ -313,16 +312,14 @@
             "<hr class='custom-hr'/>";
         return _connectToRemote;
     }
-
+    //add remote connection credits to Json
     function findRemoteConVal(classDB) {
         var items = document.getElementsByClassName(classDB);
-        var sourceStr = '';
+        var sourceStr = {};
         for (var i = 0; i < items.length; i++) {
-            var temp = {
-                [items[i].id]: items[i].value,
-            }
-            console.log(items[i].value);
-            sourceStr += JSON.stringify(temp);
+            
+            sourceStr[items[i].id] =  items[i].value;
+            
         }
         return sourceStr;
     }
@@ -366,6 +363,7 @@
             var SourcedbType = "";
             SourcedbType = $("input[name=dbCheck]:checked").val();
             switch (SourcedbType) {
+                //choose mySql
                 case "MySQL":
                     $("#chooseConnect-source-div").empty().append(chooseMySQL_DB("backToChooseSource",
                         "btn-connectToMySql-remote", "btn-connectToMySql-file"));
@@ -392,32 +390,31 @@
                                     ReturnInfo($("#Upload1").parent().find(".panel"), response);
                                 else
                                     $('#myModal').modal('show');
-
                             }
                         });
 
                     });
-
+                    //generate remote connection to MySql
                     $('#btn-connectToMySql-remote').click(function () {
                         $("#connectTo-source-div").empty().append(connectToRemote('sourceDB', 'RemoteConnSource', 'backToChooseConnect'));
                         $("#chooseConnect-source-div").addClass("inactiveDiv");
                         backToChooseConnect_Source();
                         $("#RemoteConnSource").click(function () {
-
+                            //json data for remote
                             var returnVal = findRemoteConVal('sourceDB');
-                            returnVal += JSON.stringify({ "from": "source" });
-                            returnVal += JSON.stringify({ "dbType": SourcedbType });
-                            console.log(returnVal);
+                            returnVal["from"] = "source";
+                            returnVal["dbType"] = SourcedbType;
+                            console.log(JSON.stringify(returnVal));
                             $.ajax({
                                 async: true,
                                 url: "RemoteAccess",
                                 type: "POST",
-                                data: { val: returnVal },
-                                success: function (response) {                                 
+                                data: { val: JSON.stringify(returnVal) },
+                                success: function (response) {
                                     if (response == true)
                                         ReturnInfo($(".sourceDB").first().parent().parent().find(".panel"), response);
                                     else
-                                        $('#myModal').modal('show');                            
+                                        $('#myModal').modal('show');
                                 }
                             });
                         });
@@ -461,16 +458,15 @@
                         $("#chooseConnect-source-div").addClass("inactiveDiv");
                         backToChooseConnect_Source();
                         $("#RemoteConnSource").click(function () {
-
                             var returnVal = findRemoteConVal('sourceDB');
-                            returnVal += JSON.stringify({ "from": "source" });
-                            returnVal += JSON.stringify({ "dbType": SourcedbType });
-                            console.log(returnVal);
+                            returnVal["from"] = "source";
+                            returnVal["dbType"] = SourcedbType;
+                            console.log(JSON.stringify(returnVal));
                             $.ajax({
                                 async: true,
                                 url: "RemoteAccess",
                                 type: "POST",
-                                data: { val: returnVal },
+                                data: { val: JSON.stringify(returnVal)},
                                 success: function (response) {
                                     if (response == true)
                                         ReturnInfo($(".sourceDB").first().parent().parent().find(".panel"), response);
@@ -626,16 +622,15 @@
                         $("#chooseConnect-target-div").addClass("inactiveDiv");
                         backToChooseConnect_Target();
                         $("#RemoteConnTarget").click(function () {
-
                             var returnVal = findRemoteConVal('targetDB');
-                            returnVal += JSON.stringify({ "from": "target" });
-                            returnVal += JSON.stringify({ "dbType": TargetdbType });
-                            console.log(returnVal);
+                            returnVal["from"] = "target";
+                            returnVal["dbType"] = TargetdbType;
+                            console.log(JSON.stringify(returnVal));
                             $.ajax({
                                 async: true,
                                 url: "RemoteAccess",
                                 type: "POST",
-                                data: { val: returnVal },
+                                data: { val: JSON.stringify(returnVal) },
                                 success: function (response) {
                                     if (response == true)
                                         ReturnInfo($(".targetDB").first().parent().parent().find(".panel"), response);
@@ -681,16 +676,15 @@
                             $("#chooseConnect-target-div").addClass("inactiveDiv");
                             backToChooseConnect_Target();
                         $("#RemoteConnTarget").click(function () {
-
                             var returnVal = findRemoteConVal('targetDB');
-                            returnVal += JSON.stringify({ "from": "target" });
-                            returnVal += JSON.stringify({ "dbType": TargetdbType });
-                            console.log(returnVal);
+                            returnVal["from"] = "target";
+                            returnVal["dbType"] = TargetdbType;
+                            console.log(JSON.stringify(returnVal));
                             $.ajax({
                                 async: true,
                                 url: "RemoteAccess",
                                 type: "POST",
-                                data: { val: returnVal },
+                                data: { val: JSON.stringify(returnVal) },
                                 success: function (response) {
                                     if (response == true)
                                         ReturnInfo($(".targetDB").first().parent().parent().find(".panel"), response);
@@ -761,7 +755,6 @@
 
                     });             
                     break;
-
 
                 case "none":
                     alert("kurrwa");
