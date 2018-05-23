@@ -534,6 +534,7 @@ namespace DbComparer
             {
                 DataConnectionString =
                     $"Data Source={param["ip"]},{param["port"]};Network Library=DBMSSOCN;User ID={param["user"]};Password={param["pass"]};Connect Timeout=30;";
+                DataConnectionString += "Initial Catalog =" + param["db"] + ";";
                 connection = new SqlConnection(DataConnectionString);
                 connection.Open();
                 ConType = Connection_Type.Remote;
@@ -770,6 +771,8 @@ namespace DbComparer
                 DataConnectionString =
                                        $"Server={param["ip"]};" +
                                        $"User = {param["user"]}; Password = {param["pass"]};";
+
+                DataConnectionString += $"DATABASE={param["db"]};";
                 connection = new MySqlConnection(DataConnectionString);
                 connection.Open();
                 ConType = Connection_Type.Remote;

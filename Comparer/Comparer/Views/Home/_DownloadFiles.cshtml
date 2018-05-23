@@ -271,6 +271,7 @@
             "<div class='wrapper-btn'>" +
             " <button id=" + backToChooseConnect + " class='btn-back' type='submit'>Back!</button>" +
             "</div>" +"</div>" + "<hr class='custom-hr'/>";
+
         return _connectToFile;
     }
     //remote connection function
@@ -315,13 +316,12 @@
     //add remote connection credits to Json
     function findRemoteConVal(classDB) {
         var items = document.getElementsByClassName(classDB);
-        var sourceStr = {};
+        var JSon = {};
         for (var i = 0; i < items.length; i++) {
-            
-            sourceStr[items[i].id] =  items[i].value;
-            
+                JSon[items[i].id] = items[i].value,
+            console.log(items[i].value);
         }
-        return sourceStr;
+        return JSon;
     }
 
     //source db generate front-end
@@ -380,7 +380,7 @@
                         Dropzone.options.Upload1 = {
                             uploadMultiple: false,
                             timeout: 9999999,
-                            acceptedFiles: ".mdf,.sql,.xml,.db",
+                            acceptedFiles: ".sql",
                         };
                         //upload db
                         $("#Upload1").dropzone({
@@ -390,6 +390,7 @@
                                     ReturnInfo($("#Upload1").parent().find(".panel"), response);
                                 else
                                     $('#myModal').modal('show');
+
                             }
                         });
 
@@ -404,17 +405,18 @@
                             var returnVal = findRemoteConVal('sourceDB');
                             returnVal["from"] = "source";
                             returnVal["dbType"] = SourcedbType;
-                            console.log(JSON.stringify(returnVal));
+                            returnVal = JSON.stringify(returnVal);
+                            console.log(returnVal);
                             $.ajax({
                                 async: true,
                                 url: "RemoteAccess",
                                 type: "POST",
-                                data: { val: JSON.stringify(returnVal) },
-                                success: function (response) {
+                                data: { data: returnVal },
+                                success: function (response) {                                 
                                     if (response == true)
                                         ReturnInfo($(".sourceDB").first().parent().parent().find(".panel"), response);
                                     else
-                                        $('#myModal').modal('show');
+                                        $('#myModal').modal('show');                            
                                 }
                             });
                         });
@@ -437,7 +439,7 @@
                         Dropzone.options.Upload1= {
                             uploadMultiple: false,
                             timeout: 9999999,
-                            acceptedFiles: ".mdf,.sql,.xml,.db",
+                            acceptedFiles: ".mdf",
                         };
                         //upload db
                         $("#Upload1").dropzone({
@@ -458,15 +460,17 @@
                         $("#chooseConnect-source-div").addClass("inactiveDiv");
                         backToChooseConnect_Source();
                         $("#RemoteConnSource").click(function () {
+
                             var returnVal = findRemoteConVal('sourceDB');
                             returnVal["from"] = "source";
                             returnVal["dbType"] = SourcedbType;
-                            console.log(JSON.stringify(returnVal));
+                            returnVal = JSON.stringify(returnVal);
+                            console.log(returnVal);
                             $.ajax({
                                 async: true,
                                 url: "RemoteAccess",
                                 type: "POST",
-                                data: { val: JSON.stringify(returnVal)},
+                                data: { data: returnVal },
                                 success: function (response) {
                                     if (response == true)
                                         ReturnInfo($(".sourceDB").first().parent().parent().find(".panel"), response);
@@ -494,7 +498,7 @@
                         Dropzone.options.Upload1 = {
                             uploadMultiple: false,
                             timeout: 9999999,
-                            acceptedFiles: ".mdf,.sql,.xml,.db",
+                            acceptedFiles: ".db",
                         };
                         //upload db
                         $("#Upload1").dropzone({
@@ -525,7 +529,7 @@
                         Dropzone.options.Upload1 = {
                             uploadMultiple: false,
                             timeout: 9999999,
-                            acceptedFiles: ".mdf,.sql,.xml,.db",
+                            acceptedFiles: ".sql,.tz",
                         };
                         //upload db
                         $("#Upload1").dropzone({
@@ -602,7 +606,7 @@
                         Dropzone.options.Upload2 = {
                             uploadMultiple: false,
                             timeout: 9999999,
-                            acceptedFiles: ".mdf,.sql,.xml,.db",
+                            acceptedFiles: ".sql",
                         };
                         //upload file
                         $("#Upload2").dropzone({
@@ -622,15 +626,17 @@
                         $("#chooseConnect-target-div").addClass("inactiveDiv");
                         backToChooseConnect_Target();
                         $("#RemoteConnTarget").click(function () {
+
                             var returnVal = findRemoteConVal('targetDB');
                             returnVal["from"] = "target";
                             returnVal["dbType"] = TargetdbType;
-                            console.log(JSON.stringify(returnVal));
+                            returnVal = JSON.stringify(returnVal);
+                            console.log(returnVal);
                             $.ajax({
                                 async: true,
                                 url: "RemoteAccess",
                                 type: "POST",
-                                data: { val: JSON.stringify(returnVal) },
+                                data: { data: returnVal },
                                 success: function (response) {
                                     if (response == true)
                                         ReturnInfo($(".targetDB").first().parent().parent().find(".panel"), response);
@@ -656,7 +662,7 @@
                         Dropzone.options.Upload2 = {
                             uploadMultiple: false,
                             timeout: 9999999,
-                            acceptedFiles: ".mdf,.sql,.xml,.db",
+                            acceptedFiles: ".mdf",
                         };
                         //upload file
                             $("#Upload2").dropzone({
@@ -676,15 +682,17 @@
                             $("#chooseConnect-target-div").addClass("inactiveDiv");
                             backToChooseConnect_Target();
                         $("#RemoteConnTarget").click(function () {
+
                             var returnVal = findRemoteConVal('targetDB');
                             returnVal["from"] = "target";
                             returnVal["dbType"] = TargetdbType;
-                            console.log(JSON.stringify(returnVal));
+                            returnVal = JSON.stringify(returnVal);
+                            console.log(returnVal);
                             $.ajax({
                                 async: true,
                                 url: "RemoteAccess",
                                 type: "POST",
-                                data: { val: JSON.stringify(returnVal) },
+                                data: { data: returnVal },
                                 success: function (response) {
                                     if (response == true)
                                         ReturnInfo($(".targetDB").first().parent().parent().find(".panel"), response);
@@ -710,7 +718,7 @@
                         Dropzone.options.Upload2 = {
                             uploadMultiple: false,
                             timeout: 9999999,
-                            acceptedFiles: ".mdf,.sql,.xml,.db",
+                            acceptedFiles: ".db",
                         };
                         //upload file
                         $("#Upload2").dropzone({
@@ -740,7 +748,7 @@
                         Dropzone.options.Upload2 = {
                             uploadMultiple: false,
                             timeout: 9999999,
-                            acceptedFiles: ".mdf,.sql,.xml,.db",
+                            acceptedFiles: ".sql",
                         };
                         //upload file
                         $("#Upload2").dropzone({
@@ -755,6 +763,7 @@
 
                     });             
                     break;
+
 
                 case "none":
                     alert("kurrwa");
