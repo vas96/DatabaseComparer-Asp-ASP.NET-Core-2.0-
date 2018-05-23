@@ -108,20 +108,20 @@
     </div>
     @*First Upload File*@
     @*<div class="row">
-        <div class="container-fluid col-md-6" id="Drop1">
-            <form action="/Home/Upload/?id=1" class="dropzone dz-clickable dropable" id="Upload1"></form>
-            <div class="panel" style="visibility:hidden" id="Res1">
-                <div class="panel-heading"></div>
+            <div class="container-fluid col-md-6" id="Drop1">
+                <form action="/Home/Upload/?id=1" class="dropzone dz-clickable dropable" id="Upload1"></form>
+                <div class="panel" style="visibility:hidden" id="Res1">
+                    <div class="panel-heading"></div>
+                </div>
             </div>
-        </div>
 
-        <div class="container-fluid col-md-6" id="Drop2">
-            <form action="/Home/Upload/?id=2" class="dropzone dz-clickable dropable" id="Upload2"></form>
-            <div class="panel" style="visibility:hidden" id="Res2">
-                <div class="panel-heading"></div>
+            <div class="container-fluid col-md-6" id="Drop2">
+                <form action="/Home/Upload/?id=2" class="dropzone dz-clickable dropable" id="Upload2"></form>
+                <div class="panel" style="visibility:hidden" id="Res2">
+                    <div class="panel-heading"></div>
+                </div>
             </div>
-        </div>
-    </div>*@
+        </div>*@
     @* <h6><button type="button" class="btn-lg" id="NextStep">NEXT STEP</button></h6>*@
     <button type="button" class="btn-lg btn-block btn-primary-custom" id="GoTableInfo">Check tables from DB</button>
     <button type="button" class="btn-lg btn-block btn-default-custom" id="Back" style="margin-bottom:1.5vmin;">Back</button>
@@ -218,7 +218,7 @@
         return _chooseSQL_DB;
     }
     //generate button choose MySQL database
-    function chooseMySQL_DB(IDbackToChoose, IDbtn_connectToMySql_remote,IDbtn_connectToSql_file) {
+    function chooseMySQL_DB(IDbackToChoose, IDbtn_connectToMySql_remote, IDbtn_connectToSql_file) {
         var _chooseMySQL_DB = "<hr class='custom-hr'/>" + "<div class='containerConnect container-fluid'>" +
             "<button type='button' class='btn btn-block btn-File-Remote' id=" + IDbtn_connectToSql_file +
             ">Connect to File</button>" +
@@ -262,15 +262,15 @@
     function connectToFile(ID_my_dropzon_div, ID_my_dropzon, IdUpload, backToChooseConnect) {
         var _connectToFile = "<hr class='custom-hr'/>" +
             '<div class=" containerConnect container-fluid col-md-12" id=' + ID_my_dropzon_div + '>' +
-            '            <form action="/Home/Upload/?id='+IdUpload+'" class="dropzone dz-clickable dropable" id=' + ID_my_dropzon + '></form>' +
+            '            <form action="/Home/Upload/?id=' + IdUpload + '" class="dropzone dz-clickable dropable" id=' + ID_my_dropzon + '></form>' +
             '            <div class="panel" style="visibility:hidden" id="Res1">' +
             "                <div class='panel-heading'></div>" +
             "            </div>" +
             "      </div>" +
-           " <div class='containerConnect container-fluid col-md-12 text-center'>"+
+            " <div class='containerConnect container-fluid col-md-12 text-center'>" +
             "<div class='wrapper-btn'>" +
             " <button id=" + backToChooseConnect + " class='btn-back' type='submit'>Back!</button>" +
-            "</div>" +"</div>" + "<hr class='custom-hr'/>";
+            "</div>" + "</div>" + "<hr class='custom-hr'/>";
 
         return _connectToFile;
     }
@@ -280,11 +280,11 @@
             " <div>" +
             "<div class='form-group'>" +
             "<label for='userName'>User name</label>" +
-            "<input type='text' class='form-control "+classDb+" ' id='user' placeholder='Enter User name'>" +
+            "<input type='text' class='form-control " + classDb + " ' id='user' placeholder='Enter User name'>" +
             "</div>" +
             "<div class='form-group'>" +
             "<label for= 'password'>User password</label>" +
-            "<input type='password' class='form-control " + classDb +"' id = 'pass'  placeholder='Enter db password'>" +
+            "<input type='password' class='form-control " + classDb + "' id = 'pass'  placeholder='Enter db password'>" +
             "</div>" +
             "<div class='form-group'>" +
             "<label for= 'db'>Database name</label>" +
@@ -292,13 +292,13 @@
             "</div>" +
             "<div class='form-group'>" +
             "<label for='ip'>IP address</label>" +
-            "<input type='text' class='form-control " + classDb +"' id='ip' placeholder='Enter IP' onkeypress='validate(event)'>" +
+            "<input type='text' class='form-control " + classDb + "' id='ip' placeholder='Enter IP' onkeypress='validate(event)'>" +
             "</div>" +
             "<div class='form-group'>" +
             "<label for='Id_port'>Port</label>" +
-            "<input type='text' class='form-control " + classDb +"' id='port' placeholder='Enter Port' onkeypress='validate(event)'>" +
+            "<input type='text' class='form-control " + classDb + "' id='port' placeholder='Enter Port' onkeypress='validate(event)'>" +
             "</div>" +
-            "<button class='btn btn-block btn-primary'id ="+Id_btnNext+">Next</button>" +
+            "<button class='btn btn-block btn-primary'id =" + Id_btnNext + ">Next</button>" +
             "<small id='emailHelp' class='form-text text-muted'>We'll never share your credits with anyone else.</small>" +
             "</div>" +
             "<div class='containerConnect container-fluid  text-center'>" +
@@ -316,12 +316,17 @@
     //add remote connection credits to Json
     function findRemoteConVal(classDB) {
         var items = document.getElementsByClassName(classDB);
-        var JSon = {};
+        var sourceStr = '';
         for (var i = 0; i < items.length; i++) {
-                JSon[items[i].id] = items[i].value,
+            var temp = {
+// ReSharper disable Es6Feature
+                [items[i].id]: items[i].value,
+// ReSharper restore Es6Feature
+            }
             console.log(items[i].value);
+            sourceStr += JSON.stringify(temp);
         }
-        return JSon;
+        return sourceStr;
     }
 
     //source db generate front-end
@@ -403,20 +408,19 @@
                         $("#RemoteConnSource").click(function () {
                             //json data for remote
                             var returnVal = findRemoteConVal('sourceDB');
-                            returnVal["from"] = "source";
-                            returnVal["dbType"] = SourcedbType;
-                            returnVal = JSON.stringify(returnVal);
+                            returnVal += JSON.stringify({ "from": "source" });
+                            returnVal += JSON.stringify({ "dbType": SourcedbType });
                             console.log(returnVal);
                             $.ajax({
                                 async: true,
                                 url: "RemoteAccess",
                                 type: "POST",
-                                data: { data: returnVal },
-                                success: function (response) {                                 
+                                data: { val: returnVal },
+                                success: function (response) {
                                     if (response == true)
                                         ReturnInfo($(".sourceDB").first().parent().parent().find(".panel"), response);
                                     else
-                                        $('#myModal').modal('show');                            
+                                        $('#myModal').modal('show');
                                 }
                             });
                         });
@@ -430,13 +434,13 @@
                     $(".containerChooseSource").addClass("inactiveDiv");
                     backToChooseSourceDB_Source();
                     $('#btn-connectToSql-file').click(function () {
-                        $("#connectTo-source-div").empty().append(connectToFile("Drop1","Upload1", 1,
+                        $("#connectTo-source-div").empty().append(connectToFile("Drop1", "Upload1", 1,
                             "backToChooseConnect"));
                         $("#chooseConnect-source-div").addClass("inactiveDiv");
 
                         backToChooseConnect_Source();
 
-                        Dropzone.options.Upload1= {
+                        Dropzone.options.Upload1 = {
                             uploadMultiple: false,
                             timeout: 9999999,
                             acceptedFiles: ".mdf",
@@ -452,25 +456,24 @@
 
                             }
                         });
-                   
+
                     });
-                   
+
                     $('#btn-connectToSql-remote').click(function () {
-                        $("#connectTo-source-div").empty().append(connectToRemote('sourceDB','RemoteConnSource','backToChooseConnect'));
+                        $("#connectTo-source-div").empty().append(connectToRemote('sourceDB', 'RemoteConnSource', 'backToChooseConnect'));
                         $("#chooseConnect-source-div").addClass("inactiveDiv");
                         backToChooseConnect_Source();
                         $("#RemoteConnSource").click(function () {
 
                             var returnVal = findRemoteConVal('sourceDB');
-                            returnVal["from"] = "source";
-                            returnVal["dbType"] = SourcedbType;
-                            returnVal = JSON.stringify(returnVal);
+                            returnVal += JSON.stringify({ "from": "source" });
+                            returnVal += JSON.stringify({ "dbType": SourcedbType });
                             console.log(returnVal);
                             $.ajax({
                                 async: true,
                                 url: "RemoteAccess",
                                 type: "POST",
-                                data: { data: returnVal },
+                                data: { val: returnVal },
                                 success: function (response) {
                                     if (response == true)
                                         ReturnInfo($(".sourceDB").first().parent().parent().find(".panel"), response);
@@ -511,7 +514,7 @@
 
                             }
                         });
-                   });
+                    });
                     break;
 
                 case "PostgreSQL":
@@ -529,7 +532,7 @@
                         Dropzone.options.Upload1 = {
                             uploadMultiple: false,
                             timeout: 9999999,
-                            acceptedFiles: ".sql,.tz",
+                            acceptedFiles: ".sql",
                         };
                         //upload db
                         $("#Upload1").dropzone({
@@ -554,7 +557,7 @@
 
     //target db genetate front-end
     $(document).ready(function (e) {
-        //image with check 
+        //image with check
         $('.image-db-target').click(function (e) {
             $('.image-db-target').not(this).removeClass('check')
                 .siblings('input').prop('checked', false);
@@ -628,15 +631,14 @@
                         $("#RemoteConnTarget").click(function () {
 
                             var returnVal = findRemoteConVal('targetDB');
-                            returnVal["from"] = "target";
-                            returnVal["dbType"] = TargetdbType;
-                            returnVal = JSON.stringify(returnVal);
+                            returnVal += JSON.stringify({ "from": "target" });
+                            returnVal += JSON.stringify({ "dbType": TargetdbType });
                             console.log(returnVal);
                             $.ajax({
                                 async: true,
                                 url: "RemoteAccess",
                                 type: "POST",
-                                data: { data: returnVal },
+                                data: { val: returnVal },
                                 success: function (response) {
                                     if (response == true)
                                         ReturnInfo($(".targetDB").first().parent().parent().find(".panel"), response);
@@ -665,34 +667,33 @@
                             acceptedFiles: ".mdf",
                         };
                         //upload file
-                            $("#Upload2").dropzone({
-                                url: "/Home/Upload/?id=2&type=" + TargetdbType,
-                                success: function (file, response) {
-                                    if (response == true)
-                                        ReturnInfo($("#Upload2").parent().find(".panel"), response);
-                                    else
-                                        $('#myModal').modal('show');
-                                } 
-                        }); 
-                        
+                        $("#Upload2").dropzone({
+                            url: "/Home/Upload/?id=2&type=" + TargetdbType,
+                            success: function (file, response) {
+                                if (response == true)
+                                    ReturnInfo($("#Upload2").parent().find(".panel"), response);
+                                else
+                                    $('#myModal').modal('show');
+                            }
+                        });
+
                     });
 
-                    $('#btn-connectToSql-remote-target').click(function () {                      
-                            $("#connectTo-target-div").empty().append(connectToRemote('targetDB', 'RemoteConnTarget', 'backToChooseConnectTarget'));
-                            $("#chooseConnect-target-div").addClass("inactiveDiv");
-                            backToChooseConnect_Target();
+                    $('#btn-connectToSql-remote-target').click(function () {
+                        $("#connectTo-target-div").empty().append(connectToRemote('targetDB', 'RemoteConnTarget', 'backToChooseConnectTarget'));
+                        $("#chooseConnect-target-div").addClass("inactiveDiv");
+                        backToChooseConnect_Target();
                         $("#RemoteConnTarget").click(function () {
 
                             var returnVal = findRemoteConVal('targetDB');
-                            returnVal["from"] = "target";
-                            returnVal["dbType"] = TargetdbType;
-                            returnVal = JSON.stringify(returnVal);
+                            returnVal += JSON.stringify({ "from": "target" });
+                            returnVal += JSON.stringify({ "dbType": TargetdbType });
                             console.log(returnVal);
                             $.ajax({
                                 async: true,
                                 url: "RemoteAccess",
                                 type: "POST",
-                                data: { data: returnVal },
+                                data: { val: returnVal },
                                 success: function (response) {
                                     if (response == true)
                                         ReturnInfo($(".targetDB").first().parent().parent().find(".panel"), response);
@@ -761,7 +762,7 @@
                             }
                         });
 
-                    });             
+                    });
                     break;
 
 
