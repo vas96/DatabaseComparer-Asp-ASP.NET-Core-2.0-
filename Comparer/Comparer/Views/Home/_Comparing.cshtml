@@ -224,7 +224,7 @@
 <button type="button" class="btn-lg btn-block btn-default-custom" id="Back" style="margin-bottom:1.5vmin;">STEP BACK</button>
 
 <div class="container-fluid">
-    <button class="btn btn-primary btn-block" onclick="download('myfilename.html', 'text/plain')">Generate</button>
+    <button class="btn btn-primary btn-block" onclick="download('HTML_report.html', 'text/plain')">Generate</button>
     <a href="" id="a">click here to download your file</a>
 </div>
 
@@ -319,7 +319,8 @@
         });
     });
 
-
+    var arrayN_F = [];
+    var arrayU_F = [];
     ///creating string for first table report
     var firstToSecondJson =  @Html.Raw(Json.Serialize(FirstToSecond));
     var firstToSecondUniqueJson =  @Html.Raw(Json.Serialize(FirstToSecond_unique));
@@ -331,9 +332,12 @@
     firstTableStr += '<thead>';
     firstTableStr += '<tr>';
      for (var i = 0; i <  @Html.Raw(Json.Serialize(@Model.FirstDatabase.SelectedColumns.Count)); i++)
-                        {
+     {
+         arrayN_F.push(i);
          firstTableStr += '<th>';
+         firstTableStr += '<strong>';
          firstTableStr += firstToSecondJsonAddInf[i].name; 
+         firstTableStr += '</strong>';
          firstTableStr += '</th >';
     }
     firstTableStr += '</tr>';
@@ -348,6 +352,7 @@
             firstTableStr += '</tr>';
     }
     for (var i = 0; i < firstTableUniqueLen; i++) {
+        arrayU_F.push(i);
         firstTableStr += '<tr>';
         for (var j = 0; j < firstToSecondUniqueJson[i].length; j++) {
             firstTableStr += '<th>';
@@ -359,7 +364,8 @@
         firstTableStr += '</table>';
 
 
-    
+    var arrayN_S = [];
+    var arrayU_S = [];
     ///creating string for second table report
     var secondToFirstJson =  @Html.Raw(Json.Serialize(SecondToFirst));
     var secondToFirstUniqueJson =  @Html.Raw(Json.Serialize(SecondToFirst_unique));
@@ -371,7 +377,8 @@
     secondTableStr += '<thead>';
     secondTableStr += '<tr>';
      for (var i = 0; i <  @Html.Raw(Json.Serialize(@Model.SecondDatabase.SelectedColumns.Count)); i++)
-                        {
+     {
+         arrayN_S.push(i);
          secondTableStr += '<th>';
          secondTableStr += secondTofirstJsonAddInf[i].name; 
          secondTableStr += '</th >';
@@ -388,6 +395,7 @@
             secondTableStr += '</tr>';
     }
     for (var i = 0; i < secondTableUniqueLen; i++) {
+        arrayU_S.push(i);
         secondTableStr += '<tr>';
         for (var j = 0; j < secondToFirstUniqueJson[i].length; j++) {
             secondTableStr += '<th>';
@@ -424,139 +432,175 @@
     
     thirdTableStr += '</table>';
 
-    var smallHtmlReport = '<div class="containerData">' +
-        '        <style>' +
-        '            table {' +
-        '                border-collapse: collapse;' +
-        '                border-spacing: 0;' +
-        '                width: 100%;' +
-        '                border: 0.vmin solid #ddd;' +
-        '            }' +
-        '' +
-        '            th,' +
-        '            td {' +
-        '                text-align: left;' +
-        '                padding: 8px;' +
-        '            }' +
-        '' +
-        '            tr:nth-child(even) {' +
-        '                background-color: #40739e;' +
-        '                color: white;' +
-        '            }' +
-        '' +
-        '            tbody {' +
-        '                background-color: #dfe6e9;' +
-        '                color: white;' +
-        '            }' +
-        '            #reportHeader {' +
-        '                background-color: #40739e;' +
-        '                height: 10vmin;' +
-        '                color: white;' +
-        '                display: flex;' +
-        '                justify-content: center;' +
-        '                align-items: center;' +
-        '            }' +
-        '' +
-        '            .diffBtn {' +
-        '                color: #40739e;' +
-        '                background-color: white;' +
-        '                border: solid #40739e 0.3vmin;' +
-        '                transition: all 0.5s ease;' +
-        '                font-size: 1.5em;' +
-        '                border: none;' +
-        '            }' +
-        '' +
-        '            .diffBtn:hover {' +
-        '                background: #40739e;' +
-        '                color: #ddd;' +
-        '            }' +
-        '' +
-        '            .diffDiv {' +
-        '                margin-left: 1.5vmin;' +
-        '                padding: 0.5vmin;' +
-        '                border-bottom: #40739e 1vmax solid;' +
-        '            }' +
-        '' +
-        '           ' +
-        '        </style>' +
-        '' +
-        '        <div id="reportHeader">' +
-        '            <h2>Comparing results</h2>' +
-        '        </div>' +
-        '        <div class="diffDiv">' +
-        '            <h2>Differences in first database table:</h2>' +
-        '            <button class="diffBtn" id="firstTableRes" onclick="ShowResFT(\'firstTableResDiv\',\'firstTableRes\')">Show result</button>' +
-        '            <button class="diffBtn" id="firstTableScript" onclick="ShowScriptFT(\'firstTableScriptDiv\',\'firstTableScript\')">Show script</button>' +
-        '            <div style="overflow-x:auto; display: none;" id="firstTableResDiv">' + firstTableStr +
-        '            </div>' +
-        '            <div id="firstTableScriptDiv" style="display: none">' +
-        '                <hr>' +
-        '                <pre>' +
-        '                Script' +
-        '                </pre>' +
-        '            </div>' +
-        '        </div>' +
-        '        <hr>' +
-        '        <div class="diffDiv">' +
-        '            <h2>Differences in second database table:</h2>' +
-        '            <button class="diffBtn" id="secondTableRes" onclick="ShowResFT(\'secondTableResDiv\',\'secondTableRes\')">Show results</button>' +
-        '            <button class="diffBtn" id="secondTableScript" onclick="ShowScriptFT(\'secondTableScriptDiv\',\'secondTableScript\')">Show script</button>' +
-        '            <div style="overflow-x:auto;display: none;" id="secondTableResDiv">' +
-                     secondTableStr +
-        '            </div>' +
-        '            <div id="secondTableScriptDiv" style="display: none">' +
-        '                <hr>' +
-        '                <pre>' +
-        '                    Script' +
-        '                    </pre>' +
-        '            </div>' +
-        '        </div>' +
-        '        <hr>' +
-        '        <div class="diffDiv">' +
-        '            <h2>Differences in first and second database tables:</h2>' +
-        '            <button class="diffBtn" id="twiceTableRes" onclick="ShowResFT(\'twiceTableResDiv\',\'twiceTableRes\')">Show results</button>' +
-        '            <button class="diffBtn" id="twiceTableScript" onclick="ShowScriptFT(\'twiceTableScriptDiv\',\'twiceTableScript\')">Show script</button>' +
-        '            <div style="overflow-x:auto; display: none " id="twiceTableResDiv">' + thirdTableStr +
-                   
-        '            </div>' +
-        '            <div id="twiceTableScriptDiv" style="display: none">' +
-        '                <hr>' +
-        '                <pre>' +
-        '                        Script' +
-        '                        </pre>' +
-        '            </div>' +
-        '        </div>' +
-        '        <hr>' +
-        '    </div>' +
-        '    <script>' +
-        '        function ShowResFT(idDiv, idBtn) {' +
-        '            var x = document.getElementById(idDiv);' +
-        '            if (x.style.display === "none") {' +
-        '                x.style.display = "block";' +
-        '                document.getElementById(idBtn).innerText = "Hide result";' +
-        '' +
-        '            } else {' +
-        '                x.style.display = "none";' +
-        '                document.getElementById(idBtn).innerText = "Show result";' +
-        '            }' +
-        '        }' +
-        '' +
-        '        function ShowScriptFT(idDiv, idBtn) {' +
-        '            var x = document.getElementById(idDiv);' +
-        '            if (x.style.display === "none") {' +
-        '                x.style.display = "block";' +
-        '                document.getElementById(idBtn).innerText = "Hide script";' +
-        '' +
-        '            } else {' +
-        '                x.style.display = "none";' +
-        '                document.getElementById(idBtn).innerText = "Show script";' +
-        '            }' +
-        '        }' +
-        '    <' + '/script>';
+    function createHtml(firstTableStr, secondTableStr, thirdTableStr, firstScript, secondScript ) {
+        var smallHtmlReport = '<div class="containerData">' +
+            '        <style>' +
+            '            table {' +
+            '                border-collapse: collapse;' +
+            '                border-spacing: 0;' +
+            '                width: 100%;' +
+            '                border: 0.vmin solid #ddd;' +
+            '            }' +
+            '' +
+            '            th,' +
+            '            td {' +
+            '                text-align: left;' +
+            '                padding: 8px;' +
+            '            }' +
+            '' +
+            '           thead {' +
+            '                border-bottom: 2px solid black;'+
+            '            }' +
+            '' +
+            '            tr:nth-child(even) {' +
+            '                background-color: #40739e;' +
+            '                color: white;' +
+            '            }' +
+            '' +
+            '            tbody {' +
+            '                background-color: #dfe6e9;' +
+            '                color: white;' +
+            '            }' +
+            '            #reportHeader {' +
+            '                background-color: #40739e;' +
+            '                height: 10vmin;' +
+            '                color: white;' +
+            '                display: flex;' +
+            '                justify-content: center;' +
+            '                align-items: center;' +
+            '            }' +
+            '' +
+            '            .diffBtn {' +
+            '                color: #40739e;' +
+            '                background-color: white;' +
+            '                border: solid #40739e 0.3vmin;' +
+            '                transition: all 0.5s ease;' +
+            '                font-size: 1.5em;' +
+            '                border: none;' +
+            '            }' +
+            '' +
+            '            .diffBtn:hover {' +
+            '                background: #40739e;' +
+            '                color: #ddd;' +
+            '            }' +
+            '' +
+            '            .diffDiv {' +
+            '                margin-left: 1.5vmin;' +
+            '                padding: 0.5vmin;' +
+            '                border-bottom: #40739e 1vmax solid;' +
+            '            }' +
+            '' +
+            '           ' +
+            '        </style>' +
+            '' +
+            '        <div id="reportHeader">' +
+            '            <h2>Comparing results</h2>' +
+            '        </div>' +
+            '        <div class="diffDiv">' +
+            '            <h2>Differences in first database table:</h2>' +
+            '            <button class="diffBtn" id="firstTableRes" onclick="ShowResFT(\'firstTableResDiv\',\'firstTableRes\')">Show result</button>' +
+            '            <button class="diffBtn" id="firstTableScript" onclick="ShowScriptFT(\'firstTableScriptDiv\',\'firstTableScript\')">Show script</button>' +
+            '            <div style="overflow-x:auto; display: none;" id="firstTableResDiv">' + firstTableStr +
+            '            </div>' +
+            '            <div id="firstTableScriptDiv" style="display: none">' +
+            '                <hr>' +
+            '                <pre>' +
+            firstScript +
+            '                </pre>' +
+            '            </div>' +
+            '        </div>' +
+            '        <hr>' +
+            '        <div class="diffDiv">' +
+            '            <h2>Differences in second database table:</h2>' +
+            '            <button class="diffBtn" id="secondTableRes" onclick="ShowResFT(\'secondTableResDiv\',\'secondTableRes\')">Show results</button>' +
+            '            <button class="diffBtn" id="secondTableScript" onclick="ShowScriptFT(\'secondTableScriptDiv\',\'secondTableScript\')">Show script</button>' +
+            '            <div style="overflow-x:auto;display: none;" id="secondTableResDiv">' +
+            secondTableStr +
+            '            </div>' +
+            '            <div id="secondTableScriptDiv" style="display: none">' +
+            '                <hr>' +
+            '                <pre>' +
+            secondScript +
+            '                    </pre>' +
+            '            </div>' +
+            '        </div>' +
+            '        <hr>' +
+            '        <div class="diffDiv">' +
+            '            <h2>Differences in first and second database tables:</h2>' +
+            '            <button class="diffBtn" id="twiceTableRes" onclick="ShowResFT(\'twiceTableResDiv\',\'twiceTableRes\')">Show results</button>' +
+            '            <button class="diffBtn" id="twiceTableScript" onclick="ShowScriptFT(\'twiceTableScriptDiv\',\'twiceTableScript\')">Show script</button>' +
+            '            <div style="overflow-x:auto; display: none " id="twiceTableResDiv">' + thirdTableStr +
+
+            '            </div>' +
+            '            <div id="twiceTableScriptDiv" style="display: none">' +
+            '                <hr>' +
+            '                <pre>' +                               
+            firstScript + 
+            '               </pre>' +
+            '                <hr>' +
+            '                <pre>' +
+            secondScript +
+            '               </pre>' +
+            '                <hr>' +
+            '            </div>' +
+            '        </div>' +
+            '        <hr>' +
+            '    </div>' +
+            '    <script>' +
+            '        function ShowResFT(idDiv, idBtn) {' +
+            '            var x = document.getElementById(idDiv);' +
+            '            if (x.style.display === "none") {' +
+            '                x.style.display = "block";' +
+            '                document.getElementById(idBtn).innerText = "Hide result";' +
+            '' +
+            '            } else {' +
+            '                x.style.display = "none";' +
+            '                document.getElementById(idBtn).innerText = "Show result";' +
+            '            }' +
+            '        }' +
+            '' +
+            '        function ShowScriptFT(idDiv, idBtn) {' +
+            '            var x = document.getElementById(idDiv);' +
+            '            if (x.style.display === "none") {' +
+            '                x.style.display = "block";' +
+            '                document.getElementById(idBtn).innerText = "Hide script";' +
+            '' +
+            '            } else {' +
+            '                x.style.display = "none";' +
+            '                document.getElementById(idBtn).innerText = "Show script";' +
+            '            }' +
+            '        }' +
+            '    <' + '/script>';
+        return smallHtmlReport;
+    }
+
+    var scriptFT = "";
+    var scriptST = "";
+    $.ajax({
+        async: true,
+        url: "CreateScript",
+        type: "POST",
+        data: { id: 1, arrayN: arrayN_F, arrayU: arrayU_F },
+        success: function (result) {
+            scriptFT = result.insert + result.update;
+        }
+    });
+    $.ajax({
+        async: true,
+        url: "CreateScript",
+        type: "POST",
+        data: { id: 2, arrayN: arrayN_S, arrayU: arrayU_S },
+        success: function (result) {
+            scriptST = result.insert + result.update;
+        }
+    });
 
     function download(name, type) {
+        alert(scriptFT);
+        alert(scriptST);
+        var html = createHtml(firstTableStr, secondTableStr, thirdTableStr, scriptFT, scriptST );
         var a = document.getElementById("a");
-        var file = new Blob([smallHtmlReport], {
+        var file = new Blob([html], {
             type: type
         });
         a.href = URL.createObjectURL(file);
