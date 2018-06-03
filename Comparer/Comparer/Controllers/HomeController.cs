@@ -65,8 +65,7 @@ namespace Comparer.Controllers
         /// </summary>
         /// <returns></returns>
         public IActionResult About()
-        {
-            db.CloseConnection();
+        {      
             ViewData["Message"] = "Your application description page.";
             return View();
         }

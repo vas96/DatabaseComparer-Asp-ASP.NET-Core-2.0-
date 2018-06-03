@@ -11,6 +11,9 @@
     .inform-block {
         height: 50vh;
     }
+    .inform-block img{
+        
+    }
 
     #top-block-under-text {
         color: white !important;
@@ -34,12 +37,11 @@
         color: #40739e;
     }
 </style>
-
 <!-- First Container -->
 <div class="container-fluid ">
     <div class="row"></div>
     <div class="col-md-6 top-block aligner-center">
-        <img src="~/images/index1.5.svg" class="img-responsive center-block" alt="Onedrive" style="width: 100%; height: auto;" />
+        <img src="~/images/mainPage(1.1).svg" class="img-responsive center-block" alt="Onedrive" style="width: 100%; height: auto;" />
     </div>
     <div class="col-md-6 top-block aligner-center">
         <div class="text-header">
@@ -64,22 +66,6 @@
 </div>
 <div class="container-fluid" id="index-opp-block">
 
-    <pre>
-    <code class="sql" id="Res1">
-                                        INSERT INTO Classes(ClassId,ClassName) VALUES(12,'Маг-некромант');
-                                        INSERT INTO Classes(ClassId,ClassName) VALUES(13,'Бард');UPDATE Classes SET ClassId=1 , ClassName='C#' WHERE ClassId=1 , ClassName='Web-програміст';
-                                        UPDATE Classes SET ClassId=2 , ClassName='C++' WHERE ClassId=2 , ClassName='Програміст';
-                                        UPDATE Classes SET ClassId=3 , ClassName='Java' WHERE ClassId=3 , ClassName='Системний АНАЛітик';
-                                        UPDATE Classes SET ClassId=4 , ClassName='JavaScript' WHERE ClassId=4 , ClassName='3D художник';
-                                        UPDATE Classes SET ClassId=5 , ClassName='HTML' WHERE ClassId=5 , ClassName='Аніматор';
-                                        UPDATE Classes SET ClassId=6 , ClassName='CSS' WHERE ClassId=6 , ClassName='Системний адміністратор';
-                                        UPDATE Classes SET ClassId=7 , ClassName='HTML/CSS' WHERE ClassId=7 , ClassName='Інженер ПЗ';
-                                        UPDATE Classes SET ClassId=8 , ClassName='Pascal' WHERE ClassId=8 , ClassName='TeamLead';
-                                        UPDATE Classes SET ClassId=9 , ClassName='Python' WHERE ClassId=9 , ClassName='Художник';
-                                        UPDATE Classes SET ClassId=10 , ClassName='Ruby' WHERE ClassId=10 , ClassName='Дизайнер інтерфейсів';
-                                        UPDATE Classes SET ClassId=11 , ClassName='TEST' WHERE ClassId=11 , ClassName='Паладін';
-                                    </code>
-                                </pre>
     <h1 class="text-center">You can use cloud</h1>
     <div class="col-md-3 col-md-offset-1 col-sm-4 col-sm-offset-0 text-center">
         <img src="~/images/icons8-dropbox.svg" class="img-responsive center-block" alt="Dropbox" />
@@ -98,15 +84,26 @@
     </div>
 </div>
 
-<div class="col-lg-6 inform-block aligner-center" style="background-color:#fdcb6e">
+<div class="col-lg-6 inform-block aligner-center" style="background-color:#fdcb6e;">
     <img src="~/images/sql.svg" class="img-responsive" style="width:70%;" alt="Alternate Text" />
 </div>
 <div class="col-lg-6 inform-block aligner-center" style="color:#fdcb6e">
     <div class="text-header">
         <div class="col-md-12">
-            <h1 class="text-center">Header</h1>
+            <h1 class="text-center">Generate script for updating database</h1>
+           
             <h4 class="text-left">
-                Some text Some text Some text Some text Some text Some text Some text
+                <pre>
+                <code readonly class="language-sql" id="Res1">
+                        INSERT INTO Classes(ClassId,ClassName) VALUES(12,'Маг-некромант');
+                        UPDATE Classes SET ClassId=2 , ClassName='C++' WHERE ClassId=2;
+                        UPDATE Classes SET ClassId=5 , ClassName='HTML' WHERE ClassId=5;
+                        UPDATE Classes SET ClassId=7 , ClassName='HTML/CSS' WHERE ClassId=7;
+                        UPDATE Classes SET ClassId=8 , ClassName='Pascal' WHERE ClassId=8;
+                        UPDATE Classes SET ClassId=9 , ClassName='Python' WHERE ClassId=9;
+                        UPDATE Classes SET ClassId=11 , ClassName='TEST' WHERE ClassId=11;
+                    </code>
+                 </pre>
             </h4>
         </div>
     </div>
@@ -166,3 +163,4 @@
         </div>
     </div>
 </div>
+<script src="~/js/prism.js"></script>

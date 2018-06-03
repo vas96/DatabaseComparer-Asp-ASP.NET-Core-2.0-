@@ -190,7 +190,7 @@
         //});
     });
 
-    // button baack for previos view
+    // button baack for previous view
     $("#Back").click(function () {
         waitingDialog.show();
         $.ajax({
@@ -288,7 +288,7 @@
             "</div>" +
             "<div class='form-group'>" +
             "<label for= 'db'>Database name</label>" +
-            "<input type='password' class='form-control " + classDb + "' id = 'db'  placeholder='Enter db name'>" +
+            "<input type='text' class='form-control " + classDb + "' id = 'db'  placeholder='Enter db name'>" +
             "</div>" +
             "<div class='form-group'>" +
             "<label for='ip'>IP address</label>" +
@@ -313,20 +313,15 @@
             "<hr class='custom-hr'/>";
         return _connectToRemote;
     }
-
+    //add remote connection credits to Json
     function findRemoteConVal(classDB) {
         var items = document.getElementsByClassName(classDB);
-        var sourceStr = '';
+        var JSon = {};
         for (var i = 0; i < items.length; i++) {
-            var temp = {
-// ReSharper disable Es6Feature
-                [items[i].id]: items[i].value,
-// ReSharper restore Es6Feature
-            }
-            console.log(items[i].value);
-            sourceStr += JSON.stringify(temp);
+            JSon[items[i].id] = items[i].value,
+                console.log(items[i].value);
         }
-        return sourceStr;
+        return JSon;
     }
 
     //source db generate front-end
@@ -368,6 +363,7 @@
             var SourcedbType = "";
             SourcedbType = $("input[name=dbCheck]:checked").val();
             switch (SourcedbType) {
+                //choose mySql
                 case "MySQL":
                     $("#chooseConnect-source-div").empty().append(chooseMySQL_DB("backToChooseSource",
                         "btn-connectToMySql-remote", "btn-connectToMySql-file"));
@@ -399,22 +395,23 @@
                         });
 
                     });
-
+                    //generate remote connection to MySql
                     $('#btn-connectToMySql-remote').click(function () {
                         $("#connectTo-source-div").empty().append(connectToRemote('sourceDB', 'RemoteConnSource', 'backToChooseConnect'));
                         $("#chooseConnect-source-div").addClass("inactiveDiv");
                         backToChooseConnect_Source();
                         $("#RemoteConnSource").click(function () {
-
+                            //json data for remote
                             var returnVal = findRemoteConVal('sourceDB');
-                            returnVal += JSON.stringify({ "from": "source" });
-                            returnVal += JSON.stringify({ "dbType": SourcedbType });
+                            returnVal["from"] = "source";
+                            returnVal["dbType"] = SourcedbType;
+                            returnVal = JSON.stringify(returnVal);
                             console.log(returnVal);
                             $.ajax({
                                 async: true,
                                 url: "RemoteAccess",
                                 type: "POST",
-                                data: { val: returnVal },
+                                data: { data: returnVal },
                                 success: function (response) {
                                     if (response == true)
                                         ReturnInfo($(".sourceDB").first().parent().parent().find(".panel"), response);
@@ -465,14 +462,15 @@
                         $("#RemoteConnSource").click(function () {
 
                             var returnVal = findRemoteConVal('sourceDB');
-                            returnVal += JSON.stringify({ "from": "source" });
-                            returnVal += JSON.stringify({ "dbType": SourcedbType });
+                            returnVal["from"] = "source";
+                            returnVal["dbType"] = SourcedbType;
+                            returnVal = JSON.stringify(returnVal);
                             console.log(returnVal);
                             $.ajax({
                                 async: true,
                                 url: "RemoteAccess",
                                 type: "POST",
-                                data: { val: returnVal },
+                                data: { data: returnVal },
                                 success: function (response) {
                                     if (response == true)
                                         ReturnInfo($(".sourceDB").first().parent().parent().find(".panel"), response);
@@ -628,16 +626,17 @@
                         $("#chooseConnect-target-div").addClass("inactiveDiv");
                         backToChooseConnect_Target();
                         $("#RemoteConnTarget").click(function () {
-
+                            
                             var returnVal = findRemoteConVal('targetDB');
-                            returnVal += JSON.stringify({ "from": "target" });
-                            returnVal += JSON.stringify({ "dbType": TargetdbType });
+                            returnVal["from"] = "target";
+                            returnVal["dbType"] = TargetdbType;
+                            returnVal = JSON.stringify(returnVal);
                             console.log(returnVal);
                             $.ajax({
                                 async: true,
                                 url: "RemoteAccess",
                                 type: "POST",
-                                data: { val: returnVal },
+                                data: { data: returnVal },
                                 success: function (response) {
                                     if (response == true)
                                         ReturnInfo($(".targetDB").first().parent().parent().find(".panel"), response);
@@ -685,14 +684,15 @@
                         $("#RemoteConnTarget").click(function () {
 
                             var returnVal = findRemoteConVal('targetDB');
-                            returnVal += JSON.stringify({ "from": "target" });
-                            returnVal += JSON.stringify({ "dbType": TargetdbType });
+                            returnVal["from"] = "target";
+                            returnVal["dbType"] = TargetdbType;
+                            returnVal = JSON.stringify(returnVal);
                             console.log(returnVal);
                             $.ajax({
                                 async: true,
                                 url: "RemoteAccess",
                                 type: "POST",
-                                data: { val: returnVal },
+                                data: { data: returnVal },
                                 success: function (response) {
                                     if (response == true)
                                         ReturnInfo($(".targetDB").first().parent().parent().find(".panel"), response);
@@ -763,10 +763,8 @@
 
                     });
                     break;
-
-
                 case "none":
-                    alert("kurrwa");
+                    alert("some problem");
                     break;
             }
         });
