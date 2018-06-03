@@ -8,6 +8,7 @@
 
     var FirstToSecond_unique = @Model.ComparingResult[3];
     var SecondToFirst_unique = @Model.ComparingResult[4];
+
 }
 
 <div class="container">
@@ -226,8 +227,9 @@
 <div class="container-fluid">
     <button class="btn btn-primary btn-block" onclick="download('HTML_report.html', 'text/plain')">Generate</button>
     <a href="" id="a">click here to download your file</a>
+    <button class="btn btn-primary btn-block" onclick="generatePdfReport()">Generate PDF</button>
 </div>
-
+<script src="~/js/jspdf.min.js"></script>
 <script type="text/javascript">
     $(function () {
         var buttons = $(".ColapsableScript").toArray();
@@ -318,7 +320,7 @@
             (checked === true) ? $("#checkAllFromTwoText").text('Uncheck all') : $("#checkAllFromTwoText").text('Check all');
         });
     });
-
+    //array for genetate script first table
     var arrayN_F = [];
     var arrayU_F = [];
     ///creating string for first table report
@@ -333,7 +335,7 @@
     firstTableStr += '<tr>';
      for (var i = 0; i <  @Html.Raw(Json.Serialize(@Model.FirstDatabase.SelectedColumns.Count)); i++)
      {
-         arrayN_F.push(i);
+         
          firstTableStr += '<th>';
          firstTableStr += '<strong>';
          firstTableStr += firstToSecondJsonAddInf[i].name; 
@@ -342,7 +344,8 @@
     }
     firstTableStr += '</tr>';
     firstTableStr += '<thead>';
-        for (var i = 0; i < firstTableLen; i++) {
+    for (var i = 0; i < firstTableLen; i++) {
+        arrayN_F.push(i);
             firstTableStr += '<tr>';
             for (var j = 0; j < firstToSecondJson[i].length; j++) {
                 firstTableStr += '<th>';
@@ -362,8 +365,7 @@
         firstTableStr += '</tr>';
     }
         firstTableStr += '</table>';
-
-
+     //array for genetate script second table
     var arrayN_S = [];
     var arrayU_S = [];
     ///creating string for second table report
@@ -377,8 +379,7 @@
     secondTableStr += '<thead>';
     secondTableStr += '<tr>';
      for (var i = 0; i <  @Html.Raw(Json.Serialize(@Model.SecondDatabase.SelectedColumns.Count)); i++)
-     {
-         arrayN_S.push(i);
+     {     
          secondTableStr += '<th>';
          secondTableStr += secondTofirstJsonAddInf[i].name; 
          secondTableStr += '</th >';
@@ -386,6 +387,7 @@
     secondTableStr += '</tr>';
     secondTableStr += '<thead>';
     for (var i = 0; i < secondTableLen; i++) {
+        arrayN_S.push(i);
         secondTableStr += '<tr>';
         for (var j = 0; j < secondToFirstJson[i].length; j++) {
                 secondTableStr += '<th>';
@@ -432,7 +434,8 @@
     
     thirdTableStr += '</table>';
 
-    function createHtml(firstTableStr, secondTableStr, thirdTableStr, firstScript, secondScript ) {
+    function createHtml(firstTableStr, secondTableStr, thirdTableStr, firstScript, secondScript, numRowsFT, numRowsST,
+        numSameFT, numSameST, numUniqueFT, numUniqueST, numDiffFT, numDiffST ) {
         var smallHtmlReport = '<div class="containerData">' +
             '        <style>' +
             '            table {' +
@@ -489,13 +492,64 @@
             '                padding: 0.5vmin;' +
             '                border-bottom: #40739e 1vmax solid;' +
             '            }' +
+            '#comparingDiv {' +
+            '                display: flex;' +
+            '                flex-direction: row;' +
+            '                justify-content: center;' +
             '' +
-            '           ' +
+            '            }' +
+            '' +
+            '            #comparingDiv-left {' +
+            '                padding-right: 1.5vmin;' +
+            '                border-right: #40739e solid 0.1vmin;' +
+            '            }' +
+            '' +
+            '            #comparingDiv-right {' +
+            '                padding-left: 1.5vmin;' +
+            '                border-left: #40739e solid 0.1vmin;' +
+            '            }' +
             '        </style>' +
             '' +
             '        <div id="reportHeader">' +
             '            <h2>Comparing results</h2>' +
             '        </div>' +
+            '        <div id="comparingDiv">' +
+            '            <div id="comparingDiv-left">' +
+            '                <h2>Table1</h2>' +
+            '                <hr>' +
+            '                <h3>Namber of rows</h3>' +
+            '                <h5>' + numRowsFT + '</h5>' +
+            '                <hr>' +
+            '                <h3>Namber of same rows</h3>' +
+            '                <h5>' + numSameFT + '</h5>' +
+            '                <hr>' +
+            '                <h3>Namber of unique rows</h3>' +
+            '                <h5>' + numUniqueFT + '</h5>' +
+            '                <hr>' +
+            '                <h3>Namber of different rows</h3>' +
+            '                <h5>' + numDiffFT + '</h5>' +
+            '                <hr>' +
+            '            </div>' +
+            '            <div id="comparingDiv-right">' +
+            '                <h2>Table2</h2>' +
+            '                <hr>' +
+            '                <h3>Namber of rows</h3>' +
+            '                <h5>' + numRowsST + '</h5>' +
+            '                <hr>' +
+            '                <h3>Namber of same rows</h3>' +
+            '                <h5>' + numSameST + '</h5>' +
+            '                <hr>' +
+            '                <h3>Namber of unique rows</h3>' +
+            '                <h5>' + numUniqueST + '</h5>' +
+            '                <hr>' +
+            '                <h3>Namber of different rows</h3>' +
+            '                <h5>' + numDiffST + '</h5>' +
+            '                <hr>' +
+            '            </div>' +
+            '        </div>' +
+            '        <div id="reportHeader">' +
+            '            <h2>Tables with results and scripts</h2>' +
+            '        </div>'+
             '        <div class="diffDiv">' +
             '            <h2>Differences in first database table:</h2>' +
             '            <button class="diffBtn" id="firstTableRes" onclick="ShowResFT(\'firstTableResDiv\',\'firstTableRes\')">Show result</button>' +
@@ -576,29 +630,52 @@
 
     var scriptFT = "";
     var scriptST = "";
-    $.ajax({
-        async: true,
-        url: "CreateScript",
-        type: "POST",
-        data: { id: 1, arrayN: arrayN_F, arrayU: arrayU_F },
-        success: function (result) {
-            scriptFT = result.insert + result.update;
-        }
+    $(function () {
+        $.ajax({
+            async: true,
+            url: "CreateScript",
+            type: "POST",
+            data: { id: 1, arrayN: arrayN_F, arrayU: arrayU_F },
+            success: function (result) {
+                scriptFT = result.insert + result.update;
+            }
+        });
+        $.ajax({
+            async: true,
+            url: "CreateScript",
+            type: "POST",
+            data: { id: 3, arrayN: arrayN_S, arrayU: arrayU_S },
+            success: function (result) {
+                scriptST = result.insert + result.update;
+            }
+        });
     });
-    $.ajax({
-        async: true,
-        url: "CreateScript",
-        type: "POST",
-        data: { id: 2, arrayN: arrayN_S, arrayU: arrayU_S },
-        success: function (result) {
-            scriptST = result.insert + result.update;
-        }
-    });
+     //number of rows in table    
+    var Statistic_rows_FT = @Html.Raw(Json.Serialize(Model.AdditionalInfo.Rows[1]));
+    var Statistic_rows_ST = @Html.Raw(Json.Serialize(Model.AdditionalInfo.Rows[2]));
+    //number of same row in table    
+    var Statistic_same_FT = @Html.Raw(Json.Serialize(Model.AdditionalInfo.Same[1]));
+    var Statistic_same_ST = @Html.Raw(Json.Serialize(Model.AdditionalInfo.Same[2]));
+    //number of unique rows in table    
+    var Statistic_unique_FT = @Html.Raw(Json.Serialize(Model.AdditionalInfo.Unique[1]));
+    var Statistic_unique_ST = @Html.Raw(Json.Serialize(Model.AdditionalInfo.Unique[2]));
+    //number of different rows in table    
+    var Statistic_diff_FT = @Html.Raw(Json.Serialize(Model.AdditionalInfo.Different[1]));
+    var Statistic_diff_ST = @Html.Raw(Json.Serialize(Model.AdditionalInfo.Different[2]));
+
+    function generatePdfReport () {
+        var pdf = new jsPDF('p', 'pt', 'a4');
+        header(pdf);
+
+        doc.text("number of rows in table " + Statistic_rows_FT, margins.left + 50, 80);
+
+        pdf.save('prf-repor.pdf');
+    }
 
     function download(name, type) {
-        alert(scriptFT);
-        alert(scriptST);
-        var html = createHtml(firstTableStr, secondTableStr, thirdTableStr, scriptFT, scriptST );
+        var html = createHtml(firstTableStr, secondTableStr, thirdTableStr, scriptFT, scriptST,
+            Statistic_rows_FT, Statistic_rows_ST, Statistic_same_FT, Statistic_same_ST, Statistic_unique_FT, Statistic_unique_ST,
+            Statistic_diff_FT, Statistic_diff_ST);
         var a = document.getElementById("a");
         var file = new Blob([html], {
             type: type
@@ -606,8 +683,53 @@
         a.href = URL.createObjectURL(file);
         a.download = name;
     }
+
+    margins = {
+        top: 70,
+        bottom: 40,
+        left: 30,
+        width: 550
+    };
+
+    function imgToBase64(url, callback, imgVariable) {
+
+        if (!window.FileReader) {
+            callback(null);
+            return;
+        }
+        var xhr = new XMLHttpRequest();
+        xhr.responseType = 'blob';
+        xhr.onload = function () {
+            var reader = new FileReader();
+            reader.onloadend = function () {
+                imgVariable = reader.result.replace('text/xml', 'image/jpeg');
+                callback(imgVariable);
+            };
+            reader.readAsDataURL(xhr.response);
+        };
+        xhr.open('GET', url);
+        xhr.send();
+    };
+
+    var base64Img = null;
+    imgToBase64('/images/octocat.jpg', function (base64) {
+        base64Img = base64;
+    });
+   
+    function header(doc) {
+        doc.setFontSize(30);
+        doc.setTextColor(40);
+        doc.setFontStyle('normal');
+
+        if (base64Img) {
+            doc.addImage(base64Img, 'JPEG', margins.left, 10, 40, 40);
+        }
+
+        doc.text("Report comparing", margins.left + 50, 40);
+        doc.setLineCap(2);
+        doc.line(3, 70, margins.width + 43, 70); // horizontal line
+    };
+
+
 </script>
-
-
-
 

@@ -263,7 +263,7 @@ namespace DbComparer
         {
             string[] Result = new string[selected.Length];
             int[] arr = selected.Select(i => Int32.Parse(i)).ToArray();
-            for (int i = 0; i < selected.Length; i++)
+            for (int i = 0; i < stringsTo.Count; i++)
             {
                 string Update = "UPDATE "
                                 + SelectedTable
@@ -771,7 +771,6 @@ namespace DbComparer
                 DataConnectionString =
                                        $"Server={param["ip"]};" +
                                        $"User = {param["user"]}; Password = {param["pass"]};";
-
                 DataConnectionString += $"DATABASE={param["db"]};";
                 connection = new MySqlConnection(DataConnectionString);
                 connection.Open();

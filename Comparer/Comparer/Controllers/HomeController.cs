@@ -50,13 +50,9 @@ namespace Comparer.Controllers
         }
 
         public IActionResult About()
-        {
-            db.CloseConnection();
+        {      
             ViewData["Message"] = "Your application description page.";
-            var db1 = db.FirstDatabase;
-            db1 = new SqlDataBaseConnector();
-            db1.ConnectToDatabase("Repair");
-            return View(db1);
+            return View();
         }
 
         public IActionResult Contact()
