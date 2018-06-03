@@ -117,7 +117,7 @@ namespace DBTest
 
         public void DeleteDirectory(string path, bool recursive)
         {
-            if (path == null) path = Folder; 
+            if (path == null) path = Folder;
             if (recursive)
             {
                 var subfolders = Directory.GetDirectories(path);
@@ -229,7 +229,7 @@ namespace DBTest
                 Task.WaitAll(FirstTask, SecondTask);
                 Result.Add(1, col1);
                 Result.Add(2, col2);
-                FindUniqueDifferencess(ref Result);
+                FindUniqueDifferencess(Result);
             }
             catch (Exception ex)
             {
@@ -244,46 +244,66 @@ namespace DBTest
         /// Первинні ключі визначаються автоматично
         /// </summary>
         /// <param name="items">Набір</param>
-        public void FindUniqueDifferencess(ref Dictionary<int, List<string[]>> items)
+        public Dictionary<int, List<string[]>> FindUniqueDifferencess(Dictionary<int, List<string[]>> items)
         {
             var list1 = FirstDatabase.TableColumns.Where(item => item.ISKey).Select(i => i.Position).ToArray();
             var list2 = SecondDatabase.TableColumns.Where(item => item.ISKey).Select(i => i.Position).ToArray();
-            if (list1.Length!=list2.Length)
+            if (list1.Length != list2.Length)
             {
                 items.Add(3, new List<string[]>());
                 items.Add(4, new List<string[]>());
-                return;
+                return items;
             }
-            var first = items[1].KeyPlusDataSelection(list1);
-            var second = items[2].KeyPlusDataSelection(list2);
-            var temp = new List<string[]>();
-            var temp2 = new List<string[]>();
-            int counter = second.Count;
-            for (int i = 0; i < counter; i++)
+
+            List<string[]> first=new List<string[]>(), second=new List<string[]>();
+            var FirstTaskPrepare = new Task(() =>
             {
-                if (!first.Contains(second[i], new StringArrayComparer()))
-                {
-                    temp.Add(items[2][i]);
-                    continue;
-                }
-                temp2.Add(items[2][i]);
-            }
-            items[2] = temp2;
-            items.Add(3, temp);
-            temp = new List<string[]>();
-            temp2 = new List<string[]>();
-            counter = first.Count;
-            for (int i = 0; i < counter; i++)
+                first = items[1].KeyPlusDataSelection(list1);
+            });
+            FirstTaskPrepare.Start();
+            var SecondTaskPrepare = new Task(() =>
             {
-                if (!second.Contains(first[i], new StringArrayComparer()))
+                second = items[2].KeyPlusDataSelection(list2);
+            });
+
+            var FirstTask = new Task(() =>
+            {
+                List<string[]> temp = new List<string[]>();
+                List<string[]> temp2 = new List<string[]>();
+                int counter = second.Count;
+                for (int i = 0; i < counter; i++)
                 {
-                    temp.Add(items[1][i]);
-                    continue;
+                    if (!first.Contains(second[i], new StringArrayComparer()))
+                    {
+                        temp.Add(items[2][i]);
+                        continue;
+                    }
+                    temp2.Add(items[2][i]);
                 }
-                temp2.Add(items[1][i]);
-            }
-            items[1] = temp2;
-            items.Add(4, temp);
+                items[2] = temp2;
+                items.Add(3, temp);
+            });
+            FirstTask.Start();
+            var SecondTask = new Task(() =>
+            {
+                List<string[]> temp = new List<string[]>();
+                List<string[]> temp2 = new List<string[]>();
+                int counter = first.Count;
+                for (int i = 0; i < counter; i++)
+                {
+                    if (!second.Contains(first[i], new StringArrayComparer()))
+                    {
+                        temp.Add(items[1][i]);
+                        continue;
+                    }
+                    temp2.Add(items[1][i]);
+                }
+                items[1] = temp2;
+                items.Add(4, temp);
+            });
+            SecondTask.Start();
+            Task.WaitAll(FirstTask, SecondTask);
+            return items;
         }
 
         /// <summary>

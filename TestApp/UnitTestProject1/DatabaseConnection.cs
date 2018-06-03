@@ -205,11 +205,7 @@ namespace DbComparer
         public string BuildSelectQuery(string table = null)
         {
             string Select = "SELECT ";
-            foreach (var item in SelectedColumns)
-            {
-                Select += item.Name + ", ";
-            }
-            Select = Select.Remove(Select.Length - 2, 2);
+            Select += String.Join(", ", SelectedColumns.Select(s=>s.Name));
             Select += " FROM " + ((table == null) ? SelectedTable : table);
             return Select;
             /*

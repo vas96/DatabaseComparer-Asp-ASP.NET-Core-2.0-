@@ -1,20 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using Comparer.Models;
 using DbComparer;
 using DBTest;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Net.Http.Headers;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Internal;
 using Newtonsoft.Json;
 
@@ -22,11 +19,11 @@ namespace Comparer.Controllers
 {
     public class HomeController : Controller
     {
-        private DatabaseComparer db;
+        private readonly ICounter _counterService;
 
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly ICounter _counterService;
         private int _randomInt;
+        private DatabaseComparer db;
 
         public HomeController(DatabaseComparer context, IHostingEnvironment hostingEnvironment, ICounter counter)
         {
@@ -35,8 +32,23 @@ namespace Comparer.Controllers
             _counterService = counter;
         }
 
-        #region Pages
+        #region Error
+        /// <summary>
+        /// Сторінка для помилок
+        /// </summary>
+        /// <returns></returns>
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel {RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier});
+        }
 
+        #endregion
+
+        #region Pages
+        /// <summary>
+        /// Стартова сторінка
+        /// </summary>
+        /// <returns></returns>
         public IActionResult Index()
         {
             db.CloseConnection();
@@ -48,17 +60,21 @@ namespace Comparer.Controllers
             db.CloseConnection();
             return View(db);
         }
-
+        /// <summary>
+        /// Про розробників
+        /// </summary>
+        /// <returns></returns>
         public IActionResult About()
         {
             db.CloseConnection();
             ViewData["Message"] = "Your application description page.";
-            var db1 = db.FirstDatabase;
-            db1 = new SqlDataBaseConnector();
-            db1.ConnectToDatabase("Repair");
-            return View(db1);
+            return View();
         }
 
+        /// <summary>
+        /// Контакти
+        /// </summary>
+        /// <returns></returns>
         public IActionResult Contact()
         {
             db.CloseConnection();
@@ -68,17 +84,12 @@ namespace Comparer.Controllers
 
         #endregion
 
-        #region Error
-
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
-
-        #endregion
-
         #region Partial
-
+        /// <summary>
+        /// Часткове представлення
+        /// Сторінка завантаження файлів
+        /// </summary>
+        /// <returns></returns>
         [HttpPost]
         public IActionResult FilesDownloaded()
         {
@@ -86,14 +97,18 @@ namespace Comparer.Controllers
             return PartialView("_DownloadFiles", db);
         }
 
-
+        /// <summary>
+        /// Часткове представлення
+        /// Інформація про таблиці
+        /// </summary>
+        /// <returns></returns>
         [HttpPost]
         public IActionResult TableInfo()
         {
             try
             {
-                if ((db.FirstDatabase.connection == null || db.FirstDatabase.connection.State != ConnectionState.Open) ||
-                    (db.SecondDatabase.connection == null || db.SecondDatabase.connection.State != ConnectionState.Open))
+                if (db.FirstDatabase.connection == null || db.FirstDatabase.connection.State != ConnectionState.Open ||
+                    db.SecondDatabase.connection == null || db.SecondDatabase.connection.State != ConnectionState.Open)
                     return PartialView("_Error");
                 return PartialView("_TableInfo", db);
             }
@@ -103,6 +118,12 @@ namespace Comparer.Controllers
             }
         }
 
+        /// <summary>
+        /// Часткове представлення
+        /// Маппінг полів
+        /// </summary>
+        /// <param name="array">масив, кожен елем. - назва таблиці</param>
+        /// <returns></returns>
         [HttpPost]
         public IActionResult ColumnMapping(string[] array = null)
         {
@@ -117,15 +138,11 @@ namespace Comparer.Controllers
             }
             db.FirstDatabase.SelectedTable = array[0];
             db.SecondDatabase.SelectedTable = array[1];
-            if ((db.FirstDatabase == null ||
-                 db.FirstDatabase.connection == null ||
-                 db.FirstDatabase.connection.State != ConnectionState.Open) ||
-                (db.SecondDatabase == null ||
-                 db.SecondDatabase.connection == null ||
-                 db.SecondDatabase.connection.State != ConnectionState.Open))
-            {
+            if (db.FirstDatabase == null ||
+                db.FirstDatabase.connection == null ||
+                db.FirstDatabase.connection.State != ConnectionState.Open || db.SecondDatabase == null ||
+                db.SecondDatabase.connection == null || db.SecondDatabase.connection.State != ConnectionState.Open)
                 return PartialView("_Error");
-            }
             if (db.FirstDatabase.SelectedTable == "" || db.SecondDatabase.SelectedTable == "")
                 return PartialView("_Error");
             db.FirstDatabase.GetTableInfo();
@@ -133,6 +150,12 @@ namespace Comparer.Controllers
             return PartialView("_ColumnMapping", db);
         }
 
+        /// <summary>
+        /// Часткове представлення
+        /// Порівняння
+        /// </summary>
+        /// <param name="array">масив полів які пройшли валідацію</param>
+        /// <returns></returns>
         [HttpPost]
         public IActionResult Comparing(string[] array)
         {
@@ -141,15 +164,14 @@ namespace Comparer.Controllers
                 return PartialView("_Error");
             db.FirstDatabase.SelectedColumns.Clear();
             db.SecondDatabase.SelectedColumns.Clear();
-            int min = Math.Min(db.FirstDatabase.TableColumns.Count, db.SecondDatabase.TableColumns.Count);
-            for (int i = 0; i < min; i++)
+            var min = Math.Min(db.FirstDatabase.TableColumns.Count, db.SecondDatabase.TableColumns.Count);
+            for (var i = 0; i < min; i++)
             {
                 db.FirstDatabase.SelectedColumns.Add(db.FirstDatabase.TableColumns[i]);
                 foreach (var column in db.SecondDatabase.TableColumns)
-                {
-                    if (column.Name == array[i] && AdditionalFunctions.IsTypesComparable(column.Type, db.FirstDatabase.TableColumns[i].Type))
+                    if (column.Name == array[i] &&
+                        AdditionalFunctions.IsTypesComparable(column.Type, db.FirstDatabase.TableColumns[i].Type))
                         db.SecondDatabase.SelectedColumns.Add(column);
-                }
             }
             if (db.FirstDatabase.SelectedColumns.Count !=
                 db.SecondDatabase.SelectedColumns.Count)
@@ -165,19 +187,24 @@ namespace Comparer.Controllers
         {
             return PartialView("_SelectTable", db);
         }
+
         #endregion
 
         #region UploadFile
-
+        /// <summary>
+        /// Завантаження файлів на сервер
+        /// </summary>
+        /// <param name="file">файл</param>
+        /// <param name="id">source чи target</param>
+        /// <param name="type">тип обраної бази даних</param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<bool> Upload(IFormFile file, int? id, string type)
         {
             if (file != null)
-            {
                 try
                 {
                     string path;
-
                     if (db.Folder == null || !Directory.Exists(db.Folder))
                     {
                         while (true)
@@ -186,11 +213,15 @@ namespace Comparer.Controllers
                             path = _hostingEnvironment.WebRootPath + "\\Uploads\\Folder_" + _randomInt;
                             if (!Directory.Exists(path)) break;
                         }
+
                         Directory.CreateDirectory(path);
                         db.Folder = path;
                     }
                     else
+                    {
                         path = db.Folder;
+                    }
+
                     path += "\\File_" + id + "_" + file.FileName;
                     using (var fileStream = new FileStream(path, FileMode.Append))
                     {
@@ -198,33 +229,37 @@ namespace Comparer.Controllers
                         fileWriter.AutoFlush = true;
                         await file.CopyToAsync(fileStream);
                     }
-                    Database dbase = Database.InitializeType(type);
+
+                    var dbase = Database.InitializeType(type);
                     var a = dbase.ConnectToFile(path);
                     dbase.FileName = Path.GetFileNameWithoutExtension(file.FileName);
                     switch (id)
                     {
                         case 1:
+                        {
+                            if (db.FirstDatabase != null)
                             {
-                                if (db.FirstDatabase != null)
-                                {
-                                    db.FirstDatabase.CloseConnection();
-                                    System.IO.File.SetAttributes(path, FileAttributes.Normal);
-                                }
-                                db.FirstDatabase = dbase;
-                                break;
+                                db.FirstDatabase.CloseConnection();
+                                System.IO.File.SetAttributes(path, FileAttributes.Normal);
                             }
+
+                            db.FirstDatabase = dbase;
+                            break;
+                        }
                         case 2:
+                        {
+                            if (db.SecondDatabase != null)
                             {
-                                if (db.SecondDatabase != null)
-                                {
-                                    db.SecondDatabase.CloseConnection();
-                                    System.IO.File.SetAttributes(path, FileAttributes.Normal);
-                                }
-                                db.SecondDatabase = dbase;
-                                break;
+                                db.SecondDatabase.CloseConnection();
+                                System.IO.File.SetAttributes(path, FileAttributes.Normal);
                             }
+
+                            db.SecondDatabase = dbase;
+                            break;
+                        }
                         default: return false;
                     }
+
                     if (dbase.connection.State == ConnectionState.Open)
                         return true;
                 }
@@ -233,44 +268,43 @@ namespace Comparer.Controllers
                     Console.WriteLine(e);
                     return false;
                 }
-            }
+
             return false;
         }
 
-
+        /// <summary>
+        /// Віддалене підключення
+        /// </summary>
+        /// <param name="data">набір даних у форматі JSON</param>
+        /// <returns></returns>
         [HttpPost]
         public bool RemoteAccess(string data)
         {
             try
             {
-                string[] DbWithoutRemote = new string[] { "SQLite", "PostgreSQL" };
+                string[] DbWithoutRemote = {"SQLite", "PostgreSQL"};
                 var values = JsonConvert.DeserializeObject<Dictionary<string, string>>(data);
-                Database dbase = Database.InitializeType(values["dbType"]);
+                var dbase = Database.InitializeType(values["dbType"]);
                 if (DbWithoutRemote.Contains(values["dbType"])) return false;
-                string id = values["from"];
+                var id = values["from"];
                 var a = dbase.RemoteConnection(values);
                 switch (id)
                 {
                     case "source":
-                        {
-                            if (db.FirstDatabase != null)
-                            {
-                                db.FirstDatabase.CloseConnection();
-                            }
-                            db.FirstDatabase = dbase;
-                            break;
-                        }
+                    {
+                        if (db.FirstDatabase != null) db.FirstDatabase.CloseConnection();
+                        db.FirstDatabase = dbase;
+                        break;
+                    }
                     case "target":
-                        {
-                            if (db.SecondDatabase != null)
-                            {
-                                db.SecondDatabase.CloseConnection();
-                            }
-                            db.SecondDatabase = dbase;
-                            break;
-                        }
+                    {
+                        if (db.SecondDatabase != null) db.SecondDatabase.CloseConnection();
+                        db.SecondDatabase = dbase;
+                        break;
+                    }
                     default: return false;
                 }
+
                 if (dbase.connection.State != ConnectionState.Open)
                     return false;
             }
@@ -283,59 +317,67 @@ namespace Comparer.Controllers
             return true;
         }
 
+        /// <summary>
+        /// Очищення даних після того як користувач покидає сторінку
+        /// </summary>
+        /// <param name="i"></param>
         public void CleanNotUsedData(int i)
         {
             switch (i)
             {
                 case 1:
-                    {
-                        db = new DatabaseComparer();
-                        PageClosedAction("");
-                        break;
-                    }
+                {
+                    db = new DatabaseComparer();
+                    PageClosedAction("");
+                    break;
+                }
                 case 2:
-                    {
-                        db.FirstDatabase.SelectedTable = null;
-                        db.SecondDatabase.SelectedTable = null;
-                        break;
-                    }
+                {
+                    db.FirstDatabase.SelectedTable = null;
+                    db.SecondDatabase.SelectedTable = null;
+                    break;
+                }
                 case 3:
-                    {
-                        db.FirstDatabase.TableColumns.Clear();
-                        db.SecondDatabase.TableColumns.Clear();
-                        db.FirstDatabase.SelectedColumns.Clear();
-                        db.SecondDatabase.SelectedColumns.Clear();
-                        break;
-                    }
+                {
+                    db.FirstDatabase.TableColumns.Clear();
+                    db.SecondDatabase.TableColumns.Clear();
+                    db.FirstDatabase.SelectedColumns.Clear();
+                    db.SecondDatabase.SelectedColumns.Clear();
+                    break;
+                }
                 case 4:
-                    {
-                        db.ComparingResult = null;
-                        db.FirstData = null;
-                        db.SecondData = null;
-                        db.AdditionalInfo = null;
-                        break;
-                    }
+                {
+                    db.ComparingResult = null;
+                    db.FirstData = null;
+                    db.SecondData = null;
+                    db.AdditionalInfo = null;
+                    break;
+                }
             }
         }
 
+        /// <summary>
+        /// Закриває зєднання та видаляє дані
+        /// </summary>
+        /// <param name="page"></param>
         [HttpPost]
         public void PageClosedAction(string page)
         {
             if (db.Folder != null)
-            {
                 try
                 {
-                    int sleepTimer = 100;
-                    bool conClosed = db.CloseConnection();
-                    for (int i = 0; (i < 20) && !conClosed; i++)
+                    var sleepTimer = 100;
+                    var conClosed = db.CloseConnection();
+                    for (var i = 0; i < 20 && !conClosed; i++)
                     {
-                        Thread.Sleep(sleepTimer + (i * 100));
+                        Thread.Sleep(sleepTimer + i * 100);
                         conClosed = db.CloseConnection();
                     }
-                    bool folderDeleted = db.DeleteActiveFolder();
-                    for (int i = 0; (i < 20) && !folderDeleted; i++)
+
+                    var folderDeleted = db.DeleteActiveFolder();
+                    for (var i = 0; i < 20 && !folderDeleted; i++)
                     {
-                        Thread.Sleep(sleepTimer + (i * 100));
+                        Thread.Sleep(sleepTimer + i * 100);
                         folderDeleted = db.DeleteActiveFolder();
                     }
                 }
@@ -344,9 +386,15 @@ namespace Comparer.Controllers
                     Console.WriteLine(e);
                     throw;
                 }
-            }
         }
 
+        /// <summary>
+        /// Створення скриптів на вставку та оновлення даних
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="arrayN"></param>
+        /// <param name="arrayU"></param>
+        /// <returns></returns>
         [HttpPost]
         public JsonResult CreateScript(int id, string[] arrayN = null, string[] arrayU = null)
         {
@@ -354,72 +402,27 @@ namespace Comparer.Controllers
             switch (id)
             {
                 case 1:
-                    {
-                        Update = db.SecondDatabase.BuildUpdate(db.ComparingResult[2], db.ComparingResult[1], arrayN);
-                        Insert = db.SecondDatabase.BuildInsert(db.ComparingResult[3], arrayU);
-                        break;
-                    }
+                {
+                    Update = db.SecondDatabase.BuildUpdate(db.ComparingResult[2], db.ComparingResult[1], arrayN);
+                    Insert = db.SecondDatabase.BuildInsert(db.ComparingResult[3], arrayU);
+                    break;
+                }
                 case 2:
-                    {
-                        Update = db.SecondDatabase.BuildUpdate(db.ComparingResult[2], db.ComparingResult[1], arrayN);
-                        Insert = db.FirstDatabase.BuildUpdate(db.ComparingResult[1], db.ComparingResult[2], arrayN);
-                        break;
-                    }
+                {
+                    Update = db.SecondDatabase.BuildUpdate(db.ComparingResult[2], db.ComparingResult[1], arrayN);
+                    Insert = db.FirstDatabase.BuildUpdate(db.ComparingResult[1], db.ComparingResult[2], arrayN);
+                    break;
+                }
                 case 3:
-                    {
-                        Update = db.FirstDatabase.BuildUpdate(db.ComparingResult[1], db.ComparingResult[2], arrayN);
-                        Insert = db.FirstDatabase.BuildInsert(db.ComparingResult[4], arrayU);
-                        break;
-                    }
+                {
+                    Update = db.FirstDatabase.BuildUpdate(db.ComparingResult[1], db.ComparingResult[2], arrayN);
+                    Insert = db.FirstDatabase.BuildInsert(db.ComparingResult[4], arrayU);
+                    break;
+                }
             }
-
-            var ForReturn = new { Insert = Insert.Join("\n"), Update = Update.Join("\n") };
+            var ForReturn = new {Insert = Insert.Join("\n"), Update = Update.Join("\n")};
             return Json(ForReturn);
         }
         #endregion
     }
 }
-
-
-/*
- Код для "дебагу"
- Вставити на будь-яку сторінку
-             DatabaseComparer comp = new DatabaseComparer();
-            var task1 = new Task(() =>
-            {
-                comp.FirstDatabase = new SqlDataBaseConnector();
-                var c1 = comp.FirstDatabase.ConnectToServer();
-                var c2 = comp.FirstDatabase.ConnectToDatabase("Repair");
-                comp.FirstDatabase.SelectedTable = "NewEmployees";
-                comp.FirstDatabase.GetTableInfo("NewEmployees");
-                foreach (var item in comp.FirstDatabase.TableColumns)
-                {
-                    comp.FirstDatabase.SelectedColumns.Add(item.Name);
-                }
-            });
-            task1.Start();
-            var task2 = new Task(() =>
-            {
-                comp.SecondDatabase = new SqlDataBaseConnector();
-                var c12 = comp.SecondDatabase.ConnectToServer();
-                var c22 = comp.SecondDatabase.ConnectToDatabase("Repair");
-                comp.SecondDatabase.SelectedTable = "NewEmployees2";
-                comp.SecondDatabase.GetTableInfo();
-                foreach (var item in comp.SecondDatabase.TableColumns)
-                {
-                    comp.SecondDatabase.SelectedColumns.Add(item.Name);
-                }
-            });
-            task2.Start();
-            Task.WaitAll(task1, task2);
-            Stopwatch sw1 = new Stopwatch();
-            Stopwatch sw2 = new Stopwatch();
-            sw1.Start();
-            IEnumerable<string[]> table1 = null, table2 = null;
-            var dasda = comp.ReadDataFromDb();
-            sw1.Stop();
-            sw2.Start();
-            var res = comp.CompareFullData();
-            sw2.Stop();
-            System.Console.WriteLine(1);
- */
