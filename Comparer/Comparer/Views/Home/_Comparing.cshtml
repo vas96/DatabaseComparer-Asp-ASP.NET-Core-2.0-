@@ -8,19 +8,18 @@
 
     var FirstToSecond_unique = @Model.ComparingResult[3];
     var SecondToFirst_unique = @Model.ComparingResult[4];
-
 }
 
 <div class="container">
     <h3 class="text-center">Comparing results</h3>
     <ul class="nav nav-tabs">
-        <li class="active"><a data-toggle="tab" href="#home">First table difference</a></li>
-        <li><a data-toggle="tab" href="#menu1">Two table difference</a></li>
+        <li><a data-toggle="tab" href="#menu1">First table difference</a></li>
+        <li class="active"><a data-toggle="tab" href="#home">Two table difference</a></li>
         <li><a data-toggle="tab" href="#menu2">Second table difference</a></li>
     </ul>
 
     <div class="tab-content">
-        <div id="home" class="tab-pane fade in active">
+        <div id="menu1" class="tab-pane fade">
             <table class="table table-condensed">
                 <thead>
                     <tr>
@@ -39,7 +38,7 @@
                             <td class="warning text-center"> <input type="checkbox" name="FirstDatabaseCheckbox" checked value="@i"></td>
                             @for (int j = 0; j < temp.Count; j++)
                             {
-                                <td class="success">
+                                <td class="success dataTd_source_first">
                                     @temp[j]
                                 </td>
                             }
@@ -52,7 +51,7 @@
                             <td class="warning text-center"> <input type="checkbox" name="FirstDatabaseCheckboxUnique" checked value="@i"></td>
                             @for (int j = 0; j < temp.Count; j++)
                             {
-                                <td class="danger">
+                                <td class="danger dataTd_source_first">
                                     @temp[j]
                                 </td>
                             }
@@ -87,7 +86,7 @@
                 </div>
             </div>
         </div>
-        <div id="menu1" class="tab-pane fade">
+        <div id="home" class="tab-pane fade in active">
             <table class="table table-condensed">
                 <thead>
                     <tr>
@@ -117,10 +116,10 @@
 
                             @for (int j = 0; j < columnNumber; j++)
                             {
-                                <td class="warning">
+                                <td class="warning dataTd_source">
                                     @temp[j]
                                 </td>
-                                <td class="danger">
+                                <td class="danger dataTd_target">
                                     @temp2[j]
                                 </td>
                             }
@@ -231,6 +230,30 @@
 </div>
 <script src="~/js/jspdf.min.js"></script>
 <script type="text/javascript">
+
+    //function func() {
+    //    $("td.dataTd_source_first").each(function (i) {
+    //        if ($(this).html() === $(this).next().html()) {
+    //            console.log(i+"this"+$(this).html());
+    //            console.log(i+"thisNext" +$(this).next().html());
+    //            $(this).css({ 'border-left': '0.3vmin solid red' }).css({ 'border-top': '0.3vmin solid red' }).css({ 'border-bottom': '0.3vmin solid red' });
+    //            $(this).next().css({ 'border-right': '0.3vmin solid red' }).css({ 'border-top': '0.3vmin solid red' }).css({ 'border-bottom': '0.3vmin solid red' });
+    //            } 
+    //            });
+    //};
+    //setTimeout(func, 1000);
+
+    function ShowDiff() {
+        var len = $("td.dataTd_source").toArray().length;
+        for (var i = 0; i < len; i++) {
+            if ($("body").find("td.dataTd_source").eq(i).text() !== $("body").find("td.dataTd_target").eq(i).text()) {
+                $("body").find("td.dataTd_source").eq(i).css({ 'border-left': '0.5vmin solid red' }).css({ 'border-bottom': '0.1vmin solid red' }).css({ 'border-top': '0.1vmin solid red' });               
+                $("body").find("td.dataTd_target").eq(i).css({ 'border-right': '0.5vmin solid red' }).css({ 'border-bottom': '0.1vmin solid red' }).css({ 'border-top': '0.1vmin solid red' });
+            }
+        }
+    };
+    setTimeout(ShowDiff, 350);
+
     $(function () {
         var buttons = $(".ColapsableScript").toArray();
         buttons.forEach(function (item, i) {
