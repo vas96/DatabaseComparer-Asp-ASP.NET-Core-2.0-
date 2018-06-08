@@ -143,16 +143,30 @@
     }
     //transition to next view
     $("#GoTableInfo").click(function () {
-        waitingDialog.show();
-        $.ajax({
-            url: "TableInfo",
-            type: "POST",
-            success: function (result) {
-                waitingDialog.hide();
-                $("#Partial").html(result);
-            }
-        });
+       
+        if ((screen.width >= 1920) && (screen.height >= 1080)) {
+            waitingDialog.show();
+            $.ajax({
+                url: "TableInfo",
+                type: "POST",
+                success: function (result) {
+                    waitingDialog.hide();
+                    $("#Partial").html(result);
+                }
+            });
+        } else {
+            waitingDialog.show();
+            $.ajax({
+                url: "SmallTableInfo",
+                type: "POST",
+                success: function (result) {
+                    waitingDialog.hide();
+                    $("#Partial").html(result);
+                }
+            });
+        }
     });
+
     //function for show connection result info
     function ReturnInfo(elem, result) {
         $(elem).css("visibility", "visible");

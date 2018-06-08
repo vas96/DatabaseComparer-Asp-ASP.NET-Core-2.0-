@@ -98,6 +98,21 @@ namespace Comparer.Controllers
                 return PartialView("_Error", ex);
             }
         }
+        [HttpPost]
+        public IActionResult SmallTableInfo()
+        {
+            try
+            {
+                if ((db.FirstDatabase.connection == null || db.FirstDatabase.connection.State != ConnectionState.Open) ||
+                    (db.SecondDatabase.connection == null || db.SecondDatabase.connection.State != ConnectionState.Open))
+                    return PartialView("_Error");
+                return PartialView("_SmallTableInfo", db);
+            }
+            catch (Exception ex)
+            {
+                return PartialView("_Error", ex);
+            }
+        }
 
         [HttpPost]
         public IActionResult ColumnMapping(string[] array = null)
