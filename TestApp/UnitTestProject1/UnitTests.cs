@@ -326,12 +326,12 @@ namespace UnitTestProject1
             {
                 SqlDataBaseConnector con1 = new SqlDataBaseConnector();
                 var st1 = con1.ConnectToFile(
-                    @"D:\GitHub\Database_Comaparer\DatabaseComparer-Asp-ASP.NET-Core-2.0-\TestDatabases\sakila.mdf");
+                    @"C:\DatabaseComparer-Asp-ASP.NET-Core-2.0-\TestDatabases\sakila.mdf");
                 var l11 = con1.GetTablesList();
                 l11.Sort();
                 SQLiteDatabaseConnector con2 = new SQLiteDatabaseConnector();
                 var st2 = con2.ConnectToFile(
-                    @"D:\GitHub\Database_Comaparer\DatabaseComparer-Asp-ASP.NET-Core-2.0-\TestDatabases\sakila.db");
+                    @"C:\DatabaseComparer-Asp-ASP.NET-Core-2.0-\TestDatabases\sakila.db");
                 var l21 = con2.GetTablesList();
                 l21.Sort();
 

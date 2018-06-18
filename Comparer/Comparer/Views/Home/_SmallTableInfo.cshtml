@@ -1,0 +1,193 @@
+﻿@using System.Data
+@using DbComparer
+@model DBTest.DatabaseComparer
+
+<link rel="stylesheet" href="~/css/PartialViewCss/TableInfo.css" />
+
+<style>
+    .RadioAndButon{
+        justify-content:flex-start;
+        align-items:center;
+    }
+        .RadioAndButon label {
+            padding-right: 0.2vmin;
+        }
+        .RadioAndButon input[type="radio"] {
+            margin-right: 1.3vmin !important;
+        }
+        .customHr {
+            padding: 0.13vmin !important;
+            margin: 0.13vmin !important;
+        }
+    .customHr-header {
+        border-top: 1.1vmin solid #40739e;
+        padding: 0.1vmin !important;
+        margin: 0.1vmin !important;
+    }
+    .btn-plus{
+        border:none;
+    }
+    #sortSource{
+        border:none!important;
+    }
+    #sortTarget {
+        border: none!important;
+    }
+
+</style>
+<h1 style="margin-top: 70px">Check tables</h1>
+<hr />
+<div class="container-fluid">
+    <div class="col-md-6">
+        <div>
+            <h3>@Model.FirstDatabase.FileName (source) </h3>
+            <h4> @Model.FirstDatabase.DbType database</h4>
+            <button id="sortSource" class="btn-sm btn-default-custom">Sort by name</button>
+            <hr class="customHr-header" />
+        </div>
+        <div>
+            @{
+                List<String> drcFirstDBNamesTB = Model.FirstDatabase.GetTablesList();
+            }
+            <div>
+                <div id="container-source">
+                    @foreach (String nameTB in drcFirstDBNamesTB)
+                    {
+                        <div class="box-source">
+                            <div class="RadioAndButon">
+                                <label><input type="radio" name="FirstDatabaseCH" value=@nameTB checked="checked">@nameTB</label>
+                                <button data-toggle="collapse" data-target="#@nameTB" type="button" class="btn btn-default btn-plus">
+                                    <span class="glyphicon glyphicon-plus"></span>
+                                </button>
+                                <hr class="customHr" />
+                            </div>
+
+                            <div id="@nameTB" class="collapse">
+                                @{
+                                    Model.FirstDatabase.GetTableInfo(nameTB);
+                                    foreach (Database.Column typesTB in Model.FirstDatabase.TableColumns)
+                                    {
+                                        <p class="TbType"> @typesTB.Name</p>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div>
+            <h3>@Model.SecondDatabase.FileName (target) </h3>
+            <h4> @Model.SecondDatabase.DbType database</h4>
+            <button id="sortTarget" class="btn-sm btn-default-custom">Sort by name</button>
+            <hr class="customHr-header" />
+        </div>
+        <div>
+            @{
+                List<String> drcSeconDBNamesTB = Model.SecondDatabase.GetTablesList();
+            }
+            <div>
+
+                <div id="container-target">
+                    @foreach (String nameTB in drcSeconDBNamesTB)
+                    {
+                        <div class="box-target">
+                            <div class="RadioAndButon">
+
+                                <label><input type="radio" name="SecondDatabaseCH" value=@nameTB checked="checked">@nameTB</label>
+                                <button data-toggle="collapse" data-target="#@nameTB@Model.SecondDatabase.DbType" type="button" class="btn btn-default btn-plus">
+                                    <span class="glyphicon glyphicon-plus"></span>
+                                </button>
+                                <hr class="customHr" />
+                            </div>
+
+                            <div id="@nameTB@Model.SecondDatabase.DbType" class="collapse">
+                                @{
+                                    Model.SecondDatabase.GetTableInfo(nameTB);
+                                    foreach (Database.Column typesTB in Model.SecondDatabase.TableColumns)
+                                    {
+                                        <p class="TbType"> @typesTB.Name</p>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button type="button" class="btn-lg btn-block btn-primary-custom" id="GoToColumnMapping">Check Columns</button>
+    <button type="button" class="btn-lg btn-block btn-default-custom" id="Back" style="margin-bottom:1.5vmin;">Step back</button>
+</div>
+<script>
+    //choose dafault table and scrool top
+    $(document).ready(function () {
+        $("html, body").animate({ scrollTop: 0 }, "slow");
+        $("[name=FirstDatabaseCH]").first().prop("checked", true);
+        $("[name=SecondDatabaseCH]").first().prop("checked", true);
+    });
+    //change glyphicon (plus/minus)
+    var buttons = $(".btn-plus").toArray();
+    buttons.forEach(function (item, i) {
+        $(item).click(function () {
+            $(this).find('span').toggleClass('glyphicon-plus').toggleClass('glyphicon-minus');
+        })
+    });
+    //sort div function
+    function sortDivs(source, boxClass, containerId, buttonId) {
+        $(buttonId).on('click', function () {
+            var $divs = $(boxClass);
+            var alphabeticallyOrderedDivs = $divs.sort(function (a, b) {
+                if ($(a).find("label.TbName").text().trim().toLowerCase() < $(b).find("label.TbName").text().trim().toLowerCase()) {
+                    return -1;
+                } else if ($(a).find("label.TbName").text().trim().toLowerCase() > $(b).find("label.TbName").text().trim().toLowerCase()) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            });
+            ($(boxClass).text() == source.text()) ? ($(containerId).html(alphabeticallyOrderedDivs) && $(buttonId).html('Sort by name')) : ($(containerId).html(source) && $(buttonId).html('Sort by db position'));
+        });
+    }
+    //variables for saving not sortable tables(like in db)
+    var $divsOriginSource = $("div.box-source");
+    var $divsOriginTarget = $("div.box-target");
+    //sorting
+    sortDivs($divsOriginSource, "div.box-source", "#container-source", "#sortSource");
+    sortDivs($divsOriginTarget, "div.box-target", "#container-target", "#sortTarget");
+    //go to next comparing view
+    $("#GoToColumnMapping").click(function () {
+        var array = [];
+        array.push($('input[name=FirstDatabaseCH]:checked').val());
+        array.push($('input[name=SecondDatabaseCH]:checked').val());
+        waitingDialog.show();
+        $.ajax({
+            async: true,
+            url: "ColumnMapping",
+            type: "POST",
+            data: { array: array },
+            cache: false,
+            success: function (result) {
+                waitingDialog.hide();
+                $("#Partial").html(result);
+            }
+        });
+    });
+    //back to previous view
+    $("#Back").click(function () {
+        waitingDialog.show();
+        $.ajax({
+            url: "FilesDownloaded",
+            type: "POST",
+            success: function (result) {
+                waitingDialog.hide();
+                $("#Partial").html(result);
+            }
+        });
+    });
+</script>
+
