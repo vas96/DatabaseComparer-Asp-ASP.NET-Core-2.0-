@@ -13,12 +13,14 @@ namespace Comparer.Models
             var Text_Family = new string[] {
                 "CHAR", "VARCHAR", "TINYTEXT", "TEXT", "BLOB", "MEDIUMTEXT",
                 "MEDIUMBLOB", "LONGTEXT", "LONGBLOB", "ENUM", "SET", "NCHAR", "NVARCHAR", "NTEXT",
-                "BINARY", "VARBINARY", "IMAGE"
+                "BINARY", "VARBINARY", "IMAGE","CHARACTER"
             };
             var Numeric_Family = new string[] {"TINYINT", "SMALLINT", "MEDIUMINT", "INT", "BIGINT", "FLOAT", "DOUBLE", "DECIMAL",
-            "BIT", "BIGINT", "NUMERIC", "SMALLMONEY", "READ"
+            "BIT", "BIGINT", "NUMERIC", "SMALLMONEY", "REAL","DOUBLE PRECISION","SMALLSERIAL","SERIAL","BIGSERIAL","INT2",
+                "INT4","INT8","SERIAL2","SERIAL4","SERIAL8","FLOAT8"
                 };
-            var Date_Family = new string[] { "DATE", "DATETIME", "TIMESTAMP", "TIME", "YEAR", "DATETIME2", "SMALLDATETIME", "DATETIMEOFFSET" };
+            var Date_Family = new string[] { "DATE", "DATETIME", "TIMESTAMP", "TIME", "YEAR", "DATETIME2",
+                "SMALLDATETIME", "DATETIMEOFFSET","INTERVAL","TIMETZ","TIMESTAMPTZ" };
             word1 = word1.ToUpper();
             word2 = word2.ToUpper();
             if ((Text_Family.Contains(word1) && (Text_Family.Contains(word2))) ||

@@ -1,17 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using DbComparer;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using NaturalSort.Extension;
 
 namespace DBTest
@@ -19,27 +13,27 @@ namespace DBTest
     public class DatabaseComparer
     {
         /// <summary>
-        /// Екземпляри БД
-        /// </summary>
-        public Database FirstDatabase, SecondDatabase;
-
-        /// <summary>
-        /// Результати читання з БД
-        /// </summary>
-        public List<string[]> FirstData, SecondData;
-
-        /// <summary>
-        /// Результати порівняння
-        /// </summary>
-        public Dictionary<int, List<string[]>> ComparingResult;
-
-        /// <summary>
-        /// Статистика про порівняні рядки
+        ///     Статистика про порівняні рядки
         /// </summary>
         public Statistic AdditionalInfo;
 
         /// <summary>
-        /// Ініціалізація полів
+        ///     Результати порівняння
+        /// </summary>
+        public Dictionary<int, List<string[]>> ComparingResult;
+
+        /// <summary>
+        ///     Результати читання з БД
+        /// </summary>
+        public List<string[]> FirstData, SecondData;
+
+        /// <summary>
+        ///     Екземпляри БД
+        /// </summary>
+        public Database FirstDatabase, SecondDatabase;
+
+        /// <summary>
+        ///     Ініціалізація полів
         /// </summary>
         public DatabaseComparer()
         {
@@ -53,12 +47,12 @@ namespace DBTest
         }
 
         /// <summary>
-        /// Шлях до папки активного користувача
+        ///     Шлях до папки активного користувача
         /// </summary>
         public string Folder { get; set; }
 
         /// <summary>
-        /// Закриває всі підключення до БД
+        ///     Закриває всі підключення до БД
         /// </summary>
         /// <returns></returns>
         public bool CloseConnection()
@@ -79,31 +73,36 @@ namespace DBTest
                 Console.WriteLine(e);
                 return false;
             }
+
             return true;
         }
 
         /// <summary>
-        /// Видаляє папку активного користувача
+        ///     Видаляє папку активного користувача
         /// </summary>
         /// <returns></returns>
         public bool DeleteActiveFolder()
         {
             try
             {
-                if ((FirstDatabase == null || FirstDatabase.connection == null || FirstDatabase.connection.State == ConnectionState.Closed)
-                    && (SecondDatabase == null || SecondDatabase.connection == null || SecondDatabase.connection.State == ConnectionState.Closed))
+                if ((FirstDatabase == null || FirstDatabase.connection == null ||
+                     FirstDatabase.connection.State == ConnectionState.Closed)
+                    && (SecondDatabase == null || SecondDatabase.connection == null ||
+                        SecondDatabase.connection.State == ConnectionState.Closed))
                 {
                     if (Directory.Exists(Folder))
                     {
-                        string[] files = Directory.GetFiles(Folder);
-                        foreach (string file in files)
+                        var files = Directory.GetFiles(Folder);
+                        foreach (var file in files)
                         {
                             File.SetAttributes(file, FileAttributes.Normal);
                             File.Delete(file);
                         }
+
                         Directory.Delete(Folder, false);
                         Folder = null;
                     }
+
                     return true;
                 }
             }
@@ -112,6 +111,7 @@ namespace DBTest
                 Console.WriteLine(e);
                 return false;
             }
+
             return true;
         }
 
@@ -121,27 +121,21 @@ namespace DBTest
             if (recursive)
             {
                 var subfolders = Directory.GetDirectories(path);
-                foreach (var s in subfolders)
-                {
-                    DeleteDirectory(s, recursive);
-                }
+                foreach (var s in subfolders) DeleteDirectory(s, recursive);
             }
+
             var files = Directory.GetFiles(path);
             foreach (var f in files)
-            {
                 try
                 {
                     var attr = File.GetAttributes(f);
                     if ((attr & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
-                    {
                         File.SetAttributes(f, attr ^ FileAttributes.ReadOnly);
-                    }
                     File.Delete(f);
                 }
                 catch (IOException)
                 {
                 }
-            }
 
             // At this point, all the files and sub-folders have been deleted.
             // So we delete the empty folder using the OOTB Directory.Delete method.
@@ -149,15 +143,15 @@ namespace DBTest
         }
 
         /// <summary>
-        /// Читає дані з 1-ї і 2-ї БД.
-        /// Запити генеруються на основі SelectedColumns
+        ///     Читає дані з 1-ї і 2-ї БД.
+        ///     Запити генеруються на основі SelectedColumns
         /// </summary>
         /// <returns></returns>
         public bool ReadDataFromDb()
         {
             try
             {
-                Stopwatch sw = new Stopwatch();
+                var sw = new Stopwatch();
                 AdditionalInfo = new Statistic();
                 var FirstTask = new Task(() =>
                 {
@@ -183,36 +177,39 @@ namespace DBTest
                 Console.WriteLine(ex);
                 return false;
             }
+
             return true;
         }
 
 
         /// <summary>
-        /// Повертає словник з 2-х елементів
-        /// 1-й FirstDb.Except(SecondDb)
-        /// 2-й SecondDb.Except(FirstDb)
+        ///     Повертає словник з 2-х елементів
+        ///     1-й FirstDb.Except(SecondDb)
+        ///     2-й SecondDb.Except(FirstDb)
         /// </summary>
         /// <returns></returns>
         public Dictionary<int, List<string[]>> CompareFullData()
         {
-            Dictionary<int, List<string[]>> Result = new Dictionary<int, List<string[]>>();
+            var Result = new Dictionary<int, List<string[]>>();
             try
             {
                 List<string[]> col1 = null, col2 = null;
-                Stopwatch sw = new Stopwatch();
+                var sw = new Stopwatch();
                 var FirstTask = new Task(() =>
                 {
                     col1 = FirstData.Except(SecondData, new StringArrayComparer()).ToList();
                     var list1 = FirstDatabase.TableColumns.Where(item => item.ISKey).ToList();
-                    int[] FirstKeys = new int[list1.Count];
+                    var FirstKeys = new int[list1.Count];
                     if (list1.Count != 0)
                     {
-                        IOrderedQueryable<string[]> temp = col1.AsQueryable().OrderBy(i => i[list1[0].Position], StringComparer.OrdinalIgnoreCase.WithNaturalSort());
-                        for (int i = 1; i < list1.Count; i++)
+                        var temp = col1.AsQueryable().OrderBy(i => i[list1[0].Position],
+                            StringComparer.OrdinalIgnoreCase.WithNaturalSort());
+                        for (var i = 1; i < list1.Count; i++)
                         {
                             FirstKeys[i] = list1[i].Position;
                             temp = temp.ThenBy(j => j[FirstKeys[i]]);
                         }
+
                         col1 = temp.ToList();
                     }
                 });
@@ -222,15 +219,17 @@ namespace DBTest
                 {
                     col2 = SecondData.Except(FirstData, new StringArrayComparer()).ToList();
                     var list2 = SecondDatabase.TableColumns.Where(item => item.ISKey).ToList();
-                    int[] SecondKeys = new int[list2.Count];
+                    var SecondKeys = new int[list2.Count];
                     if (list2.Count != 0)
                     {
-                        IOrderedQueryable<string[]> temp = col2.AsQueryable().OrderBy(i => i[list2[0].Position], StringComparer.OrdinalIgnoreCase.WithNaturalSort());
-                        for (int i = 1; i < list2.Count; i++)
+                        var temp = col2.AsQueryable().OrderBy(i => i[list2[0].Position],
+                            StringComparer.OrdinalIgnoreCase.WithNaturalSort());
+                        for (var i = 1; i < list2.Count; i++)
                         {
                             SecondKeys[i] = list2[i].Position;
                             temp = temp.ThenBy(j => j[SecondKeys[i]]);
                         }
+
                         col2 = temp.ToList();
                     }
                 });
@@ -245,20 +244,23 @@ namespace DBTest
                 AdditionalInfo.Different.Add(2, Result[2].Count);
                 AdditionalInfo.Unique.Add(1, Result[3].Count);
                 AdditionalInfo.Unique.Add(2, Result[4].Count);
-                AdditionalInfo.Same.Add(1, AdditionalInfo.Rows[1] - (AdditionalInfo.Different[1] + AdditionalInfo.Unique[1]));
-                AdditionalInfo.Same.Add(2, AdditionalInfo.Rows[2] - (AdditionalInfo.Different[2] + AdditionalInfo.Unique[2]));
+                AdditionalInfo.Same.Add(1,
+                    AdditionalInfo.Rows[1] - (AdditionalInfo.Different[1] + AdditionalInfo.Unique[1]));
+                AdditionalInfo.Same.Add(2,
+                    AdditionalInfo.Rows[2] - (AdditionalInfo.Different[2] + AdditionalInfo.Unique[2]));
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
                 return null;
             }
+
             return Result;
         }
 
         /// <summary>
-        /// Визначає унікальні рядки в наборі
-        /// Первинні ключі визначаються автоматично
+        ///     Визначає унікальні рядки в наборі
+        ///     Первинні ключі визначаються автоматично
         /// </summary>
         /// <param name="items">Набір</param>
         public void FindUniqueDifferencess(ref Dictionary<int, List<string[]>> items)
@@ -271,57 +273,62 @@ namespace DBTest
                 items.Add(4, new List<string[]>());
                 return;
             }
+
             var first = items[1].KeyPlusDataSelection(list1);
             var second = items[2].KeyPlusDataSelection(list2);
             var temp = new List<string[]>();
             var temp2 = new List<string[]>();
-            int counter = second.Count;
-            for (int i = 0; i < counter; i++)
+            var counter = second.Count;
+            for (var i = 0; i < counter; i++)
             {
                 if (!first.Contains(second[i], new StringArrayComparer()))
                 {
                     temp.Add(items[2][i]);
                     continue;
                 }
+
                 temp2.Add(items[2][i]);
             }
+
             items[2] = temp2;
             items.Add(3, temp);
             temp = new List<string[]>();
             temp2 = new List<string[]>();
             counter = first.Count;
-            for (int i = 0; i < counter; i++)
+            for (var i = 0; i < counter; i++)
             {
                 if (!second.Contains(first[i], new StringArrayComparer()))
                 {
                     temp.Add(items[1][i]);
                     continue;
                 }
+
                 temp2.Add(items[1][i]);
             }
+
             items[1] = temp2;
             items.Add(4, temp);
         }
 
         /// <summary>
-        /// Повертає порівняння лвох колонок як масив рядків
+        ///     Повертає порівняння лвох колонок як масив рядків
         /// </summary>
         /// <param name="SelectedColumn">Номер колонки</param>
         /// <returns></returns>
         public Dictionary<int, List<string[]>> CompareColumnsWithKeys(int SelectedColumn)
         {
-            Dictionary<int, List<string[]>> Result = new Dictionary<int, List<string[]>>();
+            var Result = new Dictionary<int, List<string[]>>();
             try
             {
                 //дістаєм імена колонок-ключів
                 var list1 = FirstDatabase.TableColumns.Where(item => item.ISKey).ToList();
                 var list2 = FirstDatabase.TableColumns.Where(item => item.ISKey).ToList();
                 //Дістаєм мінімальну к-сть головних ключів з таблиць
-                int min = Math.Min(list1.Count, list2.Count);
-                int[] FirstKeys = new int[min + 1];
-                int[] SecondKeys = new int[min + 1];
+                var min = Math.Min(list1.Count, list2.Count);
+                var FirstKeys = new int[min + 1];
+                var SecondKeys = new int[min + 1];
                 //додаєм назви цих колонок до запитів
-                for (int i = 0; i < min; i++)
+                for (var i = 0; i < min; i++)
                 {
                     FirstKeys[i] = list1[i].Position;
                     SecondKeys[i] = list2[i].Position;
@@ -335,10 +342,10 @@ namespace DBTest
                 });
                 task1.Start();
                 var task2 = new Task(() =>
-                    {
-                        SecondKeys[min] = SecondDatabase.TableColumns[SelectedColumn].Position;
-                        col2 = SecondData.KeyPlusDataSelection(SecondKeys).ToList();
-                    });
+                {
+                    SecondKeys[min] = SecondDatabase.TableColumns[SelectedColumn].Position;
+                    col2 = SecondData.KeyPlusDataSelection(SecondKeys).ToList();
+                });
                 task2.Start();
                 Task.WaitAll(task1, task2);
                 Result.Add(1, col1);
@@ -349,24 +356,25 @@ namespace DBTest
                 Console.WriteLine(e);
                 return null;
             }
+
             return Result;
         }
 
         public Dictionary<int, List<string[]>> CompareColumns(int SelectedColumn)
         {
-            Dictionary<int, List<string[]>> Result = new Dictionary<int, List<string[]>>();
+            var Result = new Dictionary<int, List<string[]>>();
             try
             {
                 List<string[]> col1 = null, col2 = null;
                 var task1 = new Task(() =>
                 {
-                    int[] col = new[] { FirstDatabase.TableColumns[SelectedColumn].Position };
+                    var col = new[] {FirstDatabase.TableColumns[SelectedColumn].Position};
                     col1 = FirstData.KeyPlusDataSelection(col).ToList();
                 });
                 task1.Start();
                 var task2 = new Task(() =>
                 {
-                    int[] col = new[] { SecondDatabase.TableColumns[SelectedColumn].Position };
+                    var col = new[] {SecondDatabase.TableColumns[SelectedColumn].Position};
                     col2 = SecondData.KeyPlusDataSelection(col).ToList();
                 });
                 task2.Start();
@@ -379,44 +387,45 @@ namespace DBTest
                 Console.WriteLine(e);
                 return null;
             }
+
             return Result;
         }
     }
 
     /// <summary>
-    /// Для статистики пошуку
+    ///     Для статистики пошуку
     /// </summary>
     public class Statistic
     {
         /// <summary>
-        /// Одинакових записів
-        /// </summary>
-        public Dictionary<int, int> Same;
-
-        /// <summary>
-        /// Відмінних записів
-        /// </summary>
-        public Dictionary<int, int> Different;
-
-        /// <summary>
-        /// Унікальних записів
-        /// </summary>
-        public Dictionary<int, int> Unique;
-
-        /// <summary>
-        /// Загалом рядків
-        /// </summary>
-        public Dictionary<int, int> Rows;
-
-        /// <summary>
-        /// Час порівняння
+        ///     Час порівняння
         /// </summary>
         public TimeSpan CompareTime;
 
         /// <summary>
-        /// Час вибірки
+        ///     Відмінних записів
+        /// </summary>
+        public Dictionary<int, int> Different;
+
+        /// <summary>
+        ///     Загалом рядків
+        /// </summary>
+        public Dictionary<int, int> Rows;
+
+        /// <summary>
+        ///     Одинакових записів
+        /// </summary>
+        public Dictionary<int, int> Same;
+
+        /// <summary>
+        ///     Час вибірки
         /// </summary>
         public TimeSpan SelectTime;
+
+        /// <summary>
+        ///     Унікальних записів
+        /// </summary>
+        public Dictionary<int, int> Unique;
 
         public Statistic()
         {
@@ -430,12 +439,12 @@ namespace DBTest
     }
 
     /// <summary>
-    /// Клас з розширеннями IEnumerable<string[]>
+    ///     Клас з розширеннями IEnumerable<string[]>
     /// </summary>
     public static class Extension
     {
         /// <summary>
-        /// Я не знаю, нашо тут це розширення. Просто тому шо я можу
+        ///     Я не знаю, нашо тут це розширення. Просто тому шо я можу
         /// </summary>
         /// <param name="table">Таблиця</param>
         /// <returns></returns>
@@ -443,17 +452,14 @@ namespace DBTest
         {
             foreach (DataRow row in table.Rows)
             {
-                string str = row.ItemArray[0].ToString();
-                for (int i = 1; i < row.ItemArray.Length; i++)
-                {
-                    str += " " + row.ItemArray[i];
-                }
+                var str = row.ItemArray[0].ToString();
+                for (var i = 1; i < row.ItemArray.Length; i++) str += " " + row.ItemArray[i];
                 yield return str;
             }
         }
 
         /// <summary>
-        /// Ага, тово тоже не потрібне
+        ///     Ага, тово тоже не потрібне
         /// </summary>
         /// <param name="table"></param>
         /// <returns></returns>
@@ -461,13 +467,13 @@ namespace DBTest
         {
             foreach (DataRow row in table.Rows)
             {
-                int last = row.ItemArray.Length - 1;
+                var last = row.ItemArray.Length - 1;
                 yield return row.ItemArray[last].ToString();
             }
         }
 
         /// <summary>
-        /// Витягує з нумерованого масиву рядків певні стовпці
+        ///     Витягує з нумерованого масиву рядків певні стовпці
         /// </summary>
         /// <param name="arr1">Собсно масив</param>
         /// <param name="arr2">А тут - масив рядків, які тре дістати</param>
@@ -478,26 +484,19 @@ namespace DBTest
         }
     }
 
-    class StringArrayComparer : IEqualityComparer<string[]>
+    internal class StringArrayComparer : IEqualityComparer<string[]>
     {
-
         public bool Equals(string[] x, string[] y)
         {
-            if (y == null || x == null)
-            {
-                return false;
-            }
+            if (y == null || x == null) return false;
             return x.SequenceEqual(y);
         }
 
         public int GetHashCode(string[] obj)
         {
-            int hash = 0;
-            foreach (var item in obj)
-            {
-                hash += item.GetHashCode();
-            }
-            return (hash);
+            var hash = 0;
+            foreach (var item in obj) hash += item.GetHashCode();
+            return hash;
         }
     }
 }

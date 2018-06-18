@@ -771,6 +771,7 @@ namespace DbComparer
                 DataConnectionString =
                                        $"Server={param["ip"]};" +
                                        $"User = {param["user"]}; Password = {param["pass"]};";
+
                 DataConnectionString += $"DATABASE={param["db"]};";
                 connection = new MySqlConnection(DataConnectionString);
                 connection.Open();
