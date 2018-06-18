@@ -6,9 +6,11 @@ using System.Data.Common;
 using System.Data.SqlClient;
 using System.Data.SQLite;
 using System.Diagnostics;
+using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Web.UI.Design.WebControls;
 using DbComparer;
 using DBTest;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -311,6 +313,57 @@ namespace UnitTestProject1
         public void PostgreSQL_To_PostgreSQL()
         {
             Assert.IsTrue(true);
+        }
+    }
+
+    [TestClass]
+    public class DataMigration
+    {
+        [TestMethod]
+        public void Func1()
+        {
+            try
+            {
+                SqlDataBaseConnector con1 = new SqlDataBaseConnector();
+                var st1 = con1.ConnectToFile(
+                    @"D:\GitHub\Database_Comaparer\DatabaseComparer-Asp-ASP.NET-Core-2.0-\TestDatabases\sakila.mdf");
+                var l11 = con1.GetTablesList();
+                l11.Sort();
+                SQLiteDatabaseConnector con2 = new SQLiteDatabaseConnector();
+                var st2 = con2.ConnectToFile(
+                    @"D:\GitHub\Database_Comaparer\DatabaseComparer-Asp-ASP.NET-Core-2.0-\TestDatabases\sakila.db");
+                var l21 = con2.GetTablesList();
+                l21.Sort();
+
+                List<dynamic> list = new List<dynamic>();
+                for (int j = 0; j < l11.Count; j++)
+                {
+                    con1.SelectedColumns.Clear();
+                    con2.SelectedColumns.Clear();
+                    var l12 = con1.GetTableInfo(l11[j]);
+                    foreach (var item in con1.TableColumns)
+                    {
+                        con1.SelectedColumns.Add(item);
+                    }
+
+                    con1.SelectedTable = l11[j];
+                    var l1 = con1.Read(con1.BuildSelectQuery(), con1.FullStringArraySelector);
+                    string[] selected = new string[l1.Count];
+                    for (int i = 0; i < l1.Count; i++)
+                    {
+                        selected[i] = i.ToString();
+                    }
+
+                    var l3 = String.Join("", con1.BuildInsert(l1, selected));
+                    list.Add(new { Name = $"{l11[j]}", Data = l3 });
+                }
+                Console.WriteLine(1);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
     }
 }
