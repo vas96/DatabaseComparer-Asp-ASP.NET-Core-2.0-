@@ -3,13 +3,23 @@
 @model DBTest.DatabaseComparer
 
 @{
-    var FirstToSecond = @Model.ComparingResult[1];
-    var SecondToFirst = @Model.ComparingResult[2];
+    var firstToSecond = @Model.ComparingResult[1];
+    var secondToFirst = @Model.ComparingResult[2];
 
-    var FirstToSecond_unique = @Model.ComparingResult[3];
-    var SecondToFirst_unique = @Model.ComparingResult[4];
+    var firstToSecondUnique = @Model.ComparingResult[3];
+    var secondToFirstUnique = @Model.ComparingResult[4];
 }
+<style>
+    #a {
+        color: #487eb0;
+        text-decoration: none;
+    }
 
+        #a:hover, #a:active {
+            color: white;
+            text-decoration: none;
+        }
+</style>
 <div class="container">
     <h3 class="text-center">Comparing results</h3>
     <ul class="nav nav-tabs">
@@ -31,9 +41,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @for (int i = 0; i < FirstToSecond.Count; i++)
+                    @for (int i = 0; i < firstToSecond.Count; i++)
                     {
-                        List<string> temp = FirstToSecond[i].ToList();
+                        var temp = firstToSecond[i].ToList();
                         <tr>
                             <td class="warning text-center"> <input type="checkbox" name="FirstDatabaseCheckbox" checked value="@i"></td>
                             @for (int j = 0; j < temp.Count; j++)
@@ -44,9 +54,9 @@
                             }
                         </tr>
                     }
-                    @for (int i = 0; i < FirstToSecond_unique.Count; i++)
+                    @for (int i = 0; i < firstToSecondUnique.Count; i++)
                     {
-                        List<string> temp = FirstToSecond_unique[i].ToList();
+                        List<string> temp = firstToSecondUnique[i].ToList();
                         <tr>
                             <td class="warning text-center"> <input type="checkbox" name="FirstDatabaseCheckboxUnique" checked value="@i"></td>
                             @for (int j = 0; j < temp.Count; j++)
@@ -101,20 +111,20 @@
                 </thead>
                 <tbody>
                     @{
-                        int maxRange = Math.Max(SecondToFirst.Count, FirstToSecond.Count);
+                        int maxRange = Math.Max(secondToFirst.Count, firstToSecond.Count);
                     }
                     @for (int i = 0; i < maxRange; i++)
                     {
-                        List<string> error = new List<string>() { "none", "none" };
+                        var error = new List<string>() { "none", "none" };
 
-                        List<string> temp = i > FirstToSecond.Count ? temp = error : temp = FirstToSecond[i].ToList();
-                        List<string> temp2 = i > SecondToFirst.Count ? temp2 = error : temp2 = SecondToFirst[i].ToList();
+                        List<string> temp = i > firstToSecond.Count ? temp = error : temp = firstToSecond[i].ToList();
+                        List<string> temp2 = i > secondToFirst.Count ? temp2 = error : temp2 = secondToFirst[i].ToList();
 
-                        int columnNumber = Math.Max(temp.Count, temp2.Count);
+                        var columnNumber = Math.Max(temp.Count, temp2.Count);
                         <tr>
-                            <td class="warning text-center"> <input type="checkbox" name="FromTwoDatabaseCheckbox" checked value="@i"></td>
+                            <td class="text-center"> <input type="checkbox" name="FromTwoDatabaseCheckbox" checked value="@i"></td>
 
-                            @for (int j = 0; j < columnNumber; j++)
+                            @for (var j = 0; j < columnNumber; j++)
                             {
                                 <td class="warning dataTd_source">
                                     @temp[j]
@@ -124,7 +134,39 @@
                                 </td>
                             }
                         </tr>
+                    }
+                    @for (int i = 0; i < firstToSecondUnique.Count; i++)
+                    {
+                        List<string> temp = firstToSecondUnique[i].ToList();
+                        <tr>
+                            <td class="warning text-center"> <input type="checkbox" name="FirstDatabaseCheckboxUnique" checked value="@i"></td>
+                            @for (int j = 0; j < temp.Count; j++)
+                            {
+                                <td class="warning dataTd_source">
+                                    @temp[j]
+                                </td>
 
+                                <td class="danger dataTd_target">
+                                    none
+                                </td>
+                            }
+                        </tr>
+                    }
+                    @for (int i = 0; i < secondToFirstUnique.Count; i++)
+                    {
+                        List<string> temp = secondToFirstUnique[i].ToList();
+                        <tr>
+                            <td class="warning text-center"> <input type="checkbox" name="FirstDatabaseCheckboxUnique" checked value="@i"></td>
+                            @foreach (var t in temp)
+                            {
+                                <td class="warning dataTd_source">
+                                    none
+                                </td>
+                                <td class="danger dataTd_target">
+                                    @t
+                                </td>
+                            }
+                        </tr>
                     }
                 </tbody>
             </table>
@@ -164,9 +206,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @for (int i = 0; i < SecondToFirst.Count; i++)
+                    @for (int i = 0; i < secondToFirst.Count; i++)
                     {
-                        List<string> temp = SecondToFirst[i].ToList();
+                        List<string> temp = secondToFirst[i].ToList();
                         <tr>
                             <td class="warning text-center"> <input type="checkbox" name="SecondDatabaseCheckbox" checked value="@i"></td>
 
@@ -180,9 +222,9 @@
                         </tr>
                     }
 
-                    @for (int i = 0; i < SecondToFirst_unique.Count; i++)
+                    @for (int i = 0; i < secondToFirstUnique.Count; i++)
                     {
-                        List<string> temp = SecondToFirst_unique[i].ToList();
+                        List<string> temp = secondToFirstUnique[i].ToList();
                         <tr>
                             <td class="warning text-center"> <input type="checkbox" name="SecondDatabaseCheckboxUnique" checked value="@i"></td>
                             @for (int j = 0; j < temp.Count; j++)
@@ -220,14 +262,17 @@
             </div>
         </div>
     </div>
+    <button class="btn btn-default-custom" onclick="download('HTML_report.html', 'text/plain')"> <a href="" id="a">Generate HTML report</a></button>
+    <button class="btn btn-default-custom" onclick="generatePdfReport()">Generate PDF report</button>
+    <br />
 </div>
 <button type="button" class="btn-lg btn-block btn-default-custom" id="Back" style="margin-bottom:1.5vmin;">STEP BACK</button>
 
-<div class="container-fluid">
-    <button class="btn btn-primary btn-block" onclick="download('HTML_report.html', 'text/plain')">Generate</button>
-    <a href="" id="a">click here to download your file</a>
-    <button class="btn btn-primary btn-block" onclick="generatePdfReport()">Generate PDF</button>
-</div>
+@*<div class="container-fluid">
+        <button class="btn btn-primary btn-block" onclick="download('HTML_report.html', 'text/plain')"> <a href="" id="a">Generate</a></button>
+        <a href="" id="a">click here to download your file</a>
+        <button class="btn btn-primary btn-block" onclick="generatePdfReport()">Generate PDF</button>
+    </div>*@
 <script src="~/js/jspdf.min.js"></script>
 <script type="text/javascript">
 
@@ -238,7 +283,7 @@
     //            console.log(i+"thisNext" +$(this).next().html());
     //            $(this).css({ 'border-left': '0.3vmin solid red' }).css({ 'border-top': '0.3vmin solid red' }).css({ 'border-bottom': '0.3vmin solid red' });
     //            $(this).next().css({ 'border-right': '0.3vmin solid red' }).css({ 'border-top': '0.3vmin solid red' }).css({ 'border-bottom': '0.3vmin solid red' });
-    //            } 
+    //            }
     //            });
     //};
     //setTimeout(func, 1000);
@@ -247,14 +292,15 @@
         var len = $("td.dataTd_source").toArray().length;
         for (var i = 0; i < len; i++) {
             if ($("body").find("td.dataTd_source").eq(i).text() !== $("body").find("td.dataTd_target").eq(i).text()) {
-                $("body").find("td.dataTd_source").eq(i).css({ 'border-left': '0.5vmin solid red' }).css({ 'border-bottom': '0.1vmin solid red' }).css({ 'border-top': '0.1vmin solid red' });               
-                $("body").find("td.dataTd_target").eq(i).css({ 'border-right': '0.5vmin solid red' }).css({ 'border-bottom': '0.1vmin solid red' }).css({ 'border-top': '0.1vmin solid red' });
+                $("body").find("td.dataTd_source").eq(i).css({ 'border-left': '0.4vmin solid red' }).css({ 'border-bottom': '0.3vmin solid red' }).css({ 'border-top': '0.3vmin solid red' });
+                $("body").find("td.dataTd_target").eq(i).css({ 'border-right': '0.4vmin solid red' }).css({ 'border-bottom': '0.3vmin solid red' }).css({ 'border-top': '0.3vmin solid red' });
             }
         }
     };
-    setTimeout(ShowDiff, 350);
+    setTimeout(ShowDiff, 450);
 
     $(function () {
+        /// <summary></summary>
         var buttons = $(".ColapsableScript").toArray();
         buttons.forEach(function (item, i) {
             $(item).click(function () {
@@ -347,8 +393,8 @@
     var arrayN_F = [];
     var arrayU_F = [];
     ///creating string for first table report
-    var firstToSecondJson =  @Html.Raw(Json.Serialize(FirstToSecond));
-    var firstToSecondUniqueJson =  @Html.Raw(Json.Serialize(FirstToSecond_unique));
+    var firstToSecondJson =  @Html.Raw(Json.Serialize(firstToSecond));
+    var firstToSecondUniqueJson =  @Html.Raw(Json.Serialize(firstToSecondUnique));
     var firstToSecondJsonAddInf =  @Html.Raw(Json.Serialize(@Model.FirstDatabase.SelectedColumns));
     var firstTableStr = '';
     var firstTableLen = Object.keys(firstToSecondJson).length;
@@ -358,10 +404,10 @@
     firstTableStr += '<tr>';
      for (var i = 0; i <  @Html.Raw(Json.Serialize(@Model.FirstDatabase.SelectedColumns.Count)); i++)
      {
-         
+
          firstTableStr += '<th>';
          firstTableStr += '<strong>';
-         firstTableStr += firstToSecondJsonAddInf[i].name; 
+         firstTableStr += firstToSecondJsonAddInf[i].name;
          firstTableStr += '</strong>';
          firstTableStr += '</th >';
     }
@@ -392,8 +438,8 @@
     var arrayN_S = [];
     var arrayU_S = [];
     ///creating string for second table report
-    var secondToFirstJson =  @Html.Raw(Json.Serialize(SecondToFirst));
-    var secondToFirstUniqueJson =  @Html.Raw(Json.Serialize(SecondToFirst_unique));
+    var secondToFirstJson =  @Html.Raw(Json.Serialize(secondToFirst));
+    var secondToFirstUniqueJson =  @Html.Raw(Json.Serialize(secondToFirstUnique));
     var secondTofirstJsonAddInf =  @Html.Raw(Json.Serialize(@Model.SecondDatabase.SelectedColumns));
     var secondTableStr = '';
     var secondTableLen = Object.keys(secondToFirstJson).length;
@@ -402,9 +448,9 @@
     secondTableStr += '<thead>';
     secondTableStr += '<tr>';
      for (var i = 0; i <  @Html.Raw(Json.Serialize(@Model.SecondDatabase.SelectedColumns.Count)); i++)
-     {     
+     {
          secondTableStr += '<th>';
-         secondTableStr += secondTofirstJsonAddInf[i].name; 
+         secondTableStr += secondTofirstJsonAddInf[i].name;
          secondTableStr += '</th >';
     }
     secondTableStr += '</tr>';
@@ -440,7 +486,7 @@
      for (var i = 0; i <  @Html.Raw(Json.Serialize(@Model.SecondDatabase.SelectedColumns.Count)); i++)
                         {
          thirdTableStr += '<th>';
-         thirdTableStr += firstToSecondJsonAddInf[i].name +" / " + secondTofirstJsonAddInf[i].name; 
+         thirdTableStr += firstToSecondJsonAddInf[i].name +" / " + secondTofirstJsonAddInf[i].name;
          thirdTableStr += '</th >';
     }
     thirdTableStr += '</tr>';
@@ -454,7 +500,7 @@
             }
         thirdTableStr += '</tr>';
     }
-    
+
     thirdTableStr += '</table>';
 
     function createHtml(firstTableStr, secondTableStr, thirdTableStr, firstScript, secondScript, numRowsFT, numRowsST,
@@ -611,8 +657,8 @@
             '            </div>' +
             '            <div id="twiceTableScriptDiv" style="display: none">' +
             '                <hr>' +
-            '                <pre>' +                               
-            firstScript + 
+            '                <pre>' +
+            firstScript +
             '               </pre>' +
             '                <hr>' +
             '                <pre>' +
@@ -673,16 +719,16 @@
             }
         });
     });
-     //number of rows in table    
+     //number of rows in table
     var Statistic_rows_FT = @Html.Raw(Json.Serialize(Model.AdditionalInfo.Rows[1]));
     var Statistic_rows_ST = @Html.Raw(Json.Serialize(Model.AdditionalInfo.Rows[2]));
-    //number of same row in table    
+    //number of same row in table
     var Statistic_same_FT = @Html.Raw(Json.Serialize(Model.AdditionalInfo.Same[1]));
     var Statistic_same_ST = @Html.Raw(Json.Serialize(Model.AdditionalInfo.Same[2]));
-    //number of unique rows in table    
+    //number of unique rows in table
     var Statistic_unique_FT = @Html.Raw(Json.Serialize(Model.AdditionalInfo.Unique[1]));
     var Statistic_unique_ST = @Html.Raw(Json.Serialize(Model.AdditionalInfo.Unique[2]));
-    //number of different rows in table    
+    //number of different rows in table
     var Statistic_diff_FT = @Html.Raw(Json.Serialize(Model.AdditionalInfo.Different[1]));
     var Statistic_diff_ST = @Html.Raw(Json.Serialize(Model.AdditionalInfo.Different[2]));
 
@@ -690,7 +736,7 @@
         var pdf = new jsPDF('p', 'pt', 'a4');
         header(pdf);
 
-        doc.text("number of rows in table " + Statistic_rows_FT, margins.left + 50, 80);
+        doc.text(scriptFT, margins.left + 50, 80);
 
         pdf.save('prf-repor.pdf');
     }
@@ -738,7 +784,7 @@
     imgToBase64('/images/octocat.jpg', function (base64) {
         base64Img = base64;
     });
-   
+
     function header(doc) {
         doc.setFontSize(30);
         doc.setTextColor(40);
