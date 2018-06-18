@@ -24,8 +24,8 @@ namespace Comparer.Models
                 };
             var Date_Family = new string[] { "DATE", "DATETIME", "TIMESTAMP", "TIME", "YEAR", "DATETIME2",
                 "SMALLDATETIME", "DATETIMEOFFSET","INTERVAL","TIMETZ","TIMESTAMPTZ" };
-            word1 = word1.ToUpper();
-            word2 = word2.ToUpper();
+            word1 = word1.ToUpper().Trim();
+            word2 = word2.ToUpper().Trim();
             if ((Text_Family.Contains(word1) && (Text_Family.Contains(word2))) ||
                 (Numeric_Family.Contains(word1) && (Numeric_Family.Contains(word2))) ||
                 (Date_Family.Contains(word1) && (Date_Family.Contains(word2))))

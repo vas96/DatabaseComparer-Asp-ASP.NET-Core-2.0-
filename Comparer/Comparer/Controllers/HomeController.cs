@@ -170,7 +170,10 @@ namespace Comparer.Controllers
                 foreach (var column in db.SecondDatabase.TableColumns)
                     if (column.Name == array[i] &&
                         AdditionalFunctions.IsTypesComparable(column.Type, db.FirstDatabase.TableColumns[i].Type))
+                    {
                         db.SecondDatabase.SelectedColumns.Add(column);
+                        break;
+                    }
             }
             if (db.FirstDatabase.SelectedColumns.Count !=
                 db.SecondDatabase.SelectedColumns.Count)
