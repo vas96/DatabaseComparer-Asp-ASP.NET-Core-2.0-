@@ -533,7 +533,7 @@ namespace DbComparer
             try
             {
                 DataConnectionString =
-                    $"Data Source={param["ip"]},{param["port"]};Network Library=DBMSSOCN;User ID={param["user"]};Password={param["pass"]};Connect Timeout=30;";
+                    $"Data Source={param["ip"]},{param["port"]};User ID={param["user"]};Password={param["pass"]};Connect Timeout=30;";
                 DataConnectionString += "Initial Catalog =" + param["db"] + ";";
                 connection = new SqlConnection(DataConnectionString);
                 connection.Open();

@@ -2,14 +2,14 @@
     For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 *@
 <link rel="stylesheet" href="~/css/PartialViewCss/DownloadFiles.css" />
-<h1 style="margin-top: 70px">Upload databases</h1>
+<h1 style="margin-top: 70px">Завантажте свої бази даних</h1>
 <hr />
 <div class="container-fluid">
     <div class="container-fluid" id="containerChooseDB">
 
         <div class="col-md-6 container-fluid" id="sourceBD">
             <div class="col-md-12">
-                <h2 class="text-center"> Connect to /Source</h2>
+                <h2 class="text-center"> Підключення до "Джерела"</h2>
             </div>
             <hr class='custom-hr' />
             <div class="containerChooseSource container-fluid">
@@ -58,7 +58,7 @@
         </div>
         <div class="col-md-6 container-fluid" id="targetBD">
             <div class="col-md-12">
-                <h2 class="text-center">Connect to /Target</h2>
+                <h2 class="text-center">Підключення до "Цілі"</h2>
             </div>
             <hr class='custom-hr' />
             <div class="containerChooseTarget container-fluid">
@@ -123,8 +123,42 @@
             </div>
         </div>*@
     @* <h6><button type="button" class="btn-lg" id="NextStep">NEXT STEP</button></h6>*@
-    <button type="button" class="btn-lg btn-block btn-primary-custom" id="GoTableInfo">Check tables from DB</button>
-    <button type="button" class="btn-lg btn-block btn-default-custom" id="Back" style="margin-bottom:1.5vmin;">Back</button>
+    <button type="button" class="btn-lg btn-block btn-primary-custom" id="GoTableInfo">Обрати таблиці для порівняння</button>
+    <button type="button" class="btn-lg btn-block btn-default-custom" id="Back" style="margin-bottom:1.5vmin;">Назад</button>
+    
+    <div class="modal fade" id="connModal" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Статус з'єднання</h4>
+                </div>
+                <div class="modal-body">
+                    <h1>Віддалене з'єднання встановлено</h1>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Закрити</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal fade" id="connFailedModal" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Статус з'єднання</h4>
+                </div>
+                <div class="modal-body">
+                    <h1>Віддалене з'єднання не встановлено</h1>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Закрити</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="~/js/dropzone.js"></script>
@@ -144,7 +178,7 @@
     //transition to next view
     $("#GoTableInfo").click(function () {
         if ((screen.width >= 1920) && (screen.height >= 1080)) {
-            waitingDialog.show();
+            waitingDialog.show("Завантаження даних...");
             $.ajax({
                 url: "TableInfo",
                 type: "POST",
@@ -154,7 +188,7 @@
                 }
             });
         } else {
-            waitingDialog.show();
+            waitingDialog.show("Завантаження даних...");
             $.ajax({
                 url: "SmallTableInfo",
                 type: "POST",
@@ -171,11 +205,11 @@
         $(elem).css("visibility", "visible");
         $(elem).removeClass("panel-danger panel-success");
         if (result == true) {
-            $(elem).find("div").text("Connection established");
+            $(elem).find("div").text("З'єднання встановлено");
             $(elem).addClass("panel-success");
         }
         else {
-            $(elem).find("div").text("Connection not established");
+            $(elem).find("div").text("З'єднання не встановлено!");
             $(elem).addClass("panel-danger");
         }
     }
@@ -205,7 +239,7 @@
 
     // button baack for previous view
     $("#Back").click(function () {
-        waitingDialog.show();
+        waitingDialog.show("Завантаження даних...");
         $.ajax({
             url: "Index",
             type: "POST",
@@ -219,13 +253,13 @@
     function chooseSQL_DB(IDbackToChoose, IDbtn_connectToSql_file, IDbtn_connectToSql_remote) {
         var _chooseSQL_DB = "<hr class='custom-hr'/>" + "<div class='containerConnect container-fluid'>" +
             "<button type='button' class='btn btn-block btn-File-Remote' id=" + IDbtn_connectToSql_file +
-            ">Connect to File</button>" +
+            ">Підключення до файлу</button>" +
             "<button type='button' class='btn btn-block btn-File-Remote' id=" + IDbtn_connectToSql_remote +
-            ">Remote connection</button>" +
+            ">Віддалене підключення</button>" +
             "</div>" +
             "<div class='containerConnect container-fluid  text-center'>" +
             "<div class='wrapper-btn'>" +
-            " <button id=" + IDbackToChoose + " class='btn-back' type='submit'>Back!</button>" +
+            " <button id=" + IDbackToChoose + " class='btn-back' type='submit'>Назад</button>" +
             "</div>" +
             "</div>" + "<hr class='custom-hr'/>";
         return _chooseSQL_DB;
@@ -234,13 +268,13 @@
     function chooseMySQL_DB(IDbackToChoose, IDbtn_connectToMySql_remote, IDbtn_connectToSql_file) {
         var _chooseMySQL_DB = "<hr class='custom-hr'/>" + "<div class='containerConnect container-fluid'>" +
             "<button type='button' class='btn btn-block btn-File-Remote' id=" + IDbtn_connectToSql_file +
-            ">Connect to File</button>" +
+            ">Підключення до файлу</button>" +
             "<button type='button' class='btn btn-block btn-File-Remote' id=" + IDbtn_connectToMySql_remote +
-            ">Remote connection</button>" +
+            ">Віддалене підключення</button>" +
             "</div>" +
             "<div class='containerConnect container-fluid  text-center'>" +
             "<div class='wrapper-btn'>" +
-            " <button id=" + IDbackToChoose + " class='btn-back' type='submit'>Back!</button>" +
+            " <button id=" + IDbackToChoose + " class='btn-back' type='submit'>Назад</button>" +
             "</div>" +
             "</div>" + "<hr class='custom-hr'/>";
         return _chooseMySQL_DB;
@@ -249,11 +283,11 @@
     function chooseSqlLite_DB(IDbackToChoose, IDbtn_connectToSqlLite_file) {
         var _chooseSqlLite_DB = "<hr class='custom-hr'/>" + "<div class='containerConnect container-fluid'>" +
             "<button type='button' class='btn btn-block btn-File-Remote' id=" + IDbtn_connectToSqlLite_file +
-            ">Connect to File</button>" +
+            ">Підключення до файлу</button>" +
             "</div>" +
             "<div class='containerConnect container-fluid  text-center'>" +
             "<div class='wrapper-btn'>" +
-            " <button id=" + IDbackToChoose + " class='btn-back' type='submit'>Back!</button>" +
+            " <button id=" + IDbackToChoose + " class='btn-back' type='submit'>Назад</button>" +
             "</div>" +
             "</div>" + "<hr class='custom-hr'/>";
         return _chooseSqlLite_DB;
@@ -262,11 +296,11 @@
     function choosePostgreSQL_DB(IDbackToChoose, IDbtn_connectToPostgreSQL_file) {
         var _choosePostgreSQL_DB = "<hr class='custom-hr'/>" + "<div class='containerConnect container-fluid'>" +
             "<button type='button' class='btn btn-block btn-File-Remote' id=" + IDbtn_connectToPostgreSQL_file +
-            ">Connect to File</button>" +
+            ">Підключення до файлу</button>" +
             "</div>" +
             "<div class='containerConnect container-fluid  text-center'>" +
             "<div class='wrapper-btn'>" +
-            " <button id=" + IDbackToChoose + " class='btn-back' type='submit'>Back!</button>" +
+            " <button id=" + IDbackToChoose + " class='btn-back' type='submit'>Назад</button>" +
             "</div>" +
             "</div>" + "<hr class='custom-hr'/>";
         return _choosePostgreSQL_DB;
@@ -282,7 +316,7 @@
             "      </div>" +
             " <div class='containerConnect container-fluid col-md-12 text-center'>" +
             "<div class='wrapper-btn'>" +
-            " <button id=" + backToChooseConnect + " class='btn-back' type='submit'>Back!</button>" +
+            " <button id=" + backToChooseConnect + " class='btn-back' type='submit'>Назад</button>" +
             "</div>" + "</div>" + "<hr class='custom-hr'/>";
 
         return _connectToFile;
@@ -311,12 +345,12 @@
             "<label for='Id_port'>Port</label>" +
             "<input type='text' class='form-control " + classDb + "' id='port' placeholder='Enter Port' onkeypress='validate(event)'>" +
             "</div>" +
-            "<button class='btn btn-block btn-primary'id =" + Id_btnNext + ">Next</button>" +
+            "<button class='btn btn-block btn-primary'id =" + Id_btnNext + ">З'єднання</button>" +
             "<small id='emailHelp' class='form-text text-muted'>We'll never share your credits with anyone else.</small>" +
             "</div>" +
             "<div class='containerConnect container-fluid  text-center'>" +
             "<div class='wrapper-btn'>" +
-            " <button id=" + Id_btnBack + " class='btn-back' type='submit'>Back!</button>" +
+            " <button id=" + Id_btnBack + " class='btn-back' type='submit'>Назад</button>" +
             "</div>" +
             "</div>" +
             "</div>" +
@@ -362,7 +396,7 @@
                     $("#chooseConnect-source-div").empty();
                     $(".containerChooseSource").removeClass("inactiveDiv");
                     $('.img-ok-source').addClass('hidden');
-                    $('.image-db-source').removeClass('check')
+                    $('.image-db-source').removeClass('check');
                 });
             };
             //second back button
@@ -427,9 +461,10 @@
                                 data: { data: returnVal },
                                 success: function (response) {
                                     if (response == true)
-                                        ReturnInfo($(".sourceDB").first().parent().parent().find(".panel"), response);
+                                       // ReturnInfo($(".sourceDB").first().parent().parent().find(".panel"), response);
+                                        $("#connModal").modal('show');
                                     else
-                                        $('#myModal').modal('show');
+                                        $('#connFailedModal').modal('show');
                                 }
                             });
                         });
@@ -486,9 +521,10 @@
                                 data: { data: returnVal },
                                 success: function (response) {
                                     if (response == true)
-                                        ReturnInfo($(".sourceDB").first().parent().parent().find(".panel"), response);
+                                       // ReturnInfo($(".sourceDB").first().parent().parent().find(".panel"), response);
+                                        $("#connModal").modal('show');
                                     else
-                                        $('#myModal').modal('show');
+                                        $('#connFailedModal').modal('show');
                                 }
                             });
                         });
@@ -652,9 +688,11 @@
                                 data: { data: returnVal },
                                 success: function (response) {
                                     if (response == true)
-                                        ReturnInfo($(".targetDB").first().parent().parent().find(".panel"), response);
+                                      //  ReturnInfo($(".targetDB").first().parent().parent().find(".panel"), response);
+                                        $("#connModal").modal('show');
+
                                     else
-                                        $('#myModal').modal('show');
+                                        $('#connFailedModal').modal('show');
                                 }
                             });
                         });
@@ -708,9 +746,10 @@
                                 data: { data: returnVal },
                                 success: function (response) {
                                     if (response == true)
-                                        ReturnInfo($(".targetDB").first().parent().parent().find(".panel"), response);
+                                        //ReturnInfo($(".targetDB").first().parent().find(".panel"), response);
+                                        $("#connModal").modal('show');
                                     else
-                                        $('#myModal').modal('show');
+                                        $('#connFailedModal').modal('show');
                                 }
                             });
                         });

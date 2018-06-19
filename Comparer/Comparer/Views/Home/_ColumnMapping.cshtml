@@ -1,7 +1,8 @@
 ﻿@using System.Data
 @using DbComparer
 @model DBTest.DatabaseComparer
-
+<h1 style="margin-top: 70px">Маппінг полів</h1>
+<hr />
 <link rel="stylesheet" href="~/css/PartialViewCss/ColumnMapping.css" />
 <div class="row">
     <div class="col-md-6">
@@ -54,8 +55,8 @@
             }
         </ol>
     </div>
-    <button type="button" class="btn-lg btn-block btn-primary-custom" id="GoToComparing">NEXT STEP</button>
-    <button type="button" class="btn-lg btn-block btn-default-custom" id="Back" style="margin-bottom:1.5vmin;">Step back</button>
+    <button type="button" class="btn-lg btn-block btn-primary-custom" id="GoToComparing">Порівняння</button>
+    <button type="button" class="btn-lg btn-block btn-default-custom" id="Back" style="margin-bottom:1.5vmin;">Назад</button>
 </div>
 
 
@@ -155,7 +156,7 @@
             array.push(item.cells[1].innerText);
         });
         console.log(array);
-        waitingDialog.show();
+        waitingDialog.show("Завантаження даних...");
         $.ajax({
             async: true,
             url: "Comparing",
@@ -169,7 +170,7 @@
     });
 
     $("#Back").click(function () {
-        waitingDialog.show();
+        waitingDialog.show("Завантаження даних...");
         $.ajax({
             url: "TableInfo",
             type: "POST",
