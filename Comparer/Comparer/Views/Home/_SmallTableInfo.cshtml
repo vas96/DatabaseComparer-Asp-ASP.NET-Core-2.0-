@@ -35,14 +35,14 @@
     }
 
 </style>
-<h1 style="margin-top: 70px">Check tables</h1>
+<h1 style="margin-top: 70px">Оберіть таблиці для порівняння</h1>
 <hr />
 <div class="container-fluid">
     <div class="col-md-6">
         <div>
             <h3>@Model.FirstDatabase.FileName (source) </h3>
-            <h4> @Model.FirstDatabase.DbType database</h4>
-            <button id="sortSource" class="btn-sm btn-default-custom">Sort by name</button>
+            <h4> @Model.FirstDatabase.DbType база даних</h4>
+            <button id="sortSource" class="btn-sm btn-default-custom">Сортувати за іменем</button>
             <hr class="customHr-header" />
         </div>
         <div>
@@ -81,8 +81,8 @@
     <div class="col-md-6">
         <div>
             <h3>@Model.SecondDatabase.FileName (target) </h3>
-            <h4> @Model.SecondDatabase.DbType database</h4>
-            <button id="sortTarget" class="btn-sm btn-default-custom">Sort by name</button>
+            <h4> @Model.SecondDatabase.DbType база даних</h4>
+            <button id="sortTarget" class="btn-sm btn-default-custom">Сортувати за іменем</button>
             <hr class="customHr-header" />
         </div>
         <div>
@@ -120,8 +120,8 @@
         </div>
     </div>
 
-    <button type="button" class="btn-lg btn-block btn-primary-custom" id="GoToColumnMapping">Check Columns</button>
-    <button type="button" class="btn-lg btn-block btn-default-custom" id="Back" style="margin-bottom:1.5vmin;">Step back</button>
+    <button type="button" class="btn-lg btn-block btn-primary-custom" id="GoToColumnMapping">Маппінг полів</button>
+    <button type="button" class="btn-lg btn-block btn-default-custom" id="Back" style="margin-bottom:1.5vmin;">Назад</button>
 </div>
 <script>
     //choose dafault table and scrool top
@@ -164,7 +164,7 @@
         var array = [];
         array.push($('input[name=FirstDatabaseCH]:checked').val());
         array.push($('input[name=SecondDatabaseCH]:checked').val());
-        waitingDialog.show();
+        waitingDialog.show("Завантаження даних...");
         $.ajax({
             async: true,
             url: "ColumnMapping",
@@ -179,7 +179,7 @@
     });
     //back to previous view
     $("#Back").click(function () {
-        waitingDialog.show();
+        waitingDialog.show("Завантаження даних...");
         $.ajax({
             url: "FilesDownloaded",
             type: "POST",

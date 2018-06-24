@@ -195,12 +195,6 @@ namespace Comparer.Controllers
                 return PartialView("_Error");
             if (db.ReadDataFromDb())
             {
-                var ss = new string[db.FirstData.Count];
-                for (int i = 0; i < ss.Length; i++)
-                {
-                    ss[i] = i.ToString();
-                }
-                var res=db.FirstDatabase.BuildInsert(db.FirstData, ss);
                 db.ComparingResult = db.CompareFullData();
             }
             else return PartialView("_Error");

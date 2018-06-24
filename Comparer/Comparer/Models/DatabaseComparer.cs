@@ -37,8 +37,8 @@ namespace DBTest
         /// </summary>
         public DatabaseComparer()
         {
-            FirstData = null;
-            SecondData = null;
+            FirstData = new List<string[]>();
+            SecondData = new List<string[]>();
             FirstDatabase = null;
             SecondDatabase = null;
             Folder = null;

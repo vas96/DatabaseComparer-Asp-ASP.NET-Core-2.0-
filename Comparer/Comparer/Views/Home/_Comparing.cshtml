@@ -21,11 +21,11 @@
         }
 </style>
 <div class="container">
-    <h3 class="text-center">Comparing results</h3>
+    <h3 class="text-center">Результати порівняння</h3>
     <ul class="nav nav-tabs">
-        <li><a data-toggle="tab" href="#menu1">First table difference</a></li>
-        <li class="active"><a data-toggle="tab" href="#home">Two table difference</a></li>
-        <li><a data-toggle="tab" href="#menu2">Second table difference</a></li>
+        <li><a data-toggle="tab" href="#menu1">Відмінності у першій таблиці</a></li>
+        <li class="active"><a data-toggle="tab" href="#home">Відмінності у обох таблицях</a></li>
+        <li><a data-toggle="tab" href="#menu2">Відмінності у другій таблиці</a></li>
     </ul>
 
     <div class="tab-content">
@@ -33,7 +33,7 @@
             <table class="table table-condensed">
                 <thead>
                     <tr>
-                        <th class="text-center"><input type="checkbox" id="checkAllFirstDatabase" checked /><span id="checkAllFirstDatabaseText">Uncheck all</span></th>
+                        <th class="text-center"><input type="checkbox" id="checkAllFirstDatabase" checked /><span id="checkAllFirstDatabaseText">Зняти вибір</span></th>
                         @for (int i = 0; i < @Model.FirstDatabase.SelectedColumns.Count; i++)
                         {
                             <th>  @Model.FirstDatabase.SelectedColumns[i].Name  </th>
@@ -75,7 +75,7 @@
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a data-toggle="collapse" href="#collapse1">Generate script for update database</a>
+                                <a data-toggle="collapse" href="#collapse1">Відобразити скрипт </a>
                             </h4>
                         </div>
                         <div id="collapse1" class="panel-collapse collapse">
@@ -86,7 +86,9 @@
                                 </pre>
                                 @*  <textarea readonly class="form-control disabled" rows="3" id="Res1"></textarea>*@
                                 <hr />
-                                <button id="1" class="btn-block btn-default btn-primary-custom ColapsableScript">Start update</button>
+                                <button id="1" class="btn-block btn-default btn-primary-custom ColapsableScript">
+                                    Згенерувати скрипт на вставку та оновлення даних для першої бд ...
+                                </button>
                             </div>
                             <div class="panel-footer">
                                 link for download db <a href="#">Updated DB</a>
@@ -100,7 +102,7 @@
             <table class="table table-condensed">
                 <thead>
                     <tr>
-                        <th class="text-center"><input type="checkbox" id="checkAllFromTwo" checked /><span id="checkAllFromTwoText">Uncheck all</span></th>
+                        <th class="text-center"><input type="checkbox" id="checkAllFromTwo" checked /><span id="checkAllFromTwoText">Зняти вибір</span></th>
 
                         @for (int i = 0; i < @Model.FirstDatabase.SelectedColumns.Count; i++)
                         {
@@ -175,7 +177,7 @@
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a data-toggle="collapse" href="#collapse3">Generate script for update database</a>
+                                <a data-toggle="collapse" href="#collapse3">Відобразити скрипт</a>
                             </h4>
                         </div>
                         <div id="collapse3" class="panel-collapse collapse">
@@ -184,7 +186,9 @@
                                 <code readonly class="language-sql" id="Res2">
                                     </code>
                                 </pre>                                <hr />
-                                <button id="2" class="btn-block btn-default btn-primary-custom ColapsableScript">Start update</button>
+                                <button id="2" class="btn-block btn-default btn-primary-custom ColapsableScript">
+                                    Згенерувати скрипт тільки на оновлення даних для першої та другої бд ... 
+                                </button>
                             </div>
                             <div class="panel-footer">
                                 link for download db <a href="#">Updated DB</a>
@@ -198,7 +202,7 @@
             <table class="table table-condensed">
                 <thead>
                     <tr>
-                        <th class="text-center"><input type="checkbox" id="checkAllSecondDatabase" checked /><span id="checkAllSecondDatabaseText">Uncheck all</span></th>
+                        <th class="text-center"><input type="checkbox" id="checkAllSecondDatabase" checked /><span id="checkAllSecondDatabaseText">Зняти вибір</span></th>
                         @for (int i = 0; i < @Model.SecondDatabase.SelectedColumns.Count; i++)
                         {
                             <th>  @Model.SecondDatabase.SelectedColumns[i].Name  </th>
@@ -242,7 +246,7 @@
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a data-toggle="collapse" href="#collapse2">Generate script for update database</a>
+                                <a data-toggle="collapse" href="#collapse2">Відобразити скрипт</a>
                             </h4>
                         </div>
                         <div id="collapse2" class="panel-collapse collapse">
@@ -250,11 +254,14 @@
                                 <pre>
                                 <code readonly class="language-sql" id="Res3">
                                     </code>
-                                </pre>                                <hr />
-                                <button id="3" class="btn-block btn-default btn-primary-custom ColapsableScript">Start update</button>
+                                </pre>                          
+                                <hr />
+                                <button id="3" class="btn-block btn-default btn-primary-custom ColapsableScript">
+                                    Згенерувати скрипт на вставку та оновлення даних для другої бд ...
+                                </button>
                             </div>
                             <div class="panel-footer">
-                                link for download db <a href="#">Updated DB</a>
+                                link for download db <a href="#">Оновити БД</a>
                             </div>
                         </div>
                     </div>
@@ -262,11 +269,10 @@
             </div>
         </div>
     </div>
-    <button class="btn btn-default-custom" onclick="download('HTML_report.html', 'text/plain')"> <a href="" id="a">Generate HTML report</a></button>
-    <button class="btn btn-default-custom" onclick="generatePdfReport()">Generate PDF report</button>
+    <button class="btn btn-default-custom" onclick="download('HTML_report.html', 'text/plain')"> <a href="" id="a">Згенерувати HTML звіт</a></button>
     <br />
 </div>
-<button type="button" class="btn-lg btn-block btn-default-custom" id="Back" style="margin-bottom:1.5vmin;">STEP BACK</button>
+<button type="button" class="btn-lg btn-block btn-default-custom" id="Back" style="margin-bottom:1.5vmin;">Назад</button>
 
 @*<div class="container-fluid">
         <button class="btn btn-primary btn-block" onclick="download('HTML_report.html', 'text/plain')"> <a href="" id="a">Generate</a></button>
@@ -304,7 +310,7 @@
         var buttons = $(".ColapsableScript").toArray();
         buttons.forEach(function (item, i) {
             $(item).click(function () {
-                waitingDialog.show();
+                waitingDialog.show("Завантаження даних...");
                 var id = this.id;
                 var arrayN = null;
                 var arrayU = null;
@@ -337,8 +343,27 @@
                     data: { id: id, arrayN: arrayN, arrayU: arrayU },
                     success: function (result) {
                         waitingDialog.hide();
-                        var sql = result.insert + result.update;
-                        document.getElementById("Res" + id).innerText = sql;
+                        var text = "";
+                        switch (id) {
+                            case "1":
+                            {
+                                text = "Вставка даних:\n" + result.insert + "\n\nОновлення даних:\n" + result.update;
+                                break;
+                            };
+                            case "2":
+                            {
+                                    text = "Оновлення даних з другої таблиці в першу:\n" + result.insert + "\n\nОновлення даних з першої таблиці в другу:\n" + result.update;
+                                break;
+                            };
+                            case "3":
+                            {
+                                text = "Вставка даних:\n" + result.insert + "\n\nОновлення даних:\n" + result.update;
+                                break;
+                            };
+                            default:
+                                return;
+                        }
+                        document.getElementById("Res" + id).innerText = text;
                         $.getScript("/js/prism.js", function (jqxhr) {
                             console.log(jqxhr.status); // 200
                         });
@@ -348,7 +373,7 @@
         });
 
         $("#Back").click(function () {
-            waitingDialog.show();
+            waitingDialog.show("Завантаження даних...");
             $.ajax({
                 url: "ColumnMapping",
                 type: "POST",
@@ -379,14 +404,14 @@
             $("input[name = 'SecondDatabaseCheckboxUnique']").prop('checked', $(this).prop("checked"));
 
             var checked = $("#checkAllSecondDatabase").is(':checked');
-            (checked === true) ? $("#checkAllSecondDatabaseText").text('Uncheck all') : $("#checkAllSecondDatabaseText").text('Check all');
+            (checked === true) ? $("#checkAllSecondDatabaseText").text('Відмінити вибір') : $("#checkAllSecondDatabaseText").text('Обрати усі');
         });
 
         $("#checkAllFromTwo").change(function () {
             $("input[name = 'FromTwoDatabaseCheckbox']").prop('checked', $(this).prop("checked"));
 
             var checked = $("#checkAllFromTwo").is(':)checked');
-            (checked === true) ? $("#checkAllFromTwoText").text('Uncheck all') : $("#checkAllFromTwoText").text('Check all');
+            (checked === true) ? $("#checkAllFromTwoText").text('Відмінити вибір') : $("#checkAllFromTwoText").text('Обрати усі');
         });
     });
     //array for genetate script first table
