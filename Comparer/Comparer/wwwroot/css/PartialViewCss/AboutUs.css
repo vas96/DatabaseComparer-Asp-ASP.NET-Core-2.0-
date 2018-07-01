@@ -8,13 +8,18 @@
     height: 13vmin;
     background-color: #40739e;
     display: flex;
+    -o-justify-content: center;
+    -webkit-justify-content: center;
     justify-content: center;
+    -ms-align-items: center;
+    -o-align-items: center;
+    -webkit-align-items: center;
     align-items: center;
     text-decoration: underline;
     text-decoration-color: #40739e;
 }
 
-    .aboutUs-inform h1 {
+.aboutUs-inform h1 {
         color: white;
         font-size: 10vmin;
         margin: 0.5vmin;

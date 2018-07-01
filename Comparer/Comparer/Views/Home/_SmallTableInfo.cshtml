@@ -5,37 +5,48 @@
 <link rel="stylesheet" href="~/css/PartialViewCss/TableInfo.css" />
 
 <style>
-    .RadioAndButon{
-        justify-content:flex-start;
-        align-items:center;
+    .RadioAndButon {
+        justify-content: flex-start;
+        align-items: center;
     }
+
         .RadioAndButon label {
             padding-right: 0.2vmin;
         }
+
         .RadioAndButon input[type="radio"] {
             margin-right: 1.3vmin !important;
         }
-        .customHr {
-            padding: 0.13vmin !important;
-            margin: 0.13vmin !important;
-        }
+
+    .customHr {
+        padding: 0.13vmin !important;
+        margin: 0.13vmin !important;
+    }
+
     .customHr-header {
         border-top: 1.1vmin solid #40739e;
         padding: 0.1vmin !important;
         margin: 0.1vmin !important;
     }
-    .btn-plus{
-        border:none;
-    }
-    #sortSource{
-        border:none!important;
-    }
-    #sortTarget {
-        border: none!important;
+
+    .btn-plus {
+        border: none;
     }
 
+    #sortSource {
+        border: none !important;
+    }
+
+    #sortTarget {
+        border: none !important;
+    }
 </style>
 <h1 style="margin-top: 70px">Оберіть таблиці для порівняння</h1>
+<hr />
+<div class="row-fluid" style="display: flex; justify-content: flex-end; align-items: center">
+    <h3>Змінити відображення</h3>
+    <img class="" id="HorizontalView" src="~/images/horizontal.svg" alt="SqlServer" srcset="" style="width: 3.5vmin; height: 3.5vmin;">
+</div>
 <hr />
 <div class="container-fluid">
     <div class="col-md-6">
@@ -124,6 +135,17 @@
     <button type="button" class="btn-lg btn-block btn-default-custom" id="Back" style="margin-bottom:1.5vmin;">Назад</button>
 </div>
 <script>
+    $("#HorizontalView").click(function () {
+        waitingDialog.show("Завантаження даних...");
+        $.ajax({
+            url: "TableInfo",
+            type: "POST",
+            success: function (result) {
+                waitingDialog.hide();
+                $("#Partial").html(result);
+            }
+        });
+    });
     //choose dafault table and scrool top
     $(document).ready(function () {
         $("html, body").animate({ scrollTop: 0 }, "slow");

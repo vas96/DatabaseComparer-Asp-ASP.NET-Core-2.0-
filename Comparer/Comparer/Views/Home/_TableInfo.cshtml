@@ -5,7 +5,14 @@
 
 <link rel="stylesheet" href="~/css/PartialViewCss/TableInfo.css" />
 
-<h1 style="margin-top: 70px">Оберіть таблиці для порівняння</h1>
+<div class="row-fluid" style="display: flex">
+    <h1 style="margin-top: 70px">Оберіть таблиці для порівняння</h1>
+</div>
+<hr />
+<div class="row-fluid" style="display: flex; justify-content: flex-end; align-items: center">
+    <h3>Змінити відображення</h3>
+    <img class="" id="VerticalView" src="~/images/vertical.svg" alt="SqlServer" srcset="" style="width: 3.5vmin; height: 3.5vmin;">
+</div>
 <hr />
 <div class="container-fluid">
     <div>
@@ -80,7 +87,17 @@
 
 </div>
 <script>
-
+    $("#VerticalView").click(function () {
+        waitingDialog.show("Завантаження даних...");
+        $.ajax({
+            url: "SmallTableInfo",
+            type: "POST",
+            success: function (result) {
+                waitingDialog.hide();
+                $("#Partial").html(result);
+            }
+        });
+    });
     //function for choosing tables
     function tbChooser() {
         $('div.table-chooser').find('div.table-chooser-item').on('click', function () {
@@ -100,9 +117,9 @@
         $("[name=SecondDatabaseCH]").first().prop("checked", true);
         $(".box-target").first().addClass("selected");
     });
-    
+
     //sort div function
-    function sortDivs(source, boxClass, containerId, buttonId) { 
+    function sortDivs(source, boxClass, containerId, buttonId) {
         $(buttonId).on('click', function () {
             var $divs = $(boxClass);
             var alphabeticallyOrderedDivs = $divs.sort(function (a, b) {
@@ -119,13 +136,13 @@
             tbChooser();
         });
     }
-    //variables for saving not sortable tables(like in db) 
+    //variables for saving not sortable tables(like in db)
     var $divsOriginSource = $("div.box-source");
     var $divsOriginTarget = $("div.box-target");
     //sorting
-    sortDivs($divsOriginSource, "div.box-source", "#container-source", "#sortSource" );
+    sortDivs($divsOriginSource, "div.box-source", "#container-source", "#sortSource");
     sortDivs($divsOriginTarget, "div.box-target", "#container-target", "#sortTarget");
-   
+
     $("#GoToColumnMapping").click(function () {
         var array = [];
         array.push($('input[name=FirstDatabaseCH]:checked').val());
